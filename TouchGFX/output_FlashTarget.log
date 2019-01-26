@@ -1,0 +1,37 @@
+Converting images
+Linking TouchGFX/build/bin/target.elf
+Producing additional output formats...
+  target.hex   - Combined internal+external hex
+  intflash.elf - Internal flash, elf debug
+  intflash.hex - Internal flash, hex
+  extflash.bin - External flash, binary
+STM32 ST-LINK CLI v3.3.0.0
+STM32 ST-LINK Command Line Interface
+
+ST-LINK SN: 066AFF545057717867192936
+ST-LINK Firmware version: V2J25S14 (Need Update)
+Connected via SWD.
+SWD Frequency = 4000K.
+Target voltage = 3.2 V
+Connection mode: Normal
+Reset mode: Hardware reset
+Device ID: 0x449 
+Device flash Size: 1024 Kbytes
+Device family: STM32F74x/F75x
+
+Loading file...
+Flash Programming:
+  File : TouchGFX/build/bin/target.hex
+  Address : 0x08000000
+  External Loader File : C:\Program Files (x86)\STMicroelectronics\STM32 ST-LINK Utility\ST-LINK Utility\ExternalLoader\N25Q128A_STM32F746G-DISCO.stldr
+  Device Name          : N25Q128A_STM32F746G-DISCO
+  Device Start Address : 0x90000000
+  Device Size          : 0x01000000
+  Device Type          : Nor Flash
+Memory programming...
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± 0% 0%€€ 4%€€€€€€€ 19%€€€€€€€€€€€€€€€€€€€€€ 60%€€€€€€€€€€€€€€€€€€€€ 100%
+Memory programmed in 9s and 641ms.
+Programming Complete.
+
+MCU Reset.
+

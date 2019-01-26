@@ -1,0 +1,423 @@
+{
+  "Application": {
+    "Screens": [
+      {
+        "Components": [
+          {
+            "Color": {
+              "Red": 0,
+              "Green": 0,
+              "Blue": 0
+            },
+            "Alpha": 255,
+            "Name": "backgroundBox",
+            "X": 0,
+            "Y": 0,
+            "Width": 800,
+            "Height": 480,
+            "Type": "Box",
+            "Visible": false,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          },
+          {
+            "RelativeFilename": "bg.png",
+            "Alpha": 255,
+            "Name": "backgroundImage",
+            "X": 0,
+            "Y": 0,
+            "Width": 480,
+            "Height": 272,
+            "Type": "Image",
+            "Visible": true,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          },
+          {
+            "RelativeFilename": "counter_box.png",
+            "Alpha": 255,
+            "Name": "counterBackgroundImage",
+            "X": 121,
+            "Y": 68,
+            "Width": 152,
+            "Height": 154,
+            "Type": "Image",
+            "Visible": true,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          },
+          {
+            "TextId": "numberText",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 222,
+              "Green": 222,
+              "Blue": 222
+            },
+            "Alpha": 255,
+            "AutoSize": false,
+            "LineSpacing": 0,
+            "Wildcard1": {
+              "TextId": "SingleUseId1",
+              "UseBuffer": true,
+              "BufferSize": 3
+            },
+            "Name": "countTxt",
+            "X": 121,
+            "Y": 99,
+            "Width": 152,
+            "Height": 90,
+            "Type": "TextArea",
+            "Visible": true,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          },
+          {
+            "Alpha": 255,
+            "ButtonTrigger": {
+              "Type": "RepeatButtonTrigger",
+              "Delay": 300,
+              "Interval": 300
+            },
+            "ButtonStyles": [
+              {
+                "Type": "IconButtonStyle",
+                "X": 34,
+                "Y": 14,
+                "IconReleased": "black_arrow.png",
+                "IconPressed": "orange_arrow.png"
+              },
+              {
+                "Type": "BoxWithBorderButtonStyle",
+                "X": 0,
+                "Y": 0,
+                "Width": 100,
+                "Height": 45,
+                "LockToFlexButtonSize": false,
+                "BorderSize": 5,
+                "ColorReleased": {
+                  "Red": 222,
+                  "Green": 222,
+                  "Blue": 222
+                },
+                "ColorPressed": {
+                  "Red": 48,
+                  "Green": 58,
+                  "Blue": 64
+                },
+                "ColorBorderReleased": {
+                  "Red": 54,
+                  "Green": 62,
+                  "Blue": 65
+                },
+                "ColorBorderPressed": {
+                  "Red": 128,
+                  "Green": 136,
+                  "Blue": 143
+                }
+              }
+            ],
+            "Name": "repeatButton",
+            "X": 12,
+            "Y": 173,
+            "Width": 100,
+            "Height": 45,
+            "Type": "FlexButton",
+            "Visible": true,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          },
+          {
+            "Alpha": 255,
+            "ButtonTrigger": {
+              "Type": "ClickButtonTrigger"
+            },
+            "ButtonStyles": [
+              {
+                "Type": "TextButtonStyle",
+                "X": -2,
+                "Y": 12,
+                "TextId": "SingleUseId3",
+                "TextRotation": "0",
+                "ColorReleased": {
+                  "Red": 70,
+                  "Green": 70,
+                  "Blue": 70
+                },
+                "ColorPressed": {
+                  "Red": 231,
+                  "Green": 154,
+                  "Blue": 9
+                }
+              },
+              {
+                "Type": "ImageButtonStyle",
+                "X": 0,
+                "Y": 0,
+                "LockFlexButtonToImageSize": true,
+                "ImageReleased": "small_btn.png",
+                "ImagePressed": "small_btn_pressed.png"
+              }
+            ],
+            "Name": "zeroButton",
+            "X": 12,
+            "Y": 117,
+            "Width": 100,
+            "Height": 56,
+            "Type": "FlexButton",
+            "Visible": true,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          },
+          {
+            "Alpha": 255,
+            "ButtonTrigger": {
+              "Type": "TouchButtonTrigger"
+            },
+            "ButtonStyles": [
+              {
+                "Type": "IconButtonStyle",
+                "X": 34,
+                "Y": 14,
+                "IconReleased": "black_arrow_up.png",
+                "IconPressed": "orange_arrow_up.png"
+              },
+              {
+                "Type": "BoxWithBorderButtonStyle",
+                "X": 0,
+                "Y": 0,
+                "Width": 100,
+                "Height": 45,
+                "LockToFlexButtonSize": true,
+                "BorderSize": 5,
+                "ColorReleased": {
+                  "Red": 222,
+                  "Green": 222,
+                  "Blue": 222
+                },
+                "ColorPressed": {
+                  "Red": 40,
+                  "Green": 58,
+                  "Blue": 64
+                },
+                "ColorBorderReleased": {
+                  "Red": 54,
+                  "Green": 62,
+                  "Blue": 65
+                },
+                "ColorBorderPressed": {
+                  "Red": 95,
+                  "Green": 103,
+                  "Blue": 109
+                }
+              }
+            ],
+            "Name": "touchButton",
+            "X": 12,
+            "Y": 68,
+            "Width": 100,
+            "Height": 45,
+            "Type": "FlexButton",
+            "Visible": true,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          },
+          {
+            "Alpha": 255,
+            "ButtonTrigger": {
+              "Type": "ToggleButtonTrigger",
+              "InitalStatePressed": false
+            },
+            "ButtonStyles": [
+              {
+                "Type": "TextButtonStyle",
+                "X": 0,
+                "Y": 0,
+                "TextId": "toggleButtonWhite",
+                "TextRotation": "0",
+                "ColorReleased": {
+                  "Red": 222,
+                  "Green": 222,
+                  "Blue": 222
+                },
+                "ColorPressed": {
+                  "Red": 231,
+                  "Green": 154,
+                  "Blue": 9
+                }
+              }
+            ],
+            "Name": "toggleButton",
+            "X": 293,
+            "Y": 41,
+            "Width": 152,
+            "Height": 36,
+            "Type": "FlexButton",
+            "Visible": true,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          },
+          {
+            "TextId": "SingleUseId8",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 222,
+              "Green": 222,
+              "Blue": 222
+            },
+            "Alpha": 255,
+            "AutoSize": true,
+            "LineSpacing": 0,
+            "Name": "toggleLabel",
+            "X": 283,
+            "Y": 20,
+            "Width": 174,
+            "Height": 18,
+            "Type": "TextArea",
+            "Visible": true,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          }
+        ],
+        "Interactions": [
+          {
+            "InteractionName": "toggleButtonInteraction",
+            "HasCompletedTrigger": false,
+            "Trigger": {
+              "TriggerComponent": "toggleButton",
+              "Type": "TriggerClicked"
+            },
+            "Action": {
+              "FunctionName": "toggleButtonPressed",
+              "Type": "ActionCustom"
+            }
+          },
+          {
+            "InteractionName": "touchButtonInteraction",
+            "HasCompletedTrigger": false,
+            "Trigger": {
+              "TriggerComponent": "touchButton",
+              "Type": "TriggerClicked"
+            },
+            "Action": {
+              "FunctionName": "touchButtonPressed",
+              "Type": "ActionCustom"
+            }
+          },
+          {
+            "InteractionName": "zeroButtonInteraction",
+            "HasCompletedTrigger": false,
+            "Trigger": {
+              "TriggerComponent": "zeroButton",
+              "Type": "TriggerClicked"
+            },
+            "Action": {
+              "FunctionName": "zeroButtonPressed",
+              "Type": "ActionCustom"
+            }
+          },
+          {
+            "InteractionName": "repeatButtonInteraction",
+            "HasCompletedTrigger": false,
+            "Trigger": {
+              "TriggerComponent": "repeatButton",
+              "Type": "TriggerClicked"
+            },
+            "Action": {
+              "FunctionName": "repeatButtonPressed",
+              "Type": "ActionCustom"
+            }
+          }
+        ],
+        "Name": "Main",
+        "OverrideDefaultBufferSize": false,
+        "CanvasBufferSize": 0
+      }
+    ],
+    "CustomContainerDefinitions": [],
+    "TextEntries": [
+      {
+        "TextEntryId": "numberText",
+        "IsResource": true
+      },
+      {
+        "TextEntryId": "SingleUseId1",
+        "IsResource": false
+      },
+      {
+        "TextEntryId": "SingleUseId3",
+        "IsResource": false
+      },
+      {
+        "TextEntryId": "SingleUseId8",
+        "IsResource": false
+      },
+      {
+        "TextEntryId": "toggleButtonWhite",
+        "IsResource": true
+      },
+      {
+        "TextEntryId": "toggleButtonOrange",
+        "IsResource": true
+      }
+    ],
+    "Name": "MyApplication5",
+    "Resolution": {
+      "Width": 480,
+      "Height": 272
+    },
+    "SelectedColorDepth": 24,
+    "StartupScreenName": "Main",
+    "SelectedStartupLanguage": "GB",
+    "Skin": "Blue",
+    "TouchGfxPath": "../Middlewares/ST/TouchGFX/touchgfx",
+    "UIPath": ".",
+    "ApplicationTemplate": {
+      "Name": "Simulator",
+      "Version": "2.0.0",
+      "Description": "STM32CubeMX Generated Simulator Application Template",
+      "AvailableColorDepths": [
+        24
+      ],
+      "AvailableImageFormats": {
+        "24": {
+          "Opaque": "RGB888",
+          "NonOpaque": "ARGB8888"
+        }
+      },
+      "AvailableResolutions": [
+        {
+          "Width": 480,
+          "Height": 272
+        }
+      ],
+      "PhysicalButtons": [],
+      "GenerateAssetsCommand": "make -f simulator/gcc/Makefile assets -j10",
+      "PostGenerateCommand": "touchgfx update_project --project-file=../EWARM/MyApplication5.ewp --gui-group-name=Application/User/TouchGFX/gui --generated-group-name=Application/User/TouchGFX/generated && touchgfx update_project --project-file=simulator/msvs/Application.vcxproj",
+      "CompileSimulatorCommand": "make -f simulator/gcc/Makefile -j10",
+      "RunSimulatorCommand": "build\\bin\\simulator.exe",
+      "CompileTargetCommand": "make -f ../gcc/Makefile -j8",
+      "FlashTargetCommand": "make -f ../gcc/Makefile -j8 flash"
+    }
+  },
+  "Version": "4.10.0",
+  "CreatedBy": "4.10.0"
+}
