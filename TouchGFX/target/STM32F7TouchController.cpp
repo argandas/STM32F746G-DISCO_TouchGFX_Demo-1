@@ -6,8 +6,8 @@
 
 extern "C"
 {
-    uint32_t LCD_GetXSize();
-    uint32_t LCD_GetYSize();
+uint32_t LCD_GetXSize();
+uint32_t LCD_GetYSize();
 
 }
 
@@ -15,17 +15,17 @@ using namespace touchgfx;
 
 void STM32F7TouchController::init()
 {
-    /* USER CODE BEGIN F4TouchController_init */
+ /* USER CODE BEGIN F4TouchController_init */
 
     /* Add code for touch controller Initialization */
     BSP_TS_Init(LCD_GetXSize(), LCD_GetYSize());
 
-    /* USER CODE END F4TouchController_init */
+/* USER CODE END F4TouchController_init */
 }
 
 bool STM32F7TouchController::sampleTouch(int32_t& x, int32_t& y)
 {
-    /* USER CODE BEGIN  F4TouchController_sampleTouch  */
+/* USER CODE BEGIN  F4TouchController_sampleTouch  */
     TS_StateTypeDef state = { 0 };
     BSP_TS_GetState(&state);
     if (state.touchDetected)
@@ -37,5 +37,5 @@ bool STM32F7TouchController::sampleTouch(int32_t& x, int32_t& y)
     }
     return false;
 
-    /* USER CODE END F4TouchController_sampleTouch  */
+/* USER CODE END F4TouchController_sampleTouch  */
 }

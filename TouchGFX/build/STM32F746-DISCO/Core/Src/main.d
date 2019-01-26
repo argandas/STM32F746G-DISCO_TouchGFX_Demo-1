@@ -53,7 +53,8 @@ TouchGFX/build/STM32F746-DISCO/Core/Src/main.o: Core/Src/main.cpp \
  Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h \
  Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
  Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_qspi.h \
- Drivers/BSP/STM32746G-Discovery/../Components/n25q128a/n25q128a.h
+ Drivers/BSP/STM32746G-Discovery/../Components/n25q128a/n25q128a.h \
+ Drivers/BSP/STM32746G-Discovery/stm32746g_discovery.h
 
 Core/Inc/main.h:
 
@@ -170,3 +171,5 @@ Middlewares/Third_Party/FreeRTOS/Source/include/timers.h:
 Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_qspi.h:
 
 Drivers/BSP/STM32746G-Discovery/../Components/n25q128a/n25q128a.h:
+
+Drivers/BSP/STM32746G-Discovery/stm32746g_discovery.h:

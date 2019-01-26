@@ -2,7 +2,7 @@
 <project>
   <fileVersion>3</fileVersion>
   <configuration>
-    <name>STM32F746G-DISCO</name>
+    <name>MyApplication5</name>
     <toolchain>
       <name>ARM</name>
     </toolchain>
@@ -369,6 +369,7 @@
           <state>$PROJ_DIR$\..\Drivers\BSP\STM32746G-Discovery</state>
           <state>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include</state>
           <state>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include</state>
+          <state>$PROJ_DIR$/../Middlewares/ST/TouchGFX/touchgfx/framework/include</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -719,7 +720,7 @@
         </option>
         <option>
           <name>IlinkOutputFile</name>
-          <state>STM32F746G-DISCO.out</state>
+          <state>MyApplication5.out</state>
         </option>
         <option>
           <name>IlinkDebugInfoEnable</name>
@@ -1538,8 +1539,12 @@
         <name>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\lib\core\cortex_m7\IAR8.x\touchgfx_core_release.a</name>
       </file>
       <file>
+        <name>$PROJ_DIR$/../Middlewares/ST/TouchGFX/touchgfx/lib/core/cortex_m7/IAR8.x/touchgfx_core_release.a</name>
+      </file>
+      <file>
         <name>$PROJ_DIR$/../Middlewares/ST/TouchGFX/touchgfx/os/OSWrappers.cpp</name>
       </file>
     </group>
   </group>
 </project>
+

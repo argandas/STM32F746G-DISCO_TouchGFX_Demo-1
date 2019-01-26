@@ -42,7 +42,7 @@
 #include <platform/core/MCUInstrumentation.hpp>
 #include <stdint.h>
 #include <main.h>
-
+    
 namespace touchgfx
 {
 class STM32F7Instrumentation: public MCUInstrumentation

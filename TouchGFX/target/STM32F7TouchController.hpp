@@ -41,7 +41,7 @@
 
 #include <platform/driver/touch/TouchController.hpp>
 #include <main.h>
-
+                 
 namespace touchgfx
 {
 class STM32F7TouchController: public TouchController

@@ -46,7 +46,7 @@
  * https://touchgfx.zendesk.com/hc/en-us/articles/206725849
  */
 
-#include "HW_Init.hpp"
+ #include "HW_Init.hpp"
 extern "C"
 {
 #include "stm32f7xx.h"
@@ -58,20 +58,20 @@ extern "C"
 static uint32_t frameBuf0 = (uint32_t)(0xc0000000);
 extern "C" {
 
-    uint32_t LCD_GetXSize(void)
-    {
-        return 480;
-    }
+uint32_t LCD_GetXSize(void)
+{
+  return 480;
+}
 
-    uint32_t LCD_GetYSize(void)
-    {
-        return 272;
-    }
+uint32_t LCD_GetYSize(void)
+{
+  return 272;
+}
 }
 
 void GRAPHICS_HW_Init()
 {
-
+    
 
     /* Initialize the SDRAM */
     MX_FMC_Init();
@@ -81,7 +81,7 @@ void GRAPHICS_HW_Init()
     MX_LCD_Init();
     GPIO::init();
 
-    //Deactivate speculative/cache access to first FMC Bank to save FMC bandwidth
+//Deactivate speculative/cache access to first FMC Bank to save FMC bandwidth
     FMC_Bank1->BTCR[0] = 0x000030D2;
 }
 
@@ -96,13 +96,13 @@ namespace touchgfx
 {
 void touchgfx_init()
 {
-    uint16_t dispWidth = 480;
-    uint16_t dispHeight = 272;
+  uint16_t dispWidth = 480;
+  uint16_t dispHeight = 272;  
+  
+    HAL& hal = touchgfx_generic_init<STM32F7HAL>(dma, display, tc, dispWidth, dispHeight,(uint16_t*) 0, 
+                                               0, 0);
 
-    HAL& hal = touchgfx_generic_init<STM32F7HAL>(dma, display, tc, dispWidth, dispHeight, (uint16_t*) 0,
-                                                 0, 0);
-
-    hal.setFrameBufferStartAddress((uint16_t*)frameBuf0, bitdepth, true, true);
+    hal.setFrameBufferStartAddress((uint16_t*)frameBuf0, bitdepth ,true , true);
 
     hal.setTouchSampleRate(2);
     hal.setFingerSize(1);
@@ -124,7 +124,7 @@ void touchgfx_init()
 
 void GRAPHICS_Init()
 {
-    touchgfx::touchgfx_init();
+   touchgfx::touchgfx_init();
 }
 
 void GRAPHICS_MainTask(void)
