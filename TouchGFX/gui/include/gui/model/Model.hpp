@@ -35,6 +35,9 @@ public:
      * the ModelListener interface.
      */
     void tick();
+    
+    void model_btnPressed();
+    
 protected:
     /**
      * Pointer to the currently active presenter.

@@ -1008,8 +1008,9 @@ void StartButtonTask(void const * argument)
     if (buttonState == 1)
     {
       BSP_LED_Toggle(LED_GREEN);
+      xQueueSend(&buttonQueueHandle, (uint8_t*)&buttonState, 0);
     }
-    osDelay(100);
+    osDelay(20);
   }
   /* USER CODE END StartButtonTask */
 }

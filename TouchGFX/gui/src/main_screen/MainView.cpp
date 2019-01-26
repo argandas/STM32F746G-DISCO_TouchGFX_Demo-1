@@ -34,6 +34,11 @@ void MainView::zeroButtonPressed()
     repeatButton.invalidate();
 }
 
+void MainView::hw_ButtonPressed()
+{
+    touchButtonPressed();
+}
+
 void MainView::touchButtonPressed()
 {
     int tmpVal = Unicode::atoi(countTxt.getWildcard());

@@ -13,3 +13,8 @@ void MainPresenter::activate()
 void MainPresenter::deactivate()
 {
 }
+
+void MainPresenter::btnPressed()
+{
+  view.hw_ButtonPressed();
+}
