@@ -228,6 +228,8 @@ void Error_Handler(void);
 #define LCD_G6_GPIO_Port GPIOK
 #define LCD_G7_Pin GPIO_PIN_2
 #define LCD_G7_GPIO_Port GPIOK
+#define SDMMC_D1_Pin GPIO_PIN_9
+#define SDMMC_D1_GPIO_Port GPIOC
 #define ARDUINO_PWM_D10_Pin GPIO_PIN_8
 #define ARDUINO_PWM_D10_GPIO_Port GPIOA
 #define OSC_25M_Pin GPIO_PIN_0
@@ -242,6 +244,8 @@ void Error_Handler(void);
 #define LCD_G4_GPIO_Port GPIOJ
 #define LCD_G5_Pin GPIO_PIN_0
 #define LCD_G5_GPIO_Port GPIOK
+#define SDMMC_D0_Pin GPIO_PIN_8
+#define SDMMC_D0_GPIO_Port GPIOC
 #define ARDUINO_RX_D0_Pin GPIO_PIN_7
 #define ARDUINO_RX_D0_GPIO_Port GPIOC
 #define FMC_A3_Pin GPIO_PIN_3

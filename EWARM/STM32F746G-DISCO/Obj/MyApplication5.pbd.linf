@@ -71,6 +71,7 @@ C:\TouchGFXProjects\MyApplication5\EWARM\STM32F746G-DISCO\Obj\stm32f7xx_hal_rcc.
 C:\TouchGFXProjects\MyApplication5\EWARM\STM32F746G-DISCO\Obj\stm32f7xx_hal_rcc_ex.pbi
 C:\TouchGFXProjects\MyApplication5\EWARM\STM32F746G-DISCO\Obj\stm32f7xx_hal_rtc.pbi
 C:\TouchGFXProjects\MyApplication5\EWARM\STM32F746G-DISCO\Obj\stm32f7xx_hal_rtc_ex.pbi
+C:\TouchGFXProjects\MyApplication5\EWARM\STM32F746G-DISCO\Obj\stm32f7xx_hal_sd.pbi
 C:\TouchGFXProjects\MyApplication5\EWARM\STM32F746G-DISCO\Obj\stm32f7xx_hal_sdram.pbi
 C:\TouchGFXProjects\MyApplication5\EWARM\STM32F746G-DISCO\Obj\stm32f7xx_hal_tim.pbi
 C:\TouchGFXProjects\MyApplication5\EWARM\STM32F746G-DISCO\Obj\stm32f7xx_hal_tim_ex.pbi
@@ -78,6 +79,7 @@ C:\TouchGFXProjects\MyApplication5\EWARM\STM32F746G-DISCO\Obj\stm32f7xx_hal_time
 C:\TouchGFXProjects\MyApplication5\EWARM\STM32F746G-DISCO\Obj\stm32f7xx_hal_uart.pbi
 C:\TouchGFXProjects\MyApplication5\EWARM\STM32F746G-DISCO\Obj\stm32f7xx_it.pbi
 C:\TouchGFXProjects\MyApplication5\EWARM\STM32F746G-DISCO\Obj\stm32f7xx_ll_fmc.pbi
+C:\TouchGFXProjects\MyApplication5\EWARM\STM32F746G-DISCO\Obj\stm32f7xx_ll_sdmmc.pbi
 C:\TouchGFXProjects\MyApplication5\EWARM\STM32F746G-DISCO\Obj\system_stm32f7xx.pbi
 C:\TouchGFXProjects\MyApplication5\EWARM\STM32F746G-DISCO\Obj\Table_Asap_Regular_15_4bpp.pbi
 C:\TouchGFXProjects\MyApplication5\EWARM\STM32F746G-DISCO\Obj\Table_Asap_Regular_27_4bpp.pbi
