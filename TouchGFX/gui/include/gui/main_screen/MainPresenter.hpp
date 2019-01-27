@@ -26,6 +26,7 @@ public:
     virtual void deactivate();
     
     virtual void btnPressed();
+    virtual void setLED(bool state);
 
     virtual ~MainPresenter() {};
 

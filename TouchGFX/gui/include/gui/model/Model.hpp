@@ -37,6 +37,7 @@ public:
     void tick();
     
     void model_btnPressed();
+    void model_ledSetState(bool led_state);
     
 protected:
     /**

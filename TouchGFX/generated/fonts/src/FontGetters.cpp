@@ -26,7 +26,7 @@ touchgfx::InternalFlashFont& getFont_Asap_Regular_27_4bpp();
 
 touchgfx::InternalFlashFont& getFont_Asap_Regular_27_4bpp()
 {
-    static touchgfx::InternalFlashFont Asap_Regular_27_4bpp(glyphs_Asap_Regular_27_4bpp, 13, 27, 5, 4, 0, 0, unicodes_Asap_Regular_27_4bpp, kerning_Asap_Regular_27_4bpp, 63, 0);
+    static touchgfx::InternalFlashFont Asap_Regular_27_4bpp(glyphs_Asap_Regular_27_4bpp, 16, 27, 5, 4, 0, 0, unicodes_Asap_Regular_27_4bpp, kerning_Asap_Regular_27_4bpp, 63, 0);
     return Asap_Regular_27_4bpp;
 }
 

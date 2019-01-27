@@ -41,6 +41,8 @@ C:\TouchGFXProjects\MyApplication5\EWARM\..\Middlewares\ST\TouchGFX\touchgfx\fra
 -I
 C:\TouchGFXProjects\MyApplication5\EWARM\..\Middlewares\ST\TouchGFX\touchgfx\framework\include
 -I
+C:\TouchGFXProjects\MyApplication5\EWARM/../Middlewares/ST/TouchGFX/touchgfx/framework/include
+-I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\CMSIS\Core\Include
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\CMSIS\DSP\Include
@@ -80,6 +82,8 @@ C:\TouchGFXProjects\MyApplication5\TouchGFX\gui\include
 C:\TouchGFXProjects\MyApplication5\Middlewares\ST\TouchGFX\touchgfx\framework\include
 -I
 C:\TouchGFXProjects\MyApplication5\Drivers\BSP\STM32746G-Discovery
+-I
+C:\TouchGFXProjects\MyApplication5\Middlewares\ST\TouchGFX\touchgfx\framework\include
 -I
 C:\TouchGFXProjects\MyApplication5\Middlewares\ST\TouchGFX\touchgfx\framework\include
 -I

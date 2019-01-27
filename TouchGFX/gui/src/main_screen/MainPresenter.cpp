@@ -18,3 +18,8 @@ void MainPresenter::btnPressed()
 {
   view.hw_ButtonPressed();
 }
+
+void MainPresenter::setLED(bool state)
+{
+  model->model_ledSetState(state);
+}

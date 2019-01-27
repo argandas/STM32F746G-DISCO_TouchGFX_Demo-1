@@ -115,3 +115,16 @@ void MainView::toggleButtonPressed()
     countTxt.invalidate();
     toggleButton.invalidate();
 }
+
+void MainView::ledButtonPressed()
+{
+  if (led_state == 0)
+  {
+    led_state = 1;
+  }
+  else
+  {
+    led_state = 0;
+  }
+  presenter->setLED(led_state);
+}

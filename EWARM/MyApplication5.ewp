@@ -369,7 +369,8 @@
           <state>$PROJ_DIR$\..\Drivers\BSP\STM32746G-Discovery</state>
           <state>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include</state>
           <state>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include</state>
-          <state>$PROJ_DIR$/../Middlewares/ST/TouchGFX/touchgfx/framework/include</state>
+          <state>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include</state>
+          <state>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1539,7 +1540,10 @@
         <name>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\lib\core\cortex_m7\IAR8.x\touchgfx_core_release.a</name>
       </file>
       <file>
-        <name>$PROJ_DIR$/../Middlewares/ST/TouchGFX/touchgfx/lib/core/cortex_m7/IAR8.x/touchgfx_core_release.a</name>
+        <name>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\lib\core\cortex_m7\IAR8.x\touchgfx_core_release.a</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\lib\core\cortex_m7\IAR8.x\touchgfx_core_release.a</name>
       </file>
       <file>
         <name>$PROJ_DIR$/../Middlewares/ST/TouchGFX/touchgfx/os/OSWrappers.cpp</name>
@@ -1547,4 +1551,3 @@
     </group>
   </group>
 </project>
-

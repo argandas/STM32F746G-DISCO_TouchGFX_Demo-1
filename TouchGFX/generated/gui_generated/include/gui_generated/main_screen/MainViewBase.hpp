@@ -44,6 +44,11 @@ public:
         // Override and implement this function in MainView
     }
 
+    virtual void ledButtonPressed()
+    {
+        // Override and implement this function in MainView
+    }
+
 protected:
     FrontendApplication& application() {
         return *static_cast<FrontendApplication*>(Application::getInstance());
@@ -61,6 +66,7 @@ protected:
     touchgfx::IconButtonStyle< touchgfx::BoxWithBorderButtonStyle< touchgfx::TouchButtonTrigger > > touchButton;
     touchgfx::TextButtonStyle< touchgfx::ToggleButtonTrigger > toggleButton;
     touchgfx::TextArea toggleLabel;
+    touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > ledButton;
 
     /*
      * Wildcard Buffers

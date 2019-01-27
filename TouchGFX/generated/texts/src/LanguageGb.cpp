@@ -20,15 +20,18 @@ TEXT_LOCATION_FLASH_PRAGMA
 KEEP const touchgfx::Unicode::UnicodeChar T_toggleButtonWhite_Gb[6] TEXT_LOCATION_FLASH_ATTRIBUTE = { 0x57, 0x68, 0x69, 0x74, 0x65, 0x0 };
 TEXT_LOCATION_FLASH_PRAGMA
 KEEP const touchgfx::Unicode::UnicodeChar T_toggleButtonOrange_Gb[7] TEXT_LOCATION_FLASH_ATTRIBUTE = { 0x4f, 0x72, 0x61, 0x6e, 0x67, 0x65, 0x0 };
+TEXT_LOCATION_FLASH_PRAGMA
+KEEP const touchgfx::Unicode::UnicodeChar T_SingleUseId9_Gb[4] TEXT_LOCATION_FLASH_ATTRIBUTE = { 0x4c, 0x45, 0x44, 0x0 };
 
 TEXT_LOCATION_FLASH_PRAGMA
-KEEP extern const touchgfx::Unicode::UnicodeChar* const textsGb[6] TEXT_LOCATION_FLASH_ATTRIBUTE =
+KEEP extern const touchgfx::Unicode::UnicodeChar* const textsGb[7] TEXT_LOCATION_FLASH_ATTRIBUTE =
 {
     T_numberText_Gb,
     T_SingleUseId1_Gb,
     T_SingleUseId3_Gb,
     T_SingleUseId8_Gb,
     T_toggleButtonWhite_Gb,
-    T_toggleButtonOrange_Gb
+    T_toggleButtonOrange_Gb,
+    T_SingleUseId9_Gb
 };
 

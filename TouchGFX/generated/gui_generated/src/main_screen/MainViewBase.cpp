@@ -55,13 +55,21 @@ MainViewBase::MainViewBase() :
     toggleButton.setText(TypedText(T_TOGGLEBUTTONWHITE));
     toggleButton.setTextPosition(0, 0, 152, 36);
     toggleButton.setTextColors(touchgfx::Color::getColorFrom24BitRGB(222, 222, 222), touchgfx::Color::getColorFrom24BitRGB(231, 154, 9));
-    toggleButton.setPosition(121, 32, 152, 36);
+    toggleButton.setPosition(293, 41, 152, 36);
     toggleButton.setAction(flexButtonCallback);
 
     toggleLabel.setXY(283, 20);
     toggleLabel.setColor(touchgfx::Color::getColorFrom24BitRGB(222, 222, 222));
     toggleLabel.setLinespacing(0);
     toggleLabel.setTypedText(TypedText(T_SINGLEUSEID8));
+
+    ledButton.setBitmaps(Bitmap(BITMAP_SMALL_BTN_ID), Bitmap(BITMAP_SMALL_BTN_PRESSED_ID));
+    ledButton.setBitmapXY(0, 0);
+    ledButton.setText(TypedText(T_SINGLEUSEID9));
+    ledButton.setTextPosition(-2, 12, 100, 56);
+    ledButton.setTextColors(touchgfx::Color::getColorFrom24BitRGB(70, 70, 70), touchgfx::Color::getColorFrom24BitRGB(231, 154, 9));
+    ledButton.setPosition(320, 117, 100, 56);
+    ledButton.setAction(flexButtonCallback);
 
     add(backgroundBox);
     add(backgroundImage);
@@ -72,6 +80,7 @@ MainViewBase::MainViewBase() :
     add(touchButton);
     add(toggleButton);
     add(toggleLabel);
+    add(ledButton);
 }
 
 void MainViewBase::setupScreen()
@@ -108,5 +117,12 @@ void MainViewBase::flexButtonCallbackHandler(const touchgfx::AbstractButtonConta
         //When toggleButton clicked call virtual function
         //Call toggleButtonPressed
         toggleButtonPressed();
+    }
+    else if (&src == &ledButton)
+    {
+        //ledButtonInteraction
+        //When ledButton clicked call virtual function
+        //Call ledButtonPressed
+        ledButtonPressed();
     }
 }

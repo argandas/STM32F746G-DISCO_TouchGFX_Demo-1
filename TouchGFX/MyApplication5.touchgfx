@@ -295,6 +295,50 @@
             "Clickable": false,
             "Fadeable": false,
             "Moveable": false
+          },
+          {
+            "Alpha": 255,
+            "ButtonTrigger": {
+              "Type": "ClickButtonTrigger"
+            },
+            "ButtonStyles": [
+              {
+                "Type": "TextButtonStyle",
+                "X": -2,
+                "Y": 12,
+                "TextId": "SingleUseId9",
+                "TextRotation": "0",
+                "ColorReleased": {
+                  "Red": 70,
+                  "Green": 70,
+                  "Blue": 70
+                },
+                "ColorPressed": {
+                  "Red": 231,
+                  "Green": 154,
+                  "Blue": 9
+                }
+              },
+              {
+                "Type": "ImageButtonStyle",
+                "X": 0,
+                "Y": 0,
+                "LockFlexButtonToImageSize": true,
+                "ImageReleased": "small_btn.png",
+                "ImagePressed": "small_btn_pressed.png"
+              }
+            ],
+            "Name": "ledButton",
+            "X": 320,
+            "Y": 117,
+            "Width": 100,
+            "Height": 56,
+            "Type": "FlexButton",
+            "Visible": true,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
           }
         ],
         "Interactions": [
@@ -345,6 +389,18 @@
               "FunctionName": "repeatButtonPressed",
               "Type": "ActionCustom"
             }
+          },
+          {
+            "InteractionName": "ledButtonInteraction",
+            "HasCompletedTrigger": true,
+            "Trigger": {
+              "TriggerComponent": "ledButton",
+              "Type": "TriggerClicked"
+            },
+            "Action": {
+              "FunctionName": "ledButtonPressed",
+              "Type": "ActionCustom"
+            }
           }
         ],
         "Name": "Main",
@@ -377,6 +433,10 @@
       {
         "TextEntryId": "toggleButtonOrange",
         "IsResource": true
+      },
+      {
+        "TextEntryId": "SingleUseId9",
+        "IsResource": false
       }
     ],
     "Name": "MyApplication5",

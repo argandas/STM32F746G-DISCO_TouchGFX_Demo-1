@@ -90,7 +90,8 @@ osThreadId defaultTaskHandle;
 osThreadId buttonTaskHandle;
 osMessageQId buttonQueueHandle;
 /* USER CODE BEGIN PV */
-
+osThreadId ledTaskHandle;
+osMessageQId ledQueueHandle;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -107,6 +108,7 @@ extern void GRAPHICS_Init(void);
 extern void GRAPHICS_MainTask(void);
 void StartDefaultTask(void const * argument);
 void StartButtonTask(void const * argument);
+void StartLEDTask(void const * argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -186,6 +188,9 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_THREADS */
     /* add threads, ... */
+    /* definition and creation of buttonTask */
+  osThreadDef(ledTask, StartLEDTask, osPriorityIdle, 0, 128);
+  ledTaskHandle = osThreadCreate(osThread(ledTask), NULL);
   /* USER CODE END RTOS_THREADS */
 
   /* Create the queue(s) */
@@ -194,6 +199,8 @@ int main(void)
   buttonQueueHandle = osMessageCreate(osMessageQ(buttonQueue), NULL);
 
   /* USER CODE BEGIN RTOS_QUEUES */
+  osMessageQDef(ledQueue, 16, uint8_t);
+  ledQueueHandle = osMessageCreate(osMessageQ(ledQueue), NULL);
     /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
  
@@ -961,6 +968,35 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+void StartLEDTask(void const * argument)
+{
+  /* USER CODE BEGIN StartLEDTask */
+  uint8_t led_state = 0;
+
+  BSP_LED_Init(LED_GREEN);
+  BSP_LED_Off(LED_GREEN);
+    
+  /* Infinite loop */
+  for(;;)
+  {
+    if (xQueueReceive(&ledQueueHandle, &led_state, 0) == pdTRUE)
+    {
+      if (led_state == 1)
+      {
+        BSP_LED_On(LED_GREEN);
+      }
+      else
+      {
+        BSP_LED_Off(LED_GREEN);
+      }
+    }
+    
+    osDelay(20);
+  }
+  /* USER CODE END StartButtonTask */
+}
+
+
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -994,20 +1030,17 @@ void StartDefaultTask(void const * argument)
 /* USER CODE END Header_StartButtonTask */
 void StartButtonTask(void const * argument)
 {
-//  buttonQueue
-  uint32_t buttonState = 0;
-    
-    BSP_LED_Init(LED_GREEN);
-    BSP_LED_On(LED_GREEN);
-    BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
   /* USER CODE BEGIN StartButtonTask */
+  uint32_t buttonState = 0;
+  
+  BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
+  
   /* Infinite loop */
   for(;;)
   {
     buttonState = BSP_PB_GetState(BUTTON_KEY);
     if (buttonState == 1)
     {
-      BSP_LED_Toggle(LED_GREEN);
       xQueueSend(&buttonQueueHandle, (uint8_t*)&buttonState, 0);
     }
     osDelay(20);
