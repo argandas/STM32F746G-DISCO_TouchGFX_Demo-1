@@ -372,6 +372,9 @@
           <state>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include</state>
           <state>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include</state>
           <state>$PROJ_DIR$/../Middlewares/ST/TouchGFX/touchgfx/framework/include</state>
+          <state>$PROJ_DIR$/../FATFS/Target</state>
+          <state>$PROJ_DIR$/../FATFS/App</state>
+          <state>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1152,6 +1155,27 @@
           </file>
         </group>
       </group>
+      <group>
+        <name>FatFs</name>
+        <group>
+          <name>App</name>
+          <file>
+            <name>$PROJ_DIR$/../FATFS/App/fatfs.c</name>
+          </file>
+        </group>
+        <group>
+          <name>Target</name>
+          <file>
+            <name>$PROJ_DIR$/../FATFS/Target/bsp_driver_sd.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$/../FATFS/Target/sd_diskio.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$/../FATFS/Target/fatfs_platform.c</name>
+          </file>
+        </group>
+      </group>
     </group>
   </group>
   <group>
@@ -1565,6 +1589,21 @@
       </file>
       <file>
         <name>$PROJ_DIR$/../Middlewares/ST/TouchGFX/touchgfx/os/OSWrappers.cpp</name>
+      </file>
+    </group>
+    <group>
+      <name>FatFs</name>
+      <file>
+        <name>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src/diskio.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src/ff.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src/ff_gen_drv.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src/option/syscall.c</name>
       </file>
     </group>
   </group>

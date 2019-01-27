@@ -242,6 +242,20 @@ board_c_files += \
 	Core/Src/stm32f7xx_it.c \
 	$(Middlewares_path)/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c
 
+board_c_files += \
+	$(Drivers_path)/Console/src/sprintf.c \
+
+board_c_files += \
+    $(Middlewares_path)/Third_Party/FatFs/src/diskio.c \
+    $(Middlewares_path)/Third_Party/FatFs/src/ff.c \
+    $(Middlewares_path)/Third_Party/FatFs/src/ff_gen_drv.c \
+    $(Middlewares_path)/Third_Party/FatFs/src/option/syscall.c \
+    $(Middlewares_path)/Third_Party/FatFs/src/option/unicode.c \
+    FATFS/Target/bsp_driver_sd.c \
+    FATFS/Target/fatfs_platform.c \
+    FATFS/Target/sd_diskio.c \
+    FATFS/App/fatfs.c
+
 board_cpp_files := \
 	Core/Src/main.cpp \
 	TouchGFX/target/STM32F7Instrumentation.cpp \
@@ -265,7 +279,13 @@ board_include_paths := \
 	$(Drivers_path)/STM32F7xx_HAL_Driver/Inc \
 	$(Drivers_path)/CMSIS/Include \
 	$(Drivers_path)/CMSIS/Device/ST/STM32f7xx/Include \
-	Core/Inc
+	Core/Inc \
+	FATFS/App \
+	FATFS/Target \
+	FATFS/Target \
+	$(Middlewares_path)/Third_Party/FatFs/src \
+	$(Middlewares_path)/Third_Party/FatFs/src/option \
+	$(Drivers_path)/Console/inc/
 
 asm_source_files := \
 	$(Drivers_path)/CMSIS/Device/ST/STM32F7xx/Source/Templates/gcc/startup_stm32f746xx.s

@@ -51,6 +51,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
+#include "fatfs.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -60,7 +61,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
-// #include <sprintf.h>
+#include "sprintf.h"
 
 #define CLI_FMT_BUFFER_LEN 256
 
@@ -210,7 +211,7 @@ int main(void)
   /* USER CODE BEGIN RTOS_THREADS */
     /* add threads, ... */
     /* definition and creation of buttonTask */
-  osThreadDef(ledTask, StartLEDTask, osPriorityIdle, 0, 128);
+  osThreadDef(ledTask, StartLEDTask, osPriorityIdle, 0, 512);
   ledTaskHandle = osThreadCreate(osThread(ledTask), NULL);
   /* USER CODE END RTOS_THREADS */
 
@@ -624,14 +625,6 @@ static void MX_SDMMC1_SD_Init(void)
   hsd1.Init.BusWide = SDMMC_BUS_WIDE_1B;
   hsd1.Init.HardwareFlowControl = SDMMC_HARDWARE_FLOW_CONTROL_DISABLE;
   hsd1.Init.ClockDiv = 0;
-  if (HAL_SD_Init(&hsd1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  if (HAL_SD_ConfigWideBusOperation(&hsd1, SDMMC_BUS_WIDE_4B) != HAL_OK)
-  {
-    Error_Handler();
-  }
   /* USER CODE BEGIN SDMMC1_Init 2 */
 
   /* USER CODE END SDMMC1_Init 2 */
@@ -1020,6 +1013,7 @@ void com_init()
 
 uint16_t cli_printf(const char* fmt, ...)
 {
+#if 0
     va_list  args;
     uint16_t len = 0;
 
@@ -1028,6 +1022,16 @@ uint16_t cli_printf(const char* fmt, ...)
     va_end(args);
 
     return len;
+#else
+    char buff[32];
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buff, sizeof(buff), fmt, args);
+    HAL_UART_Transmit(&huart1, (uint8_t*)buff, strlen(buff), 100);
+    va_end(args);
+#endif
+    
+    
 }
 
 uint16_t cli_write(const char* src, uint16_t len)
@@ -1059,20 +1063,19 @@ void StartLEDTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    xQueueReceive(ledQueueHandle, &led_state, 0);
-
-    if (led_state == 1)
+    if(xQueueReceive(ledQueueHandle, &led_state, 0) == pdTRUE)
     {
-      BSP_LED_On(LED_GREEN);
+      if (led_state == 1)
+      {
+        BSP_LED_On(LED_GREEN);
+      }
+      else
+      {
+        BSP_LED_Off(LED_GREEN);
+      }
+      
+      cli_printf("Model::p2m_SetLEDState: %d\r\n", led_state);
     }
-    else
-    {
-      BSP_LED_Off(LED_GREEN);
-    }
-    
-    cli_printf("Hello %s \r\n", "world");
-    
-    // com_printf("Model::p2m_SetLEDState: %d\r\n", led_state);
     
     osDelay(20);
   }
@@ -1089,6 +1092,8 @@ void StartLEDTask(void const * argument)
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void const * argument)
 {
+  /* init code for FATFS */
+  MX_FATFS_Init();
 
 /* Graphic application */  
   GRAPHICS_MainTask();

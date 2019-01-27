@@ -54,9 +54,16 @@ TouchGFX/build/STM32F746-DISCO/Core/Src/main.o: Core/Src/main.cpp \
  Middlewares/Third_Party/FreeRTOS/Source/include/queue.h \
  Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h \
  Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
+ FATFS/App/fatfs.h Middlewares/Third_Party/FatFs/src/ff.h \
+ Middlewares/Third_Party/FatFs/src/integer.h FATFS/Target/ffconf.h \
+ FATFS/Target/bsp_driver_sd.h FATFS/Target/fatfs_platform.h \
+ Middlewares/Third_Party/FatFs/src/ff_gen_drv.h \
+ Middlewares/Third_Party/FatFs/src/diskio.h \
+ Middlewares/Third_Party/FatFs/src/ff.h FATFS/Target/sd_diskio.h \
  Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_qspi.h \
  Drivers/BSP/STM32746G-Discovery/../Components/n25q128a/n25q128a.h \
- Drivers/BSP/STM32746G-Discovery/stm32746g_discovery.h
+ Drivers/BSP/STM32746G-Discovery/stm32746g_discovery.h \
+ Drivers/Console/inc/sprintf.h
 
 Core/Inc/main.h:
 
@@ -174,8 +181,30 @@ Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h:
 
 Middlewares/Third_Party/FreeRTOS/Source/include/timers.h:
 
+FATFS/App/fatfs.h:
+
+Middlewares/Third_Party/FatFs/src/ff.h:
+
+Middlewares/Third_Party/FatFs/src/integer.h:
+
+FATFS/Target/ffconf.h:
+
+FATFS/Target/bsp_driver_sd.h:
+
+FATFS/Target/fatfs_platform.h:
+
+Middlewares/Third_Party/FatFs/src/ff_gen_drv.h:
+
+Middlewares/Third_Party/FatFs/src/diskio.h:
+
+Middlewares/Third_Party/FatFs/src/ff.h:
+
+FATFS/Target/sd_diskio.h:
+
 Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_qspi.h:
 
 Drivers/BSP/STM32746G-Discovery/../Components/n25q128a/n25q128a.h:
 
 Drivers/BSP/STM32746G-Discovery/stm32746g_discovery.h:
+
+Drivers/Console/inc/sprintf.h:
