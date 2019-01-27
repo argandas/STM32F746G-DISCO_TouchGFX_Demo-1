@@ -84,8 +84,8 @@
             "Alpha": 255,
             "ButtonTrigger": {
               "Type": "RepeatButtonTrigger",
-              "Delay": 300,
-              "Interval": 300
+              "Delay": 100,
+              "Interval": 100
             },
             "ButtonStyles": [
               {

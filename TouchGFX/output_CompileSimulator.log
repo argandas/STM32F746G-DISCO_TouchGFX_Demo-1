@@ -1,14 +1,2 @@
 Converting images
-Compiling gui/src/model/Model.cpp
 Linking build/bin/simulator.exe
-build/MINGW32_NT-6.2/gui/src/main_screen/MainPresenter.o: In function `ZN13ModelListenerC2Ev':
-C:\TouchGFXProjects\MyApplication5\TouchGFX/gui/include/gui/model/ModelListener.hpp:18: undefined reference to `vtable for ModelListener'
-build/MINGW32_NT-6.2/gui/src/main_screen/MainPresenter.o: In function `ZN13ModelListenerD2Ev':
-C:\TouchGFXProjects\MyApplication5\TouchGFX/gui/include/gui/model/ModelListener.hpp:20: undefined reference to `vtable for ModelListener'
-collect2.exe: error: ld returned 1 exit status
-simulator/gcc/Makefile:186: recipe for target 'build/bin/simulator.exe' failed
-make[2]: *** [build/bin/simulator.exe] Error 1
-simulator/gcc/Makefile:182: recipe for target 'generate_assets' failed
-make[1]: *** [generate_assets] Error 2
-simulator/gcc/Makefile:40: recipe for target 'all' failed
-make: *** [all] Error 2

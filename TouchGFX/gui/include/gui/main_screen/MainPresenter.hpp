@@ -25,8 +25,11 @@ public:
      */
     virtual void deactivate();
     
-    virtual void btnPressed();
-    virtual void setLED(bool state);
+    /* redefine call on MainListener, to be calle from Model*/
+    void m2p_ButtonPressed();
+    
+    /* to be called from view */
+    void v2p_SetLEDState(bool state);
 
     virtual ~MainPresenter() {};
 

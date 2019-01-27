@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <gui/model/ModelListener.hpp>
+#include <touchgfx/Utils.hpp>
 
 #ifndef SIMULATOR
 #include "cmsis_os.h"
@@ -15,27 +16,20 @@ Model::Model() : modelListener(0)
 
 void Model::tick()
 {
-
 #ifndef SIMULATOR
   uint8_t buttonStateReceived = 0;
   if (xQueueReceive(&buttonQueueHandle, &buttonStateReceived, 0) == pdTRUE)
   {
-    model_btnPressed();
+    modelListener->m2p_ButtonPressed();
   }
 #endif
+} 
 
-}
-        
-void Model::model_btnPressed()
+void Model::p2m_SetLEDState(bool led_state)
 {
-  modelListener->btnPressed();
-}
+  touchgfx_printf("Model::p2m_SetLEDState: %d\r\n", led_state);
 
-void Model::model_ledSetState(bool led_state)
-{
 #ifndef SIMULATOR
-  xQueueSend(&ledQueueHandle, &led_state, 0);
-#else
-  printf("led_state: %d", led_state);
+  xQueueSend(ledQueueHandle, &led_state, 0);
 #endif
 }

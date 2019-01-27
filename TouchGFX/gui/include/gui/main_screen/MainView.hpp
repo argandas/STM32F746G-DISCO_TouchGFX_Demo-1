@@ -8,7 +8,7 @@ class MainView : public MainViewBase
 {
 public:
     MainView();
-    virtual ~MainView() {}
+    virtual ~MainView(){}
     virtual void setupScreen();
     virtual void tearDownScreen();
 
@@ -22,6 +22,8 @@ public:
     bool led_state;
 
 private:
+  void inc_count();
+  void dec_count();
 };
 
 #endif // MAIN_VIEW_HPP

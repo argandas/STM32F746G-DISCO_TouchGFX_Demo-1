@@ -28,7 +28,8 @@ public:
         model = m;
     }
     
-    virtual void btnPressed();
+    virtual void m2p_ButtonPressed(){}
+
 protected:
     Model* model;
 };

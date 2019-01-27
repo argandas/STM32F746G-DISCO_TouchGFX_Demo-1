@@ -26,8 +26,8 @@ MainViewBase::MainViewBase() :
     countTxt.setWildcard(countTxtBuffer);
     countTxt.setTypedText(TypedText(T_NUMBERTEXT));
 
-    repeatButton.setDelay(18);
-    repeatButton.setInterval(18);
+    repeatButton.setDelay(6);
+    repeatButton.setInterval(6);
     repeatButton.setBoxWithBorderPosition(0, 0, 100, 45);
     repeatButton.setBorderSize(5);
     repeatButton.setBoxWithBorderColors(touchgfx::Color::getColorFrom24BitRGB(222, 222, 222), touchgfx::Color::getColorFrom24BitRGB(48, 58, 64), touchgfx::Color::getColorFrom24BitRGB(54, 62, 65), touchgfx::Color::getColorFrom24BitRGB(128, 136, 143));

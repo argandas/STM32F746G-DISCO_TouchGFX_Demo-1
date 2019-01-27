@@ -970,7 +970,6 @@ static void MX_GPIO_Init(void)
 
 void StartLEDTask(void const * argument)
 {
-  /* USER CODE BEGIN StartLEDTask */
   uint8_t led_state = 0;
 
   BSP_LED_Init(LED_GREEN);
@@ -979,23 +978,20 @@ void StartLEDTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    if (xQueueReceive(&ledQueueHandle, &led_state, 0) == pdTRUE)
+    xQueueReceive(ledQueueHandle, &led_state, 0);
+
+    if (led_state == 1)
     {
-      if (led_state == 1)
-      {
-        BSP_LED_On(LED_GREEN);
-      }
-      else
-      {
-        BSP_LED_Off(LED_GREEN);
-      }
+      BSP_LED_On(LED_GREEN);
+    }
+    else
+    {
+      BSP_LED_Off(LED_GREEN);
     }
     
     osDelay(20);
   }
-  /* USER CODE END StartButtonTask */
 }
-
 
 /* USER CODE END 4 */
 
@@ -1043,7 +1039,7 @@ void StartButtonTask(void const * argument)
     {
       xQueueSend(&buttonQueueHandle, (uint8_t*)&buttonState, 0);
     }
-    osDelay(20);
+    osDelay(100);
   }
   /* USER CODE END StartButtonTask */
 }

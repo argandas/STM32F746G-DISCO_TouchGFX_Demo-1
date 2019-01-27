@@ -1,508 +1,547 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
     <fileVersion>4</fileVersion>
-    <fileChecksum>2430776878</fileChecksum>
+    <fileChecksum>1719298210</fileChecksum>
     <configuration>
-        <name>STM32F746G-DISCO</name>
+        <name>MyApplication5</name>
         <outputs>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\MainViewBase.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32746g_discovery_qspi.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Kerning_Asap_Regular_27_4bpp.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\MainView.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\ft5336.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\FrontendApplicationBase.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\counter_box.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\system_stm32f7xx.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\btn_long_pressed.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Model.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Table_Asap_Regular_27_4bpp.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Table_Asap_Regular_15_4bpp.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\BitmapDatabase.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\btn_long.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\small_btn_pressed.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\list.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_tim.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_i2c.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\orange_arrow.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\HW_Init.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\cmsis_os.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\MainView.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\ft5336.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\TypedTextDatabase.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_uart.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rtc_ex.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\small_btn_pressed.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_qspi.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\orange_arrow_up.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\croutine.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_i2c_ex.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\FrontendApplication.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_ll_fmc.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\btn_long_pressed.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7HAL.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\small_btn.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\small_btn_disable.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\OSWrappers.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Texts.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7Instrumentation.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\LanguageGb.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Model.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\counter_box.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_tim_ex.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\MainPresenter.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\port.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\ApplicationFontProvider.pbi</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\WildcardTextButtonStyle.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\common\TouchGFXInit.hpp</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rtc.o</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\common\Meta.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\ToggleButtonTrigger.hpp</file>
-            <file>$TOOLKIT_DIR$\inc\cpp\exception</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_sdram.o</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\JSMOCHelper.hpp</file>
-            <file>$TOOLKIT_DIR$\inc\cpp\xtr1common</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\mvp\MVPApplication.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\BoxWithBorderButtonStyle.hpp</file>
-            <file>$TOOLKIT_DIR$\inc\c\DLib_Product_stdlib.h</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Screen.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\events\DragEvent.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\TextButtonStyle.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\widgets\AnimatedImage.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\common\AbstractPartition.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\mvp\View.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\ClickButtonTrigger.hpp</file>
-            <file>$TOOLKIT_DIR$\inc\cpp\new</file>
-            <file>$TOOLKIT_DIR$\inc\c\stdlib.h</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\widgets\Box.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\widgets\TextAreaWithWildcard.hpp</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_ltdc.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rcc_ex.o</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\ImageButtonStyle.hpp</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_pwr.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_ltdc_ex.o</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\Container.hpp</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_pwr_ex.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rcc.o</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\timers.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_dma2d.h</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS\cmsis_os.h</file>
-            <file>$TOOLKIT_DIR$\inc\c\cmsis_iar.h</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\semphr.h</file>
-            <file>$PROJ_DIR$\..\Drivers\CMSIS\Include\core_cmSimd.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\Legacy\stm32_hal_legacy.h</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\event_groups.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_qspi.h</file>
-            <file>$PROJ_DIR$\..\Core\Inc\stm32f7xx_hal_conf.h</file>
-            <file>$PROJ_DIR$\..\Drivers\CMSIS\Include\core_cm7.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_tim.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_rtc_ex.h</file>
-            <file>$PROJ_DIR$\..\Drivers\BSP\STM32746G-Discovery\stm32746g_discovery_qspi.h</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\queue.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_flash_ex.h</file>
-            <file>$PROJ_DIR$\..\Drivers\CMSIS\Include\core_cmFunc.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_crc_ex.h</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_msp.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32746g_discovery.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\queue.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Font_Asap_Regular_27_4bpp.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\event_groups.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Kerning_Asap_Regular_15_4bpp.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\GPIO.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_gpio.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\BoardConfiguration.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7TouchController.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Font_Asap_Regular_15_4bpp.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\main.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7DMA.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\heap_4.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_it.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\portasm.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_flash.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_flash_ex.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\startup_stm32f746xx.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Font_Asap_Regular_80_4bpp.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\tasks.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\freertos.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\FontGetters.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\system_stm32f7xx.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_crc_ex.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32746g_discovery_ts.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_timebase_tim.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\timers.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32746g_discovery_qspi.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_cortex.o</file>
-            <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_rcc.h</file>
-            <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
-            <file>$TOOLKIT_DIR$\inc\c\iar_intrinsics_common.h</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\portable.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal.h</file>
-            <file>$PROJ_DIR$\..\Drivers\CMSIS\Include\core_cmInstr.h</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\portable\IAR\ARM_CM7\r0p1\portmacro.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_gpio.h</file>
-            <file>$TOOLKIT_DIR$\inc\c\stdio.h</file>
-            <file>$PROJ_DIR$\..\Core\Inc\FreeRTOSConfig.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_flash.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_uart.h</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\task.h</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\mpu_wrappers.h</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\black_arrow_up.pbi</file>
-            <file>$TOOLKIT_DIR$\inc\c\stddef.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_crc.h</file>
-            <file>$TOOLKIT_DIR$\inc\c\intrinsics.h</file>
-            <file>$TOOLKIT_DIR$\inc\c\DLib_Config_Full.h</file>
-            <file>$TOOLKIT_DIR$\inc\c\iccarm_builtin.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_pwr.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_pwr_ex.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_gpio_ex.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_i2c_ex.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_dma.h</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\projdefs.h</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\bg.pbi</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_i2c.h</file>
-            <file>$PROJ_DIR$\..\Core\Inc\main.h</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Exe\STM32F746G-DISCO.out</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_rtc.h</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\port.pbi</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\deprecated_definitions.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_rcc_ex.h</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\MyApplication5.pbd</file>
-            <file>$TOOLKIT_DIR$\inc\c\stdint.h</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\queue.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\list.pbi</file>
-            <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\OSWrappers.pbi</file>
-            <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
-            <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\timers.pbi</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_def.h</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_cortex.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_flash.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_pwr.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_dsi.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_i2c_ex.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_crc_ex.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_dma.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_tim_ex.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_ltdc_ex.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_dma_ex.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\heap_4.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_i2c.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rcc_ex.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rtc.pbi</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Texts.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\platform\driver\touch\TouchController.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\AbstractButtonContainer.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\hal\GPIO.hpp</file>
-            <file>$TOOLKIT_DIR$\inc\cpp\cassert</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\hal\DMA.hpp</file>
-            <file>$TOOLKIT_DIR$\inc\c\assert.h</file>
-            <file>$PROJ_DIR$\..\TouchGFX\gui\include\gui\common\FrontendHeap.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\common\Partition.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\TypedText.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\widgets\Image.hpp</file>
-            <file>$TOOLKIT_DIR$\inc\c\stdarg.h</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\IconButtonStyle.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\hal\HAL.hpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\gui\include\gui\main_screen\MainPresenter.hpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\target\STM32F7HAL.hpp</file>
-            <file>$TOOLKIT_DIR$\inc\cpp\xstddef</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\Buttons.hpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\target\STM32F7TouchController.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Event.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\TouchButtonTrigger.hpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\gui_generated\include\gui_generated\common\FrontendApplicationBase.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Callback.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Drawable.hpp</file>
-            <file>$TOOLKIT_DIR$\inc\cpp\xxexception</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\gui_generated\include\gui_generated\main_screen\MainViewBase.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\platform\core\MCUInstrumentation.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\TiledImageButtonStyle.hpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\target\HW_Init.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Unicode.hpp</file>
-            <file>$TOOLKIT_DIR$\inc\cpp\type_traits</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Kerning_Asap_Regular_80_4bpp.cpp</file>
-            <file>$PROJ_DIR$\..\Core\Src\main.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Table_Asap_Regular_80_4bpp.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\target\STM32F7DMA.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\FontGetters.cpp</file>
-            <file>$PROJ_DIR$\..\Core\Src\stm32f7xx_hal_msp.c</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\gui_generated\src\common\FrontendApplicationBase.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Table_Asap_Regular_15_4bpp.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\gui_generated\src\main_screen\MainViewBase.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\target\GPIO.cpp</file>
-            <file>$PROJ_DIR$\..\Core\Src\freertos.c</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\ApplicationFontProvider.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\bg.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\BitmapDatabase.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\target\BoardConfiguration.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\target\HW_Init.cpp</file>
-            <file>$PROJ_DIR$\..\Core\Src\stm32f7xx_it.c</file>
-            <file>$PROJ_DIR$\..\TouchGFX\target\STM32F7HAL.cpp</file>
-            <file>$PROJ_DIR$\..\Core\Src\stm32f7xx_hal_timebase_tim.c</file>
-            <file>$PROJ_DIR$\..\TouchGFX\target\STM32F7TouchController.cpp</file>
-            <file>$PROJ_DIR$\startup_stm32f746xx.s</file>
-            <file>$PROJ_DIR$\..\TouchGFX\target\STM32F7Instrumentation.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Font_Asap_Regular_15_4bpp.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Font_Asap_Regular_27_4bpp.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Font_Asap_Regular_80_4bpp.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Kerning_Asap_Regular_15_4bpp.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Table_Asap_Regular_27_4bpp.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Kerning_Asap_Regular_27_4bpp.cpp</file>
-            <file>$PROJ_DIR$\..\Drivers\BSP\STM32746G-Discovery\stm32746g_discovery.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_flash.c</file>
-            <file>$PROJ_DIR$\..\TouchGFX\gui\src\main_screen\MainView.cpp</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_crc.c</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\btn_long_pressed.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\black_arrow_up.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\texts\src\TypedTextDatabase.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\btn_long.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\texts\src\LanguageGb.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\small_btn_disable.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\gui\src\main_screen\MainPresenter.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\gui\src\model\Model.cpp</file>
-            <file>$PROJ_DIR$\..\Drivers\BSP\Components\ft5336\ft5336.c</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\texts\src\Texts.cpp</file>
-            <file>$PROJ_DIR$\..\Drivers\BSP\STM32746G-Discovery\stm32746g_discovery_ts.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal.c</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\black_arrow.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\small_btn_pressed.cpp</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_crc_ex.c</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\orange_arrow_up.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\small_btn.cpp</file>
-            <file>$PROJ_DIR$\..\Drivers\BSP\STM32746G-Discovery\stm32746g_discovery_qspi.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_dma.c</file>
-            <file>$PROJ_DIR$\..\Core\Src\system_stm32f7xx.c</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\orange_arrow.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\counter_box.cpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\gui\src\common\FrontendApplication.cpp</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_cortex.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_dma2d.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_dma_ex.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_dsi.c</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\event_groups.c</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\portable\IAR\ARM_CM7\r0p1\port.c</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\queue.c</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\os\OSWrappers.cpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\portable\IAR\ARM_CM7\r0p1\portasm.s</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\timers.c</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\lib\core\cortex_m7\IAR8.x\touchgfx_core_release.a</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\croutine.c</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\tasks.c</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\portable\MemMang\heap_4.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_uart.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_ll_fmc.c</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS\cmsis_os.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_tim_ex.c</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\list.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rtc_ex.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_sdram.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_i2c.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rtc.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_tim.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_ltdc.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_flash_ex.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_ltdc_ex.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_pwr.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_qspi.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_gpio.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rcc.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_pwr_ex.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_i2c_ex.c</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rcc_ex.c</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\MainPresenter.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\FrontendApplication.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_pwr_ex.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\orange_arrow.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\TypedTextDatabase.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\small_btn.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\orange_arrow_up.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32746g_discovery_ts.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\small_btn_disable.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Texts.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\LanguageGb.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Table_Asap_Regular_80_4bpp.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Kerning_Asap_Regular_80_4bpp.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\black_arrow.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32746g_discovery.pbi</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\texts\include\texts\TextKeysAndLanguages.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Color.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\hal\Types.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\transitions\Transition.hpp</file>
             <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\main.o</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Font.hpp</file>
-            <file>$TOOLKIT_DIR$\inc\cpp\initializer_list</file>
-            <file>$PROJ_DIR$\..\Core\Inc\stm32f7xx_it.h</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\RepeatButtonTrigger.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\widgets\Widget.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\TextProvider.hpp</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\HW_Init.o</file>
-            <file>$PROJ_DIR$\..\TouchGFX\gui\include\gui\common\FrontendApplication.hpp</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_cortex.h</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Font_Asap_Regular_15_4bpp.o</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_dma_ex.h</file>
-            <file>$PROJ_DIR$\..\Drivers\CMSIS\Device\ST\STM32F7xx\Include\stm32f746xx.h</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\UIEventListener.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\list.h</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\mvp\Presenter.hpp</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_sdram.h</file>
-            <file>$PROJ_DIR$\..\Drivers\CMSIS\Device\ST\STM32F7xx\Include\system_stm32f7xx.h</file>
-            <file>$PROJ_DIR$\..\Drivers\BSP\Components\n25q128a\n25q128a.h</file>
-            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\FreeRTOS.h</file>
-            <file>$PROJ_DIR$\..\Drivers\CMSIS\Device\ST\STM32F7xx\Include\stm32f7xx.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_ll_fmc.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_tim_ex.h</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_uart_ex.h</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Bitmap.hpp</file>
-            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_ltdc.h</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\FontManager.hpp</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\freertos.o</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\hal\BlitOp.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Application.hpp</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_dma.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_dsi.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Table_Asap_Regular_27_4bpp.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\BitmapDatabase.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Table_Asap_Regular_80_4bpp.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Kerning_Asap_Regular_27_4bpp.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Kerning_Asap_Regular_15_4bpp.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\btn_long.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7HAL.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\black_arrow.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_timebase_tim.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7Instrumentation.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_msp.o</file>
             <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_it.o</file>
             <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\GPIO.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_crc.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7DMA.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\bg.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7TouchController.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_msp.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\freertos.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_timebase_tim.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\HW_Init.o</file>
             <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\BoardConfiguration.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\FontGetters.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\ApplicationFontProvider.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\MainViewBase.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\FrontendApplicationBase.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_dma_ex.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Font_Asap_Regular_80_4bpp.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7DMA.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Table_Asap_Regular_27_4bpp.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\black_arrow.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7HAL.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Font_Asap_Regular_15_4bpp.o</file>
             <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Kerning_Asap_Regular_80_4bpp.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Font_Asap_Regular_27_4bpp.o</file>
             <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Table_Asap_Regular_15_4bpp.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\orange_arrow_up.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7Instrumentation.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\small_btn.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Table_Asap_Regular_80_4bpp.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\small_btn_pressed.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\btn_long_pressed.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Kerning_Asap_Regular_15_4bpp.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\LanguageGb.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\ApplicationFontProvider.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Kerning_Asap_Regular_27_4bpp.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\BitmapDatabase.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\orange_arrow.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7TouchController.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Font_Asap_Regular_27_4bpp.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\FrontendApplicationBase.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\btn_long.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Font_Asap_Regular_80_4bpp.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\FontGetters.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\counter_box.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\small_btn_disable.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\MainViewBase.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\bg.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Texts.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\TypedTextDatabase.o</file>
             <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\black_arrow_up.o</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Font_Asap_Regular_15_4bpp.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Font_Asap_Regular_80_4bpp.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\FontGetters.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\target\STM32F7Instrumentation.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\target\STM32F7TouchController.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Kerning_Asap_Regular_15_4bpp.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\target\GPIO.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Kerning_Asap_Regular_27_4bpp.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Kerning_Asap_Regular_80_4bpp.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Table_Asap_Regular_15_4bpp.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\target\STM32F7HAL.cpp</file>
+            <file>$PROJ_DIR$\..\Core\Src\main.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Table_Asap_Regular_27_4bpp.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Table_Asap_Regular_80_4bpp.cpp</file>
+            <file>$PROJ_DIR$\..\Core\Src\stm32f7xx_hal_msp.c</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\gui_generated\src\common\FrontendApplicationBase.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\target\BoardConfiguration.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\target\STM32F7DMA.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\ApplicationFontProvider.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Font_Asap_Regular_27_4bpp.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\gui_generated\src\main_screen\MainViewBase.cpp</file>
+            <file>$PROJ_DIR$\startup_stm32f746xx.s</file>
+            <file>$PROJ_DIR$\..\Core\Src\freertos.c</file>
+            <file>$PROJ_DIR$\..\Core\Src\stm32f7xx_hal_timebase_tim.c</file>
+            <file>$PROJ_DIR$\..\Core\Src\stm32f7xx_it.c</file>
+            <file>$PROJ_DIR$\..\TouchGFX\target\HW_Init.cpp</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7Instrumentation.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_uart.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\queue.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7TouchController.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\croutine.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7HAL.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Font_Asap_Regular_15_4bpp.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_tim_ex.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\startup_stm32f746xx.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\ApplicationFontProvider.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_timebase_tim.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Font_Asap_Regular_27_4bpp.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\cmsis_os.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_it.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\BoardConfiguration.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_ll_fmc.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\GPIO.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_tim.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\event_groups.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_sdram.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\port.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\tasks.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\portasm.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\list.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\heap_4.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\freertos.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\main.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_msp.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\HW_Init.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\OSWrappers.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\timers.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7DMA.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\MainPresenter.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_ltdc.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_dma.o</file>
             <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_dma2d.o</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\croutine.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32746g_discovery.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\system_stm32f7xx.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_crc_ex.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_qspi.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rcc.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rcc_ex.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Model.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rtc.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_dsi.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rtc_ex.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\MainView.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_cortex.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_flash.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32746g_discovery_ts.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_flash_ex.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_gpio.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_i2c.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_crc.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_i2c_ex.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\FrontendApplication.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_dma_ex.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_ltdc_ex.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_pwr.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32746g_discovery_qspi.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\ft5336.o</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_pwr_ex.o</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_ltdc.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_ltdc_ex.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_pwr_ex.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rcc_ex.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_i2c_ex.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rtc_ex.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_sdram.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_uart.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_tim.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_ll_fmc.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_gpio.c</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS\cmsis_os.c</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\croutine.c</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\portable\MemMang\heap_4.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_qspi.c</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\list.c</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\event_groups.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_tim_ex.c</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\portable\IAR\ARM_CM7\r0p1\port.c</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\portable\IAR\ARM_CM7\r0p1\portasm.s</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_i2c.c</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\queue.c</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\tasks.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rcc.c</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\timers.c</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\os\OSWrappers.cpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\lib\core\cortex_m7\IAR8.x\touchgfx_core_release.a</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rtc.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_flash_ex.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_flash.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_pwr.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_dsi.c</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\small_btn.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\small_btn_disable.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\gui\src\common\FrontendApplication.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\gui\src\model\Model.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\gui\src\main_screen\MainPresenter.cpp</file>
+            <file>$PROJ_DIR$\..\Drivers\BSP\STM32746G-Discovery\stm32746g_discovery_ts.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_crc_ex.c</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\counter_box.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\orange_arrow_up.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\orange_arrow.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\texts\src\TypedTextDatabase.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\gui\src\main_screen\MainView.cpp</file>
+            <file>$PROJ_DIR$\..\Core\Src\system_stm32f7xx.c</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\small_btn_pressed.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\black_arrow.cpp</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal.c</file>
+            <file>$PROJ_DIR$\..\Drivers\BSP\STM32746G-Discovery\stm32746g_discovery.c</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\texts\src\Texts.cpp</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_cortex.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_crc.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_dma.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_dma2d.c</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_dma_ex.c</file>
+            <file>$PROJ_DIR$\..\Drivers\BSP\STM32746G-Discovery\stm32746g_discovery_qspi.c</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\BitmapDatabase.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\black_arrow_up.cpp</file>
+            <file>$PROJ_DIR$\..\Drivers\BSP\Components\ft5336\ft5336.c</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\btn_long_pressed.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\btn_long.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\texts\src\LanguageGb.cpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\images\src\bg.cpp</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_ltdc.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_dsi.pbi</file>
             <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_qspi.pbi</file>
             <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_tim.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\cmsis_os.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rtc_ex.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_pwr_ex.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_tim_ex.pbi</file>
             <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_uart.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rcc.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_ll_fmc.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_crc.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_dma2d.pbi</file>
             <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_gpio.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\event_groups.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_pwr.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rcc_ex.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_i2c.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32746g_discovery_ts.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32746g_discovery_qspi.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\system_stm32f7xx.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_ltdc_ex.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_dma2d.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_crc.pbi</file>
             <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_flash_ex.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rcc.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rtc.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_cortex.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_crc_ex.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rtc_ex.pbi</file>
             <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_sdram.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_ltdc.pbi</file>
-            <file>$PROJ_DIR$\STM32F746G-DISCO\Exe\STM32F746G-DISCO.hex</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\widgets\BoxWithBorder.hpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\target\STM32F7DMA.hpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\texts\include\texts\TypedTextDatabase.hpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\gui\include\gui\model\Model.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\platform\driver\button\ButtonController.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\AnimatedImageButtonStyle.hpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\fonts\include\fonts\ApplicationFontProvider.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\events\ClickEvent.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\widgets\TextArea.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\widgets\TiledImage.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\transitions\NoTransition.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\hal\Config.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\TwoWildcardTextButtonStyle.hpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\gui\include\gui\main_screen\MainView.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\hal\Atomic.hpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\images\include\BitmapDatabase.hpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\gui\include\gui\model\ModelListener.hpp</file>
-            <file>$TOOLKIT_DIR$\inc\cpp\cstdlib</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Utils.hpp</file>
-            <file>$TOOLKIT_DIR$\inc\cpp\cstddef</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\platform\driver\lcd\LCD24bpp.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\hal\Gestures.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\lcd\LCD.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\TextureMapTypes.hpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\target\STM32F7Instrumentation.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\hal\BoardConfiguration.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\events\GestureEvent.hpp</file>
-            <file>$PROJ_DIR$\..\TouchGFX\generated\gui_generated\include\gui_generated\common\FrontendHeapBase.hpp</file>
-            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\mvp\MVPHeap.hpp</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_ll_fmc.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_dma_ex.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\cmsis_os.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\croutine.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_i2c_ex.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_dma.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_flash.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\MainPresenter.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\BitmapDatabase.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Model.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Table_Asap_Regular_15_4bpp.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\ft5336.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\LanguageGb.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\TypedTextDatabase.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32746g_discovery.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Kerning_Asap_Regular_15_4bpp.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\black_arrow.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\bg.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\MainView.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\FontGetters.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\small_btn_pressed.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Kerning_Asap_Regular_27_4bpp.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\MainViewBase.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\orange_arrow.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\black_arrow_up.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\counter_box.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\FrontendApplicationBase.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\small_btn.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\btn_long.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Kerning_Asap_Regular_80_4bpp.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Texts.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\orange_arrow_up.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\small_btn_disable.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\btn_long_pressed.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\FrontendApplication.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Table_Asap_Regular_80_4bpp.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Font_Asap_Regular_80_4bpp.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Table_Asap_Regular_27_4bpp.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\MyApplication5.pbd</file>
+            <file>$TOOLKIT_DIR$\inc\c\stddef.h</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\projdefs.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\mpu_wrappers.h</file>
             <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\tasks.pbi</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\deprecated_definitions.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\timers.h</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\queue.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\list.pbi</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\semphr.h</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\heap_4.pbi</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS\cmsis_os.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\stdint.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\iccarm_builtin.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\list.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\stdio.h</file>
+            <file>$PROJ_DIR$\..\TouchGFX\gui\include\gui\model\ModelListener.hpp</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_Config_Full.h</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\event_groups.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Exe\STM32F746G-DISCO.hex</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\OSWrappers.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\timers.pbi</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\port.pbi</file>
+            <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\FreeRTOS.h</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Exe\MyApplication5.out</file>
+            <file>$TOOLKIT_DIR$\inc\c\intrinsics.h</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\portable\IAR\ARM_CM7\r0p1\portmacro.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\iar_intrinsics_common.h</file>
+            <file>$PROJ_DIR$\..\Core\Inc\FreeRTOSConfig.h</file>
+            <file>$PROJ_DIR$\..\TouchGFX\gui\include\gui\model\Model.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\task.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\queue.h</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\event_groups.h</file>
+            <file>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\include\portable.h</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\common\Meta.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\mvp\View.hpp</file>
+            <file>$TOOLKIT_DIR$\inc\c\stdarg.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\stdlib.h</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\hal\Config.hpp</file>
+            <file>$TOOLKIT_DIR$\inc\cpp\cstddef</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Utils.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\lcd\LCD.hpp</file>
+            <file>$TOOLKIT_DIR$\inc\cpp\xstddef</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Callback.hpp</file>
+            <file>$TOOLKIT_DIR$\inc\cpp\exception</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\AbstractButtonContainer.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\events\ClickEvent.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\hal\HAL.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\hal\DMA.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\events\GestureEvent.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\widgets\TextArea.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Bitmap.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\widgets\Widget.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\TouchButtonTrigger.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\Buttons.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\TwoWildcardTextButtonStyle.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\widgets\Image.hpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\gui\include\gui\common\FrontendApplication.hpp</file>
+            <file>$TOOLKIT_DIR$\inc\cpp\new</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\hal\BlitOp.hpp</file>
+            <file>$TOOLKIT_DIR$\inc\c\assert.h</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\events\DragEvent.hpp</file>
+            <file>$TOOLKIT_DIR$\inc\cpp\cstdlib</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\TextProvider.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\hal\Types.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\platform\driver\touch\TouchController.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\UIEventListener.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Event.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\platform\core\MCUInstrumentation.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\mvp\MVPApplication.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\mvp\Presenter.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Application.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\common\Partition.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Drawable.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Texts.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Unicode.hpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\gui_generated\include\gui_generated\main_screen\MainViewBase.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\AnimatedImageButtonStyle.hpp</file>
+            <file>$TOOLKIT_DIR$\inc\cpp\xtr1common</file>
+            <file>$TOOLKIT_DIR$\inc\c\DLib_Product_stdlib.h</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\widgets\Box.hpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\gui_generated\include\gui_generated\common\FrontendApplicationBase.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\widgets\TextAreaWithWildcard.hpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\gui\include\gui\main_screen\MainPresenter.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\mvp\MVPHeap.hpp</file>
+            <file>$TOOLKIT_DIR$\inc\cpp\cassert</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\transitions\Transition.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\BoxWithBorderButtonStyle.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\ClickButtonTrigger.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Font.hpp</file>
+            <file>$TOOLKIT_DIR$\inc\cpp\type_traits</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\RepeatButtonTrigger.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Screen.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\JSMOCHelper.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\common\AbstractPartition.hpp</file>
+            <file>$TOOLKIT_DIR$\inc\cpp\initializer_list</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\Container.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\hal\Gestures.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\TypedText.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\TiledImageButtonStyle.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\ToggleButtonTrigger.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\widgets\TiledImage.hpp</file>
+            <file>$TOOLKIT_DIR$\inc\cpp\xxexception</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\TextButtonStyle.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\WildcardTextButtonStyle.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\hal\Atomic.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\platform\driver\button\ButtonController.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\widgets\AnimatedImage.hpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\gui\include\gui\main_screen\MainView.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\FontManager.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\IconButtonStyle.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\containers\buttons\ImageButtonStyle.hpp</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\widgets\BoxWithBorder.hpp</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\freertos.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\main.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_it.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\GPIO.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\HW_Init.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\BoardConfiguration.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7DMA.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_msp.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_timebase_tim.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\black_arrow.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\LanguageGb.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Texts.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Font_Asap_Regular_80_4bpp.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\small_btn.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\TypedTextDatabase.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\FontGetters.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\FrontendApplication.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\ApplicationFontProvider.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Table_Asap_Regular_80_4bpp.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7Instrumentation.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Table_Asap_Regular_15_4bpp.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\small_btn_disable.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\btn_long.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Kerning_Asap_Regular_15_4bpp.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Kerning_Asap_Regular_27_4bpp.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\FrontendApplicationBase.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\counter_box.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Kerning_Asap_Regular_80_4bpp.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7TouchController.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\STM32F7HAL.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Font_Asap_Regular_15_4bpp.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Table_Asap_Regular_27_4bpp.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\MainViewBase.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\bg.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\BitmapDatabase.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Font_Asap_Regular_27_4bpp.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\black_arrow_up.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\btn_long_pressed.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\orange_arrow.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\orange_arrow_up.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\small_btn_pressed.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\MainView.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_pwr_ex.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_dma.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32746g_discovery_ts.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_dma2d.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_dsi.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_i2c.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_i2c_ex.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_ltdc.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_flash.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\ft5336.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_gpio.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_crc_ex.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_ltdc_ex.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\Model.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32746g_discovery.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rcc.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rcc_ex.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\system_stm32f7xx.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32746g_discovery_qspi.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rtc.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\MainPresenter.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_flash_ex.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_rtc_ex.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_crc.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_pwr.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_cortex.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_qspi.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_dma_ex.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_sdram.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_tim.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_uart.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_ll_fmc.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\heap_4.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\port.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\croutine.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\stm32f7xx_hal_tim_ex.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\queue.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\list.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\timers.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\OSWrappers.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\tasks.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\event_groups.__cstat.et</file>
+            <file>$PROJ_DIR$\STM32F746G-DISCO\Obj\cmsis_os.__cstat.et</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_sdram.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_rcc.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_i2c.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_ltdc.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_ll_fmc.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_crc_ex.h</file>
+            <file>$PROJ_DIR$\..\Drivers\BSP\Components\n25q128a\n25q128a.h</file>
+            <file>$PROJ_DIR$\..\Drivers\BSP\STM32746G-Discovery\stm32746g_discovery_qspi.h</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Device\ST\STM32F7xx\Include\stm32f746xx.h</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Device\ST\STM32F7xx\Include\system_stm32f7xx.h</file>
+            <file>$TOOLKIT_DIR$\inc\c\cmsis_iar.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_flash_ex.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_dma_ex.h</file>
+            <file>$PROJ_DIR$\..\Drivers\BSP\STM32746G-Discovery\stm32746g_discovery.h</file>
+            <file>$PROJ_DIR$\..\Core\Inc\stm32f7xx_hal_conf.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_gpio.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_dma.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_tim_ex.h</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Include\core_cmFunc.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_def.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_uart_ex.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_cortex.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_crc.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\Legacy\stm32_hal_legacy.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_rtc_ex.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_dma2d.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_flash.h</file>
+            <file>$PROJ_DIR$\..\Core\Inc\main.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_pwr.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_pwr_ex.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_rcc_ex.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_qspi.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_i2c_ex.h</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Device\ST\STM32F7xx\Include\stm32f7xx.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_tim.h</file>
+            <file>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include\touchgfx\Color.hpp</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_gpio_ex.h</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Include\core_cm7.h</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Include\core_cmInstr.h</file>
+            <file>$PROJ_DIR$\..\Drivers\CMSIS\Include\core_cmSimd.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_uart.h</file>
+            <file>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Inc\stm32f7xx_hal_rtc.h</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\images\include\BitmapDatabase.hpp</file>
+            <file>$PROJ_DIR$\..\TouchGFX\generated\texts\include\texts\TextKeysAndLanguages.hpp</file>
         </outputs>
         <file>
-            <name>$PROJ_DIR$\STM32F746G-DISCO\Exe\STM32F746G-DISCO.out</name>
+            <name>[ROOT_NODE]</name>
             <outputs>
                 <tool>
-                    <name>OBJCOPY</name>
-                    <file> 402</file>
+                    <name>ILINK</name>
+                    <file> 283</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Kerning_Asap_Regular_80_4bpp.cpp</name>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Font_Asap_Regular_15_4bpp.cpp</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 382</file>
+                    <name>__cstat</name>
+                    <file> 403</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 319</file>
+                    <file> 72</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\Core\Src\main.cpp</name>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Font_Asap_Regular_80_4bpp.cpp</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 326</file>
+                    <name>__cstat</name>
+                    <file> 385</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 107</file>
-                </tool>
-            </outputs>
-            <inputs>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 145 95 347 171 78 143 338 146 166 169 90 348 153 91 84 343 94 168 81 127 337 93 349 345 82 134 130 132 80 87 128 135 152 335 144 79 138 342 155 351 148 86 158 89 139 161 346 136 88 163 133 83 129 147 150 151 149 140 92 85 137 131 160 141 156 340 344</file>
-                </tool>
-            </inputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Table_Asap_Regular_80_4bpp.cpp</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 360</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 318</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\TouchGFX\target\STM32F7DMA.cpp</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 371</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 108</file>
+                    <file> 253</file>
                 </tool>
             </outputs>
         </file>
@@ -510,70 +549,51 @@
             <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\FontGetters.cpp</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 376</file>
+                    <name>__cstat</name>
+                    <file> 388</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 118</file>
+                    <file> 236</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\Core\Src\stm32f7xx_hal_msp.c</name>
+            <name>$PROJ_DIR$\..\TouchGFX\target\STM32F7Instrumentation.cpp</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 374</file>
+                    <name>__cstat</name>
+                    <file> 392</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 96</file>
-                </tool>
-            </outputs>
-            <inputs>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 148 161 171 152 146 169 138 139 128 144 155 158 136 163 166 129 151 149 132 135 335 79 342 351 86 89 346 88 133 150 87 84 338 343 83 168 127 156 94 81 147 337 95 93 347 90 348 349</file>
-                </tool>
-            </inputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\gui_generated\src\common\FrontendApplicationBase.cpp</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 379</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 5</file>
+                    <file> 66</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Table_Asap_Regular_15_4bpp.cpp</name>
+            <name>$PROJ_DIR$\..\TouchGFX\target\STM32F7TouchController.cpp</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 384</file>
+                    <name>__cstat</name>
+                    <file> 401</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 11</file>
+                    <file> 69</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\gui_generated\src\main_screen\MainViewBase.cpp</name>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Kerning_Asap_Regular_15_4bpp.cpp</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 378</file>
+                    <name>__cstat</name>
+                    <file> 396</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 0</file>
+                    <file> 232</file>
                 </tool>
             </outputs>
         </file>
@@ -581,76 +601,135 @@
             <name>$PROJ_DIR$\..\TouchGFX\target\GPIO.cpp</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 369</file>
+                    <name>__cstat</name>
+                    <file> 376</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 102</file>
+                    <file> 82</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Kerning_Asap_Regular_27_4bpp.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 397</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 238</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Kerning_Asap_Regular_80_4bpp.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 400</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 246</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Table_Asap_Regular_15_4bpp.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 393</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 227</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\target\STM32F7HAL.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 402</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 71</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Core\Src\main.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 374</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 92</file>
                 </tool>
             </outputs>
             <inputs>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 190</file>
+                    <file> 259 459 497 469 489 482 480 491 490 281 478 293 474 485 462 494 493 498 271 258 270 291 269 261 465 466 473 460 475 481 486 461 488 501 500 273 499 496 492 289 292 287 262 272 268 472 483 467 468 477 275 290 471 464 470 463 484 476 479 282 263 266 256 257 285 284 286 487</file>
                 </tool>
             </inputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\Core\Src\freertos.c</name>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Table_Asap_Regular_27_4bpp.cpp</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 353</file>
+                    <name>__cstat</name>
+                    <file> 404</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 117</file>
-                </tool>
-            </outputs>
-            <inputs>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 163 158 171 166 169 144 153 129 146 128 155 161 136 133 151 149 156 127 168 160 145 147 152 138 148 139 150 140 143 137 131 134 141 130 132 135 335 79 342 351 86 89 346 88 83 81 345 340 87 84 338 343 94 337 95 93 347 90 348 349</file>
-                </tool>
-            </inputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\ApplicationFontProvider.cpp</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 377</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 46</file>
+                    <file> 254</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\bg.cpp</name>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Table_Asap_Regular_80_4bpp.cpp</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 372</file>
+                    <name>__cstat</name>
+                    <file> 391</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 154</file>
+                    <file> 252</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\BitmapDatabase.cpp</name>
+            <name>$PROJ_DIR$\..\Core\Src\stm32f7xx_hal_msp.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 359</file>
+                    <name>__cstat</name>
+                    <file> 380</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 12</file>
+                    <file> 93</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\gui_generated\src\common\FrontendApplicationBase.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 398</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 243</file>
                 </tool>
             </outputs>
         </file>
@@ -658,95 +737,64 @@
             <name>$PROJ_DIR$\..\TouchGFX\target\BoardConfiguration.cpp</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 375</file>
+                    <name>__cstat</name>
+                    <file> 378</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 104</file>
-                </tool>
-            </outputs>
-            <inputs>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 354 324 325 355 171 169 163 339 352 334 327 341 328 166 69 215 192 216 191 208 195 210 212 201 193 425 57 189 197 350 84 93 349 202 89 194 188 206 196 187 198 50 56 60 209 203 211 217 204 331 65 61 343 190 205 152 405 213 414 129 332 431 416 200 421 422 127 420 406 411 51 72 47 75 62 338 94 337 428 423 404 427 346 161 409 418 424 407 146 168 410 429 417 430 413 63 64 66 59 54 52 55 143 67 58 68 419 330 207 199 408 214 415 403 412 426 156 132 87 128 135 335 144 79 138 342 155 351 148 86 158 139 136 88 81 95 347 90 348 48 133 83 147 150 151 149</file>
-                </tool>
-            </inputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\TouchGFX\target\HW_Init.cpp</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 333</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 19</file>
+                    <file> 80</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\Core\Src\stm32f7xx_it.c</name>
+            <name>$PROJ_DIR$\..\TouchGFX\target\STM32F7DMA.cpp</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 368</file>
+                    <name>__cstat</name>
+                    <file> 379</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 110</file>
-                </tool>
-            </outputs>
-            <inputs>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 160 346 342 127 335 86 88 171 166 132 135 79 351 89 168 140 153 80 128 152 144 138 155 148 158 139 161 136 163 83 85 130 329 87 84 338 343 133 129 146 169 150 151 149 92 78 156 94 81 147 337 95 93 347 90 348 349 345 82 143 137 131 134 141 145 340</file>
-                </tool>
-            </inputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\TouchGFX\target\STM32F7HAL.cpp</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 364</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 34</file>
+                    <file> 97</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\Core\Src\stm32f7xx_hal_timebase_tim.c</name>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\ApplicationFontProvider.cpp</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 366</file>
+                    <name>__cstat</name>
+                    <file> 390</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 122</file>
+                    <file> 75</file>
                 </tool>
             </outputs>
-            <inputs>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 171 346 342 146 169 335 86 88 135 79 351 89 132 166 129 151 149 128 152 144 138 155 148 158 139 161 136 163 133 150 87 84 338 343 83 168 127 94 81 147 337 95 93 347 90 348 349</file>
-                </tool>
-            </inputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\target\STM32F7TouchController.cpp</name>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Font_Asap_Regular_27_4bpp.cpp</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 373</file>
+                    <name>__cstat</name>
+                    <file> 408</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 105</file>
+                    <file> 77</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\gui_generated\src\main_screen\MainViewBase.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 405</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 239</file>
                 </tool>
             </outputs>
         </file>
@@ -755,507 +803,267 @@
             <outputs>
                 <tool>
                     <name>AARM</name>
-                    <file> 114</file>
+                    <file> 74</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\target\STM32F7Instrumentation.cpp</name>
+            <name>$PROJ_DIR$\..\Core\Src\freertos.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 367</file>
+                    <name>__cstat</name>
+                    <file> 373</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 39</file>
+                    <file> 91</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Font_Asap_Regular_15_4bpp.cpp</name>
+            <name>$PROJ_DIR$\..\Core\Src\stm32f7xx_hal_timebase_tim.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 336</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 106</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Font_Asap_Regular_27_4bpp.cpp</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 383</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 99</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Font_Asap_Regular_80_4bpp.cpp</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
+                    <name>__cstat</name>
                     <file> 381</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 115</file>
+                    <file> 76</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Kerning_Asap_Regular_15_4bpp.cpp</name>
+            <name>$PROJ_DIR$\..\Core\Src\stm32f7xx_it.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 362</file>
+                    <name>__cstat</name>
+                    <file> 375</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 101</file>
+                    <file> 79</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Table_Asap_Regular_27_4bpp.cpp</name>
+            <name>$PROJ_DIR$\..\TouchGFX\target\HW_Init.cpp</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 358</file>
+                    <name>__cstat</name>
+                    <file> 377</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 10</file>
+                    <file> 94</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Kerning_Asap_Regular_27_4bpp.cpp</name>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_ltdc.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 361</file>
+                    <name>__cstat</name>
+                    <file> 423</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 2</file>
+                    <file> 192</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\Drivers\BSP\STM32746G-Discovery\stm32746g_discovery.c</name>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_ltdc_ex.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 97</file>
+                    <name>__cstat</name>
+                    <file> 428</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 321</file>
+                    <file> 207</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_flash.c</name>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_pwr_ex.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 112</file>
+                    <name>__cstat</name>
+                    <file> 415</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 173</file>
+                    <file> 196</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\gui\src\main_screen\MainView.cpp</name>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rcc_ex.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 21</file>
+                    <name>__cstat</name>
+                    <file> 432</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 3</file>
-                </tool>
-            </outputs>
-            <inputs>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 425 163 204 64 198 50 67 193 206 324 213 421 199 212 201 406 209 429 414 166 129 350 192 60 52 420 127 58 189 331 323 334 197 66 410 169 200 332 354 188 339 216 341 355 210 55 143 327 330 214 418 322 68 69 411 208 56 195 431 191 325 146 168 424 407 417 63 59 75 54 203 211 422 328 187 207 408 415 403 412 416 217 419 352 196 65 51 57 72 61 47 62</file>
-                </tool>
-            </inputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_crc.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 370</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 395</file>
+                    <file> 201</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\btn_long_pressed.cpp</name>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_i2c_ex.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 33</file>
+                    <name>__cstat</name>
+                    <file> 422</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 8</file>
+                    <file> 221</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\black_arrow_up.cpp</name>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rtc_ex.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 385</file>
+                    <name>__cstat</name>
+                    <file> 438</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 142</file>
+                    <file> 215</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\texts\src\TypedTextDatabase.cpp</name>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_sdram.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 23</file>
+                    <name>__cstat</name>
+                    <file> 444</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 311</file>
+                    <file> 216</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\btn_long.cpp</name>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_uart.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 363</file>
+                    <name>__cstat</name>
+                    <file> 446</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 13</file>
+                    <file> 198</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\texts\src\LanguageGb.cpp</name>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_tim.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 40</file>
+                    <name>__cstat</name>
+                    <file> 445</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 317</file>
+                    <file> 195</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\small_btn_disable.cpp</name>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_ll_fmc.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 36</file>
+                    <name>__cstat</name>
+                    <file> 447</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 315</file>
+                    <file> 217</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\gui\src\main_screen\MainPresenter.cpp</name>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_gpio.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 44</file>
+                    <name>__cstat</name>
+                    <file> 426</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 307</file>
+                    <file> 199</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\gui\src\model\Model.cpp</name>
+            <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS\cmsis_os.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 41</file>
+                    <name>__cstat</name>
+                    <file> 458</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 9</file>
+                    <file> 219</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\Drivers\BSP\Components\ft5336\ft5336.c</name>
+            <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\croutine.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 22</file>
+                    <name>__cstat</name>
+                    <file> 450</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 4</file>
+                    <file> 220</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\texts\src\Texts.cpp</name>
+            <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\portable\MemMang\heap_4.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 38</file>
+                    <name>__cstat</name>
+                    <file> 448</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 316</file>
+                    <file> 267</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\Drivers\BSP\STM32746G-Discovery\stm32746g_discovery_ts.c</name>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_qspi.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 121</file>
+                    <name>__cstat</name>
+                    <file> 442</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 314</file>
+                    <file> 194</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal.c</name>
+            <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\list.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 125</file>
+                    <name>__cstat</name>
+                    <file> 453</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 179</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\black_arrow.cpp</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 365</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 320</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\small_btn_pressed.cpp</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 26</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 14</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_crc_ex.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 120</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 177</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\orange_arrow_up.cpp</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 28</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 313</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\small_btn.cpp</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 35</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 312</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\BSP\STM32746G-Discovery\stm32746g_discovery_qspi.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 124</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 1</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_dma.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 356</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 178</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Core\Src\system_stm32f7xx.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 119</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 7</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\orange_arrow.cpp</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 18</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 310</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\counter_box.cpp</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 42</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 6</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\TouchGFX\gui\src\common\FrontendApplication.cpp</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 31</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 308</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_cortex.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 126</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 172</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_dma2d.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 386</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 396</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_dma_ex.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 380</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 182</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_dsi.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 357</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 175</file>
+                    <file> 265</file>
                 </tool>
             </outputs>
         </file>
@@ -1263,12 +1071,25 @@
             <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\event_groups.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 100</file>
+                    <name>__cstat</name>
+                    <file> 457</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 398</file>
+                    <file> 276</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_tim_ex.c</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 451</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 197</file>
                 </tool>
             </outputs>
         </file>
@@ -1276,38 +1097,12 @@
             <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\portable\IAR\ARM_CM7\r0p1\port.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 45</file>
+                    <name>__cstat</name>
+                    <file> 449</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 159</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\queue.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 98</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 164</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\os\OSWrappers.cpp</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 37</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 167</file>
+                    <file> 280</file>
                 </tool>
             </outputs>
         </file>
@@ -1316,33 +1111,39 @@
             <outputs>
                 <tool>
                     <name>AARM</name>
-                    <file> 111</file>
+                    <file> 88</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>AARM</name>
+                    <file> 287</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_i2c.c</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 421</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 202</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\timers.c</name>
+            <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\queue.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 123</file>
+                    <name>__cstat</name>
+                    <file> 452</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 170</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\croutine.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 29</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 387</file>
+                    <file> 264</file>
                 </tool>
             </outputs>
         </file>
@@ -1350,233 +1151,12 @@
             <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\tasks.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 116</file>
+                    <name>__cstat</name>
+                    <file> 456</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 432</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\portable\MemMang\heap_4.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 109</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 183</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_uart.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 24</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 392</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_ll_fmc.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 32</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 394</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS\cmsis_os.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 20</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 390</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_tim_ex.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 43</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 180</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\list.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 15</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 165</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rtc_ex.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 25</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 391</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_sdram.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 53</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 400</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_i2c.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 17</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 184</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rtc.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 49</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 186</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_tim.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 16</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 389</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_ltdc.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 70</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 401</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_flash_ex.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 113</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 399</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_ltdc_ex.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 74</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 181</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_pwr.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 73</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 174</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_qspi.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 27</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 388</file>
-                </tool>
-            </outputs>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_gpio.c</name>
-            <outputs>
-                <tool>
-                    <name>ICCARM</name>
-                    <file> 103</file>
-                </tool>
-                <tool>
-                    <name>BICOMP</name>
-                    <file> 397</file>
+                    <file> 260</file>
                 </tool>
             </outputs>
         </file>
@@ -1584,60 +1164,533 @@
             <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rcc.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 77</file>
+                    <name>__cstat</name>
+                    <file> 431</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 393</file>
+                    <file> 211</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_pwr_ex.c</name>
+            <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\timers.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 76</file>
+                    <name>__cstat</name>
+                    <file> 454</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 309</file>
+                    <file> 279</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_i2c_ex.c</name>
+            <name>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\os\OSWrappers.cpp</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 30</file>
+                    <name>__cstat</name>
+                    <file> 455</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 176</file>
+                    <file> 278</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rcc_ex.c</name>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rtc.c</name>
             <outputs>
                 <tool>
-                    <name>ICCARM</name>
-                    <file> 71</file>
+                    <name>__cstat</name>
+                    <file> 435</file>
                 </tool>
                 <tool>
                     <name>BICOMP</name>
-                    <file> 185</file>
+                    <file> 212</file>
                 </tool>
             </outputs>
         </file>
         <file>
-            <name>[ROOT_NODE]</name>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_flash_ex.c</name>
             <outputs>
                 <tool>
-                    <name>ILINK</name>
-                    <file> 157</file>
+                    <name>__cstat</name>
+                    <file> 437</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 210</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_flash.c</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 424</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 223</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_pwr.c</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 440</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 200</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_dsi.c</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 420</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 193</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\small_btn.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 386</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 244</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\small_btn_disable.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 394</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 249</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\gui\src\common\FrontendApplication.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 389</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 251</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\gui\src\model\Model.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 429</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 226</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 275 288 292 293 281 300 320 345 271 269 290 324 289 263 273 274 268 262 258 311 298 291 287 261 259 284 286 282 266 256 257 285 270 272</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\gui\src\main_screen\MainPresenter.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 436</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 224</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 271 294 338 330 281 331 256 317 324 327 323 325 326 335 333 301 315 316 318 306 269 307 319 303 339 310 312 313 305 300 343 314 288 295 309 298 258 296 311 308 328 321 320 304 322 297 262 299 302 334 337 336 340 342 341 329 332 344 345 346 275 290 349 357 366 365 354 352 356 353 362 355 350 351 370 359 367 368 274 369 358 348 360 347 371 363 364 372 361</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\BSP\STM32746G-Discovery\stm32746g_discovery_ts.c</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 417</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 203</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_crc_ex.c</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 427</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 214</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\counter_box.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 399</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 242</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\orange_arrow_up.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 412</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 248</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\orange_arrow.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 411</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 240</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\texts\src\TypedTextDatabase.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 387</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 230</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\gui\src\main_screen\MainView.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 414</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 235</file>
+                </tool>
+            </outputs>
+            <inputs>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 329 345 349 306 350 295 321 357 324 333 331 320 365 299 281 358 371 300 342 341 332 346 275 366 323 354 356 303 262 305 311 367 495 343 340 310 307 344 326 290 271 301 335 309 296 352 353 302 362 355 288 369 360 364 502 503 336 317 316 314 294 318 327 269 298 258 319 308 325 328 330 304 322 338 256 297 274 348 347 363 368 339 312 334 351 313 370 337 359 315 372 361</file>
+                </tool>
+            </inputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Core\Src\system_stm32f7xx.c</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 433</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 205</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\small_btn_pressed.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 413</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 237</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\black_arrow.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 382</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 233</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal.c</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 419</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 206</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\BSP\STM32746G-Discovery\stm32746g_discovery.c</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 430</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 231</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\texts\src\Texts.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 384</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 247</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_cortex.c</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 441</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 213</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_crc.c</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 439</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 209</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_dma.c</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 416</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 222</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_dma2d.c</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 418</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 208</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_dma_ex.c</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 443</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 218</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\BSP\STM32746G-Discovery\stm32746g_discovery_qspi.c</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 434</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 204</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\BitmapDatabase.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 407</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 225</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\black_arrow_up.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 409</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 241</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\Drivers\BSP\Components\ft5336\ft5336.c</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 425</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 228</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\btn_long_pressed.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 410</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 250</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\btn_long.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 395</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 245</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\texts\src\LanguageGb.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 383</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 229</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\bg.cpp</name>
+            <outputs>
+                <tool>
+                    <name>__cstat</name>
+                    <file> 406</file>
+                </tool>
+                <tool>
+                    <name>BICOMP</name>
+                    <file> 234</file>
+                </tool>
+            </outputs>
+        </file>
+        <file>
+            <name>$PROJ_DIR$\STM32F746G-DISCO\Exe\MyApplication5.out</name>
+            <outputs>
+                <tool>
+                    <name>OBJCOPY</name>
+                    <file> 277</file>
                 </tool>
             </outputs>
         </file>

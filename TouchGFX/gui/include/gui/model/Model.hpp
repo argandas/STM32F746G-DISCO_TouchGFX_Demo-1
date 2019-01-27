@@ -36,9 +36,9 @@ public:
      */
     void tick();
     
-    void model_btnPressed();
-    void model_ledSetState(bool led_state);
-    
+    /* to be called from presenter */
+    void p2m_SetLEDState(bool led_state);
+        
 protected:
     /**
      * Pointer to the currently active presenter.
