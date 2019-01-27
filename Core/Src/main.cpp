@@ -56,6 +56,23 @@
 /* USER CODE BEGIN Includes */
 #include <stm32746g_discovery_qspi.h>
 #include <stm32746g_discovery.h>
+    
+#include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+#include <sprintf.h>
+
+#define CLI_FMT_BUFFER_LEN 256
+
+/*
+void cli_init();
+*/
+
+uint16_t cli_printf(const char* fmt, ...);
+uint16_t cli_write(const char* src, uint16_t len);
+uint16_t cli_varg_printf(const char* fmt, va_list args);
+
+char cli_fmt_buffer[CLI_FMT_BUFFER_LEN];
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -968,12 +985,51 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+UART_HandleTypeDef uart_console;
+
+void com_init()
+{
+  BSP_COM_DeInit(COM1, &uart_console);
+  BSP_COM_Init(COM1, &uart_console);
+}
+
+uint16_t cli_printf(const char* fmt, ...)
+{
+    va_list  args;
+    uint16_t len = 0;
+
+    va_start(args, fmt);
+    len = cli_varg_printf(fmt, args);
+    va_end(args);
+
+    return len;
+}
+
+uint16_t cli_write(const char* src, uint16_t len)
+{
+    HAL_UART_Transmit(&huart1, (uint8_t*)src, len, 100);
+}
+
+uint16_t cli_varg_printf(const char* fmt, va_list args)
+{
+    uint16_t len = 0;
+    if (NULL != fmt)
+    {
+        //len = (uint16_t) tfp_vsnprintf(&cli_fmt_buffer[0], CLI_FMT_BUFFER_LEN, fmt, args);
+    }
+    return cli_write(fmt, strlen(fmt));
+    // return cli_write(&cli_fmt_buffer[0], len);
+}
+
 void StartLEDTask(void const * argument)
 {
+  //char* string = "Hello World";
   uint8_t led_state = 0;
 
   BSP_LED_Init(LED_GREEN);
   BSP_LED_Off(LED_GREEN);
+  
+  // com_init();
     
   /* Infinite loop */
   for(;;)
@@ -988,6 +1044,10 @@ void StartLEDTask(void const * argument)
     {
       BSP_LED_Off(LED_GREEN);
     }
+    
+    cli_printf("Hello %s \r\n", "world");
+    
+    // com_printf("Model::p2m_SetLEDState: %d\r\n", led_state);
     
     osDelay(20);
   }

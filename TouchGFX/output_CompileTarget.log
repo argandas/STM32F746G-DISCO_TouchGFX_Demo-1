@@ -1,101 +1,11 @@
 Converting images
-Compiling TouchGFX/gui/src/main_screen/MainPresenter.cpp
-Compiling TouchGFX/gui/src/main_screen/MainView.cpp
-Compiling TouchGFX/gui/src/model/Model.cpp
-Compiling TouchGFX/gui/src/common/FrontendApplication.cpp
-Compiling TouchGFX/generated/gui_generated/src/main_screen/MainViewBase.cpp
-Compiling TouchGFX/generated/gui_generated/src/common/FrontendApplicationBase.cpp
-Compiling TouchGFX/generated/fonts/src/Font_Asap_Regular_15_4bpp.cpp
-Compiling TouchGFX/generated/fonts/src/Kerning_Asap_Regular_15_4bpp.cpp
-Compiling TouchGFX/generated/fonts/src/Font_Asap_Regular_27_4bpp.cpp
-Compiling TouchGFX/generated/fonts/src/FontGetters.cpp
-Compiling TouchGFX/generated/fonts/src/Table_Asap_Regular_80_4bpp.cpp
-Compiling TouchGFX/generated/fonts/src/Kerning_Asap_Regular_27_4bpp.cpp
-Compiling TouchGFX/generated/fonts/src/Table_Asap_Regular_15_4bpp.cpp
-Compiling TouchGFX/generated/fonts/src/Font_Asap_Regular_80_4bpp.cpp
-Compiling TouchGFX/generated/fonts/src/Table_Asap_Regular_27_4bpp.cpp
-Compiling TouchGFX/generated/fonts/src/Kerning_Asap_Regular_80_4bpp.cpp
-Compiling TouchGFX/generated/fonts/src/ApplicationFontProvider.cpp
-Compiling TouchGFX/generated/images/src/counter_box.cpp
-Compiling TouchGFX/generated/images/src/orange_arrow_up.cpp
-Compiling TouchGFX/generated/images/src/black_arrow.cpp
-Compiling TouchGFX/generated/images/src/BitmapDatabase.cpp
-Compiling TouchGFX/generated/images/src/btn_long_pressed.cpp
-Compiling TouchGFX/generated/images/src/small_btn.cpp
-Compiling TouchGFX/generated/images/src/bg.cpp
-Compiling TouchGFX/generated/images/src/orange_arrow.cpp
-Compiling TouchGFX/generated/images/src/small_btn_disable.cpp
-Compiling TouchGFX/generated/images/src/btn_long.cpp
-Compiling TouchGFX/generated/images/src/black_arrow_up.cpp
-Compiling TouchGFX/generated/images/src/small_btn_pressed.cpp
-Compiling TouchGFX/generated/texts/src/LanguageGb.cpp
-Compiling TouchGFX/generated/texts/src/TypedTextDatabase.cpp
-Compiling TouchGFX/generated/texts/src/Texts.cpp
-Compiling Middlewares/ST/TouchGFX/touchgfx//os/OSWrappers.cpp
-Compiling Core/Src/main.cpp
-Compiling TouchGFX/target/STM32F7Instrumentation.cpp
-Compiling TouchGFX/target/STM32F7TouchController.cpp
-Compiling TouchGFX/target/STM32F7DMA.cpp
-Compiling TouchGFX/target/STM32F7HAL.cpp
-Compiling TouchGFX/target/GPIO.cpp
-In file included from Core/Src/main.cpp:53:0:
-Core/Src/main.cpp: In function 'int main()':
-Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h:470:54: warning: ISO C++ forbids converting a string constant to 'char*' [-Wwrite-strings]
- { #name, (thread), (priority), (instances), (stacksz)}
-                                                      ^
-Core/Src/main.cpp:176:5: note: in expansion of macro 'osThreadDef'
-     osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 4096);
-     ^~~~~~~~~~~
-Compiling TouchGFX/target/HW_Init.cpp
-Compiling TouchGFX/target/BoardConfiguration.cpp
-Compiling Middlewares/Third_Party/FreeRTOS/Source/croutine.c
-Compiling Middlewares/Third_Party/FreeRTOS/Source/list.c
-Compiling Middlewares/Third_Party/FreeRTOS/Source/queue.c
-Compiling Middlewares/Third_Party/FreeRTOS/Source/tasks.c
-Compiling Middlewares/Third_Party/FreeRTOS/Source/timers.c
-Compiling Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_2.c
-Compiling Middlewares/Third_Party/FreeRTOS/Source/portable/GCC/ARM_CM7/r0p1/port.c
-Compiling Drivers/BSP/STM32746G-Discovery/stm32746g_discovery.c
-Compiling Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_sdram.c
-Compiling Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_ts.c
-Compiling Drivers/BSP/STM32746G-Discovery/stm32746g_discovery_qspi.c
-Compiling Drivers/BSP/Components/ft5336/ft5336.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_cortex.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dma.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dma2d.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dma_ex.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_gpio.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c_ex.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_ltdc.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_nor.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr_ex.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc_ex.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_sdram.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_sd.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim_ex.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_qspi.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_crc.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_crc_ex.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rtc.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rtc_ex.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_fmc.c
-Compiling Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_sdmmc.c
-Compiling Core/Src/system_stm32f7xx.c
-Compiling Core/Src/freertos.c
-Compiling Core/Src/stm32f7xx_hal_msp.c
-Compiling Core/Src/stm32f7xx_hal_timebase_tim.c
-Compiling Core/Src/stm32f7xx_it.c
-Compiling Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c
-Compiling ASM Drivers/CMSIS/Device/ST/STM32F7xx/Source/Templates/gcc/startup_stm32f746xx.s
 Linking TouchGFX/build/bin/target.elf
-Producing additional output formats...
-  target.hex   - Combined internal+external hex
-  intflash.elf - Internal flash, elf debug
-  intflash.hex - Internal flash, hex
-  extflash.bin - External flash, binary
+TouchGFX/build/STM32F746-DISCO/Core/Src/main.o: In function `cli_varg_printf(char const*, std::__va_list)':
+c:\TouchGFXProjects\MyApplication5/Core/Src/main.cpp:1018: undefined reference to `tfp_vsnprintf(char*, unsigned int, char const*, std::__va_list)'
+collect2.exe: error: ld returned 1 exit status
+gcc/Makefile:328: recipe for target 'TouchGFX/build/bin/target.elf' failed
+make[2]: *** [TouchGFX/build/bin/target.elf] Error 1
+gcc/Makefile:324: recipe for target 'generate_assets' failed
+make[1]: *** [generate_assets] Error 2
+../gcc/Makefile:47: recipe for target 'all' failed
+make: *** [all] Error 2
