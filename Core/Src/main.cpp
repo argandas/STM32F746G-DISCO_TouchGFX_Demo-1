@@ -109,6 +109,8 @@ QSPI_HandleTypeDef hqspi;
 RTC_HandleTypeDef hrtc;
 
 SD_HandleTypeDef hsd1;
+DMA_HandleTypeDef hdma_sdmmc1_rx;
+DMA_HandleTypeDef hdma_sdmmc1_tx;
 
 UART_HandleTypeDef huart1;
 
@@ -124,6 +126,7 @@ osMessageQId ledQueueHandle;
 /* Private function prototypes -----------------------------------------------*/
 extern "C" void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_DMA_Init(void);
 static void MX_CRC_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_I2C3_Init(void);
@@ -176,6 +179,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_CRC_Init();
   MX_I2C1_Init();
   MX_I2C3_Init();
@@ -213,7 +217,7 @@ int main(void)
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of buttonTask */
-  osThreadDef(buttonTask, StartButtonTask, osPriorityIdle, 0, 512);
+  osThreadDef(buttonTask, StartButtonTask, osPriorityIdle, 0, 128);
   buttonTaskHandle = osThreadCreate(osThread(buttonTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -677,6 +681,24 @@ static void MX_USART1_UART_Init(void)
 
 }
 
+/** 
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void) 
+{
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA2_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA2_Stream3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream3_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream3_IRQn);
+  /* DMA2_Stream6_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream6_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream6_IRQn);
+
+}
+
 /**
   * @brief GPIO Initialization Function
   * @param None
@@ -1094,7 +1116,7 @@ void StartLEDTask(void const * argument)
 
 void StartSDTask(void const * argument)
 {
-  
+#if 0
   FATFS fs;    /* Ponter to the filesystem object */
   FRESULT fr;   /* FatFs function common result code */
   char label[12];
@@ -1109,19 +1131,20 @@ void StartSDTask(void const * argument)
   cli_printf("f_open: %d\r\n", fr);
   
   
-#if 0
-    FRESULT res;                                        /* FatFs function common result code */
+#else
+  FRESULT fr;                                        /* FatFs function common result code */
   uint32_t byteswritten, bytesread;                     /* File write/read counts */
   uint8_t wtext[] = "This is STM32 working with FatFs"; /* File write buffer */
   uint8_t rtext[100];                                   /* File read buffer */
-  
-  cli_printf("Step #%d\r\n", 1);
+    
+  cli_printf("FATFS %s\r\n", "Start");
   /*##-1- Link the micro SD disk I/O driver ##################################*/
   // if(FATFS_LinkDriver(&SD_Driver, SDPath) == 0)
   {  
-      cli_printf("Step #%d\r\n", 2);
     /*##-2- Register the file system object to the FatFs module ##############*/
-    if(f_mount(&SDFatFs, (TCHAR const*)SDPath, 0) != FR_OK)
+    fr = f_mount(&SDFatFs, (TCHAR const*)SDPath, 0);
+    cli_printf("f_mount: %d\r\n", fr);
+    if(fr != FR_OK)
     {
       /* FatFs Initialization Error */
       Error_Handler();
@@ -1129,11 +1152,11 @@ void StartSDTask(void const * argument)
     else
     {
 #if 1
-        cli_printf("Step #%d\r\n", 3);
-
       /*##-3- Create a FAT file system (format) on the logical drive #########*/
       /* WARNING: Formatting the uSD card will delete all content on the device */
-if(f_mkfs((TCHAR const*)SDPath, FM_ANY, 0, workBuffer, sizeof(workBuffer)) != FR_OK)
+      fr = f_mkfs((TCHAR const*)SDPath, FM_ANY, 0, workBuffer, sizeof(workBuffer));
+      cli_printf("f_mkfs: %d\r\n", fr);
+      if(fr != FR_OK)
       {
         /* FatFs Format Error */
         Error_Handler();
@@ -1141,62 +1164,52 @@ if(f_mkfs((TCHAR const*)SDPath, FM_ANY, 0, workBuffer, sizeof(workBuffer)) != FR
       else
 #endif
       {
-          cli_printf("Step #%d\r\n", 4);
-
         /*##-4- Create and Open a new text file object with write access #####*/
-        if(f_open(&MyFile, "STM32.TXT", FA_CREATE_ALWAYS | FA_WRITE) != FR_OK)
+        fr = f_open(&MyFile, "STM32.TXT", FA_CREATE_ALWAYS | FA_WRITE);
+        cli_printf("f_open: %d\r\n", fr);
+        if(fr != FR_OK)
         {
           /* 'STM32.TXT' file Open for write Error */
           Error_Handler();
         }
         else
         {
-            cli_printf("Step #%d\r\n", 5);
-
           /*##-5- Write data to the text file ################################*/
-          res = f_write(&MyFile, wtext, sizeof(wtext), (UINT *)&byteswritten);
-          
-          if((byteswritten == 0) || (res != FR_OK))
+          fr = f_write(&MyFile, wtext, sizeof(wtext), (UINT *)&byteswritten);
+          cli_printf("f_write: %d\r\n", fr);
+          if((byteswritten == 0) || (fr != FR_OK))
           {
             /* 'STM32.TXT' file Write or EOF Error */
             Error_Handler();
           }
           else
           {
-              cli_printf("Step #%d\r\n", 6);
-
             /*##-6- Close the open text file #################################*/
-            f_close(&MyFile);
-            
-              cli_printf("Step #%d\r\n", 7);
-
+            fr = f_close(&MyFile);
+            cli_printf("f_close: %d\r\n", fr);
             /*##-7- Open the text file object with read access ###############*/
-            if(f_open(&MyFile, "STM32.TXT", FA_READ) != FR_OK)
+            fr = f_open(&MyFile, "STM32.TXT", FA_READ);
+            cli_printf("f_open: %d\r\n", fr);
+            if(fr != FR_OK)
             {
               /* 'STM32.TXT' file Open for read Error */
               Error_Handler();
             }
             else
             {
-                cli_printf("Step #%d\r\n", 8);
-
               /*##-8- Read data from the text file ###########################*/
-              res = f_read(&MyFile, rtext, sizeof(rtext), (UINT*)&bytesread);
-              
-              if((bytesread == 0) || (res != FR_OK))
+              fr = f_read(&MyFile, rtext, sizeof(rtext), (UINT*)&bytesread);
+              cli_printf("f_read: %d\r\n", fr);
+              if((bytesread == 0) || (fr != FR_OK))
               {
                 /* 'STM32.TXT' file Read or EOF Error */
                 Error_Handler();
               }
               else
               {
-                  cli_printf("Step #%d\r\n", 9);
-
                 /*##-9- Close the open text file #############################*/
-                f_close(&MyFile);
-                
-                  cli_printf("Step #%d\r\n", 10);
-
+                fr = f_close(&MyFile);
+                cli_printf("f_close: %d\r\n", fr);
                 /*##-10- Compare read data with the expected data ############*/
                 if ((bytesread != byteswritten))
                 {                
@@ -1205,10 +1218,7 @@ if(f_mkfs((TCHAR const*)SDPath, FM_ANY, 0, workBuffer, sizeof(workBuffer)) != FR
                 }
                 else
                 {
-                    cli_printf("SUCESS #%X\r\n", 255);
-
-                  /* Success of the demo: no error occurrence */
-                  BSP_LED_On(LED1);
+                    cli_printf("FATFS %s\r\n", "Success");
                 }
               }
             }
@@ -1217,10 +1227,9 @@ if(f_mkfs((TCHAR const*)SDPath, FM_ANY, 0, workBuffer, sizeof(workBuffer)) != FR
       }
     }
   }
-  
-                    cli_printf("Step #%d\r\n", 11);
 
   /*##-11- Unlink the micro SD disk I/O driver ###############################*/
+  cli_printf("FATFS %s\r\n", "End");
   FATFS_UnLinkDriver(SDPath);
   
 #endif
