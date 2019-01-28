@@ -18,7 +18,7 @@ void Model::tick()
 {
 #ifndef SIMULATOR
   uint8_t buttonStateReceived = 0;
-  if (xQueueReceive(&buttonQueueHandle, &buttonStateReceived, 0) == pdTRUE)
+  if (xQueueReceive(buttonQueueHandle, &buttonStateReceived, 0) == pdTRUE)
   {
     modelListener->m2p_ButtonPressed();
   }

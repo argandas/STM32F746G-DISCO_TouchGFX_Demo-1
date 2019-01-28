@@ -217,7 +217,7 @@ int main(void)
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of buttonTask */
-  osThreadDef(buttonTask, StartButtonTask, osPriorityIdle, 0, 128);
+  osThreadDef(buttonTask, StartButtonTask, osPriorityIdle, 0, 512);
   buttonTaskHandle = osThreadCreate(osThread(buttonTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -1277,6 +1277,7 @@ void StartButtonTask(void const * argument)
 {
   /* USER CODE BEGIN StartButtonTask */
   uint32_t buttonState = 0;
+  BaseType_t ret = pdFALSE;
   
   BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
   
@@ -1286,11 +1287,17 @@ void StartButtonTask(void const * argument)
     buttonState = BSP_PB_GetState(BUTTON_KEY);
     if (buttonState == 1)
     {
-      if(xQueueSend(&buttonQueueHandle, (uint8_t*)&buttonState, 0) == pdTRUE)
+      ret = xQueueSend(buttonQueueHandle, (uint8_t*)&buttonState, 0);
+      if(ret == pdTRUE)
       {
-        cli_printf("HW --> Model::tick: %d\r\n", buttonState);
+        cli_printf("hw2m --> Model::tick: %d\r\n", buttonState);
+      }
+      else
+      {
+        cli_printf("xQueueSend: %d\r\n", ret);
       }
     }
+    
     osDelay(100);
   }
   /* USER CODE END StartButtonTask */
