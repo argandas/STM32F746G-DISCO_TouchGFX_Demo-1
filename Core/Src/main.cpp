@@ -55,6 +55,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
 #include <stm32746g_discovery_qspi.h>
 #include <stm32746g_discovery.h>
     
@@ -63,23 +64,6 @@
 #include <string.h>
 #include "sprintf.h"
 
-#define CLI_FMT_BUFFER_LEN 256
-
-/* Private variables ---------------------------------------------------------*/
-FATFS SDFatFs;  /* File system object for SD card logical drive */
-FIL MyFile;     /* File object */
-char SDPath[4]; /* SD card logical drive path */
-uint8_t workBuffer[2*_MAX_SS];
-
-/*
-void cli_init();
-*/
-
-uint16_t cli_printf(const char* fmt, ...);
-uint16_t cli_write(const char* src, uint16_t len);
-uint16_t cli_varg_printf(const char* fmt, va_list args);
-
-char cli_fmt_buffer[CLI_FMT_BUFFER_LEN];
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -116,11 +100,17 @@ UART_HandleTypeDef huart1;
 
 osThreadId defaultTaskHandle;
 osThreadId buttonTaskHandle;
-osMessageQId buttonQueueHandle;
-/* USER CODE BEGIN PV */
 osThreadId ledTaskHandle;
 osThreadId sdTaskHandle;
+osMessageQId buttonQueueHandle;
 osMessageQId ledQueueHandle;
+/* USER CODE BEGIN PV */
+
+FATFS SDFatFs;  /* File system object for SD card logical drive */
+FIL MyFile;     /* File object */
+char SDPath[4]; /* SD card logical drive path */
+uint8_t workBuffer[2*_MAX_SS];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -139,11 +129,12 @@ extern void GRAPHICS_MainTask(void);
 static void MX_SDMMC1_SD_Init(void);
 void StartDefaultTask(void const * argument);
 void StartButtonTask(void const * argument);
-
-/* USER CODE BEGIN PFP */
 void StartLEDTask(void const * argument);
 void StartSDTask(void const * argument);
 
+/* USER CODE BEGIN PFP */
+uint16_t cli_printf(const char* fmt, ...);
+uint16_t cli_write(const char* src, uint16_t len);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -220,14 +211,16 @@ int main(void)
   osThreadDef(buttonTask, StartButtonTask, osPriorityIdle, 0, 512);
   buttonTaskHandle = osThreadCreate(osThread(buttonTask), NULL);
 
-  /* USER CODE BEGIN RTOS_THREADS */
-    /* add threads, ... */
-    /* definition and creation of buttonTask */
+  /* definition and creation of ledTask */
   osThreadDef(ledTask, StartLEDTask, osPriorityIdle, 0, 512);
   ledTaskHandle = osThreadCreate(osThread(ledTask), NULL);
-  
-  osThreadDef(sdTask, StartSDTask, osPriorityIdle, 0, 2048);
+
+  /* definition and creation of sdTask */
+  osThreadDef(sdTask, StartSDTask, osPriorityIdle, 0, 512);
   sdTaskHandle = osThreadCreate(osThread(sdTask), NULL);
+
+  /* USER CODE BEGIN RTOS_THREADS */
+    /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
   /* Create the queue(s) */
@@ -235,9 +228,11 @@ int main(void)
   osMessageQDef(buttonQueue, 16, uint8_t);
   buttonQueueHandle = osMessageCreate(osMessageQ(buttonQueue), NULL);
 
-  /* USER CODE BEGIN RTOS_QUEUES */
+  /* definition and creation of ledQueue */
   osMessageQDef(ledQueue, 16, uint8_t);
   ledQueueHandle = osMessageCreate(osMessageQ(ledQueue), NULL);
+
+  /* USER CODE BEGIN RTOS_QUEUES */
     /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
  
@@ -1036,35 +1031,14 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-UART_HandleTypeDef uart_console;
-
-void com_init()
-{
-  BSP_COM_DeInit(COM1, &uart_console);
-  BSP_COM_Init(COM1, &uart_console);
-}
-
 uint16_t cli_printf(const char* fmt, ...)
 {
-#if 0
-    va_list  args;
-    uint16_t len = 0;
-
-    va_start(args, fmt);
-    len = cli_varg_printf(fmt, args);
-    va_end(args);
-
-    return len;
-#else
     char buff[32];
     va_list args;
     va_start(args, fmt);
     vsnprintf(buff, sizeof(buff), fmt, args);
     HAL_UART_Transmit(&huart1, (uint8_t*)buff, strlen(buff), 100);
-    va_end(args);
-#endif
-    
-    
+    va_end(args);    
 }
 
 uint16_t cli_write(const char* src, uint16_t len)
@@ -1072,27 +1046,79 @@ uint16_t cli_write(const char* src, uint16_t len)
     HAL_UART_Transmit(&huart1, (uint8_t*)src, len, 100);
 }
 
-uint16_t cli_varg_printf(const char* fmt, va_list args)
+/* USER CODE END 4 */
+
+/* USER CODE BEGIN Header_StartDefaultTask */
+/**
+  * @brief  Function implementing the defaultTask thread.
+  * @param  argument: Not used
+  * @retval None
+  */
+/* USER CODE END Header_StartDefaultTask */
+void StartDefaultTask(void const * argument)
 {
-    uint16_t len = 0;
-    if (NULL != fmt)
+  /* init code for FATFS */
+  MX_FATFS_Init();
+
+/* Graphic application */  
+  GRAPHICS_MainTask();
+
+  /* USER CODE BEGIN 5 */
+    /* Infinite loop */
+    for (;;)
     {
-        //len = (uint16_t) tfp_vsnprintf(&cli_fmt_buffer[0], CLI_FMT_BUFFER_LEN, fmt, args);
+        osDelay(1);
     }
-    return cli_write(fmt, strlen(fmt));
-    // return cli_write(&cli_fmt_buffer[0], len);
+  /* USER CODE END 5 */ 
 }
 
+/* USER CODE BEGIN Header_StartButtonTask */
+/**
+* @brief Function implementing the buttonTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartButtonTask */
+void StartButtonTask(void const * argument)
+{
+  /* USER CODE BEGIN StartButtonTask */
+  uint32_t buttonState = 0;
+  
+  BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
+  
+  /* Infinite loop */
+  for(;;)
+  {
+    buttonState = BSP_PB_GetState(BUTTON_KEY);
+    if (buttonState == 1)
+    {
+      if(xQueueSend(buttonQueueHandle, (uint8_t*)&buttonState, 0) == pdTRUE)
+      {
+        cli_printf("[Queue] HW -> Model (%d)\r\n", buttonState);
+      }
+    }
+    
+    osDelay(100);
+  }
+  /* USER CODE END StartButtonTask */
+}
+
+/* USER CODE BEGIN Header_StartLEDTask */
+/**
+* @brief Function implementing the ledTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartLEDTask */
 void StartLEDTask(void const * argument)
 {
-  //char* string = "Hello World";
+  /* USER CODE BEGIN StartLEDTask */
+  
   uint8_t led_state = 0;
 
   BSP_LED_Init(LED_GREEN);
   BSP_LED_Off(LED_GREEN);
-  
-  // com_init();
-    
+      
   /* Infinite loop */
   for(;;)
   {
@@ -1107,32 +1133,25 @@ void StartLEDTask(void const * argument)
         BSP_LED_Off(LED_GREEN);
       }
       
-      cli_printf("Model::p2m_SetLEDState: %d\r\n", led_state);
+      cli_printf("[Queue] Model -> HW (%d)\r\n", led_state);
     }
     
     osDelay(20);
   }
+  /* USER CODE END StartLEDTask */
 }
 
+/* USER CODE BEGIN Header_StartSDTask */
+/**
+* @brief Function implementing the sdTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartSDTask */
 void StartSDTask(void const * argument)
 {
-#if 0
-  FATFS fs;    /* Ponter to the filesystem object */
-  FRESULT fr;   /* FatFs function common result code */
-  char label[12];
-
-
-  BSP_SD_Init();
-
-  fr = f_mount(&SDFatFS, "", 1);
-  cli_printf("f_mount: %d\r\n", fr);
-  
-  fr = f_open(&MyFile, "STM32.TXT", FA_CREATE_ALWAYS | FA_WRITE);
-  cli_printf("f_open: %d\r\n", fr);
-  
-  
-#else
-  FRESULT fr;                                        /* FatFs function common result code */
+  /* USER CODE BEGIN StartSDTask */
+  FRESULT fr;                                           /* FatFs function common result code */
   uint32_t byteswritten, bytesread;                     /* File write/read counts */
   uint8_t wtext[] = "This is STM32 working with FatFs"; /* File write buffer */
   uint8_t rtext[100];                                   /* File read buffer */
@@ -1187,6 +1206,7 @@ void StartSDTask(void const * argument)
             /*##-6- Close the open text file #################################*/
             fr = f_close(&MyFile);
             cli_printf("f_close: %d\r\n", fr);
+            
             /*##-7- Open the text file object with read access ###############*/
             fr = f_open(&MyFile, "STM32.TXT", FA_READ);
             cli_printf("f_open: %d\r\n", fr);
@@ -1210,6 +1230,7 @@ void StartSDTask(void const * argument)
                 /*##-9- Close the open text file #############################*/
                 fr = f_close(&MyFile);
                 cli_printf("f_close: %d\r\n", fr);
+                
                 /*##-10- Compare read data with the expected data ############*/
                 if ((bytesread != byteswritten))
                 {                
@@ -1232,75 +1253,12 @@ void StartSDTask(void const * argument)
   cli_printf("FATFS %s\r\n", "End");
   FATFS_UnLinkDriver(SDPath);
   
-#endif
-  /* Infinite Loop */
-  for( ;; )
-  {
-  }
-
-}
-
-/* USER CODE END 4 */
-
-/* USER CODE BEGIN Header_StartDefaultTask */
-/**
-  * @brief  Function implementing the defaultTask thread.
-  * @param  argument: Not used
-  * @retval None
-  */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void const * argument)
-{
-  /* init code for FATFS */
-  MX_FATFS_Init();
-
-/* Graphic application */  
-  GRAPHICS_MainTask();
-
-  /* USER CODE BEGIN 5 */
-    /* Infinite loop */
-    for (;;)
-    {
-        osDelay(1);
-    }
-  /* USER CODE END 5 */ 
-}
-
-/* USER CODE BEGIN Header_StartButtonTask */
-/**
-* @brief Function implementing the buttonTask thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_StartButtonTask */
-void StartButtonTask(void const * argument)
-{
-  /* USER CODE BEGIN StartButtonTask */
-  uint32_t buttonState = 0;
-  BaseType_t ret = pdFALSE;
-  
-  BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
-  
   /* Infinite loop */
   for(;;)
   {
-    buttonState = BSP_PB_GetState(BUTTON_KEY);
-    if (buttonState == 1)
-    {
-      ret = xQueueSend(buttonQueueHandle, (uint8_t*)&buttonState, 0);
-      if(ret == pdTRUE)
-      {
-        cli_printf("hw2m --> Model::tick: %d\r\n", buttonState);
-      }
-      else
-      {
-        cli_printf("xQueueSend: %d\r\n", ret);
-      }
-    }
-    
-    osDelay(100);
+    osDelay(1);
   }
-  /* USER CODE END StartButtonTask */
+  /* USER CODE END StartSDTask */
 }
 
 /**
