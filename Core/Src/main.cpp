@@ -58,6 +58,7 @@
 
 #include <stm32746g_discovery_qspi.h>
 #include <stm32746g_discovery.h>
+#include <stm32f7xx_hal_rng.h>
     
 #include <stdio.h>
 #include <stdarg.h>
@@ -89,6 +90,8 @@ I2C_HandleTypeDef hi2c1;
 I2C_HandleTypeDef hi2c3;
 
 QSPI_HandleTypeDef hqspi;
+
+RNG_HandleTypeDef hrng;
 
 RTC_HandleTypeDef hrtc;
 
@@ -129,6 +132,7 @@ extern void GRAPHICS_HW_Init(void);
 extern void GRAPHICS_Init(void);
 extern void GRAPHICS_MainTask(void);
 static void MX_SDMMC1_SD_Init(void);
+static void MX_RNG_Init(void);
 void StartDefaultTask(void const * argument);
 void StartButtonTask(void const * argument);
 void StartLEDTask(void const * argument);
@@ -182,6 +186,7 @@ int main(void)
   MX_RTC_Init();
   MX_USART1_UART_Init();
   MX_SDMMC1_SD_Init();
+  MX_RNG_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -520,6 +525,32 @@ static void MX_QUADSPI_Init(void)
     HAL_MPU_ConfigRegion(&MPU_InitStruct);
     HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
   /* USER CODE END QUADSPI_Init 2 */
+
+}
+
+/**
+  * @brief RNG Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_RNG_Init(void)
+{
+
+  /* USER CODE BEGIN RNG_Init 0 */
+
+  /* USER CODE END RNG_Init 0 */
+
+  /* USER CODE BEGIN RNG_Init 1 */
+
+  /* USER CODE END RNG_Init 1 */
+  hrng.Instance = RNG;
+  if (HAL_RNG_Init(&hrng) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN RNG_Init 2 */
+
+  /* USER CODE END RNG_Init 2 */
 
 }
 
@@ -1212,6 +1243,11 @@ void StartSDTask(void const * argument)
   uint32_t byteswritten, bytesread;                     /* File write/read counts */
   uint8_t wtext[] = "This is STM32 working with FatFs"; /* File write buffer */
   uint8_t rtext[100];                                   /* File read buffer */
+  uint32_t rng_value = 0;
+  
+  uint8_t file_name_buff[16];
+  
+  strcpy((char*)file_name_buff, "filenn.TXT");
     
   cli_printf("FATFS %s\r\n", "Start");
   /*##-1- Link the micro SD disk I/O driver ##################################*/
@@ -1242,8 +1278,16 @@ void StartSDTask(void const * argument)
       }
       else
       {
+        HAL_RNG_GenerateRandomNumber(&hrng, &rng_value);
+        file_name_buff[4] = '0' + (uint8_t)(rng_value % 10);
+        
+        HAL_RNG_GenerateRandomNumber(&hrng, &rng_value);
+        file_name_buff[5] = '0' + (uint8_t)(rng_value % 10);
+        
+        cli_printf("file_name_buff: %s\r\n", file_name_buff);
+
         /*##-4- Create and Open a new text file object with write access #####*/
-        fr = f_open(&MyFile, "STM32.TXT", FA_CREATE_ALWAYS | FA_WRITE);
+        fr = f_open(&MyFile, (char*)file_name_buff, FA_CREATE_ALWAYS | FA_WRITE);
         cli_printf("f_open: %d\r\n", fr);
         if(fr != FR_OK)
         {
@@ -1267,7 +1311,7 @@ void StartSDTask(void const * argument)
             cli_printf("f_close: %d\r\n", fr);
             
             /*##-7- Open the text file object with read access ###############*/
-            fr = f_open(&MyFile, "STM32.TXT", FA_READ);
+            fr = f_open(&MyFile, (char*)file_name_buff, FA_READ);
             cli_printf("f_open: %d\r\n", fr);
             if(fr != FR_OK)
             {

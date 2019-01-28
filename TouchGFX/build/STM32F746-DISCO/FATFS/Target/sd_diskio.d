@@ -33,6 +33,7 @@ TouchGFX/build/STM32F746-DISCO/FATFS/Target/sd_diskio.o: \
  Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr.h \
  Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr_ex.h \
  Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_qspi.h \
+ Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rng.h \
  Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rtc.h \
  Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rtc_ex.h \
  Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_sd.h \
@@ -136,6 +137,8 @@ Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr.h:
 Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pwr_ex.h:
 
 Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_qspi.h:
+
+Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rng.h:
 
 Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rtc.h:
 

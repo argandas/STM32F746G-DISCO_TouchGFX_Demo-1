@@ -235,6 +235,7 @@ board_c_files += \
 	$(Drivers_path)/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.c \
 	$(Drivers_path)/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_fmc.c \
 	$(Drivers_path)/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_sdmmc.c \
+	$(Drivers_path)/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rng.c \
 	Core/Src/system_stm32f7xx.c \
 	Core/Src/freertos.c \
 	Core/Src/stm32f7xx_hal_msp.c \
