@@ -111,6 +111,8 @@ FIL MyFile;     /* File object */
 char SDPath[4]; /* SD card logical drive path */
 uint8_t workBuffer[2*_MAX_SS];
 
+char cli_buff[64];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -135,6 +137,8 @@ void StartSDTask(void const * argument);
 /* USER CODE BEGIN PFP */
 uint16_t cli_printf(const char* fmt, ...);
 uint16_t cli_write(const char* src, uint16_t len);
+FRESULT scan_files(char* path);
+FRESULT get_free_clusters(FATFS* fs);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -1033,17 +1037,70 @@ static void MX_GPIO_Init(void)
 
 uint16_t cli_printf(const char* fmt, ...)
 {
-    char buff[32];
     va_list args;
     va_start(args, fmt);
-    vsnprintf(buff, sizeof(buff), fmt, args);
-    HAL_UART_Transmit(&huart1, (uint8_t*)buff, strlen(buff), 100);
+    vsnprintf(cli_buff, sizeof(cli_buff), fmt, args);
+    cli_write(&cli_buff[0], strlen(cli_buff));
     va_end(args);    
 }
 
 uint16_t cli_write(const char* src, uint16_t len)
 {
     HAL_UART_Transmit(&huart1, (uint8_t*)src, len, 100);
+}
+
+FRESULT get_free_clusters(FATFS* fs)
+{
+    FRESULT fr;
+    DWORD fre_clust, fre_sect, tot_sect;
+
+    /* Get volume information and free clusters of used drive */
+    fr = f_getfree((TCHAR const*)SDPath, &fre_clust, &fs);
+    cli_printf("f_getfree: %d\r\n", fr);
+
+    if (fr == FR_OK)
+    {
+      /* Get total sectors and free sectors */
+      tot_sect = (fs->n_fatent - 2) * fs->csize;
+      fre_sect = fre_clust * fs->csize;
+
+      /* Print the free space (assuming 512 bytes/sector) */
+      cli_printf("%10lu KiB total drive space.\r\n", tot_sect/2);
+      cli_printf("%10lu KiB available space.\r\n", fre_sect/2);
+    }
+    
+    return fr;
+}
+
+/* Start node to be scanned (***also used as work area***) */
+FRESULT scan_files(char* path)
+{
+    FRESULT res;
+    DIR dir;
+    UINT i;
+    static FILINFO fno;
+
+    res = f_opendir(&dir, path);                       /* Open the directory */
+    if (res == FR_OK) {
+        for (;;) {
+            res = f_readdir(&dir, &fno);                   /* Read a directory item */
+            if (res != FR_OK || fno.fname[0] == 0) break;  /* Break on error or end of dir */
+            if (fno.fattrib & AM_DIR) {                    /* It is a directory */
+                i = strlen(path);
+                sprintf(&path[i], "/%s", fno.fname);
+                res = scan_files(path);                    /* Enter the directory */
+                if (res != FR_OK) break;
+                path[i] = 0;
+            }
+            else 
+            {                                       /* It is a file. */
+                cli_printf("%s/%s\r\n", path, fno.fname);
+            }
+        }
+        f_closedir(&dir);
+    }
+
+    return res;
 }
 
 /* USER CODE END 4 */
@@ -1170,18 +1227,20 @@ void StartSDTask(void const * argument)
     }
     else
     {
-#if 1
+#if 1      
+      fr = get_free_clusters(&SDFatFs);
+#else
       /*##-3- Create a FAT file system (format) on the logical drive #########*/
       /* WARNING: Formatting the uSD card will delete all content on the device */
       fr = f_mkfs((TCHAR const*)SDPath, FM_ANY, 0, workBuffer, sizeof(workBuffer));
       cli_printf("f_mkfs: %d\r\n", fr);
+#endif
       if(fr != FR_OK)
       {
         /* FatFs Format Error */
         Error_Handler();
       }
       else
-#endif
       {
         /*##-4- Create and Open a new text file object with write access #####*/
         fr = f_open(&MyFile, "STM32.TXT", FA_CREATE_ALWAYS | FA_WRITE);
@@ -1246,6 +1305,12 @@ void StartSDTask(void const * argument)
           }
         }
       }
+      
+      /*##-10++ - Scan files in the device ###############################*/
+      strcpy((char*)rtext, "/");
+      rtext[2] = 0x00;
+      fr = scan_files((char*)rtext);
+      cli_printf("scan_files: %d\r\n", fr);
     }
   }
 
