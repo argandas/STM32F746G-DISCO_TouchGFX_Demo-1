@@ -65,6 +65,12 @@
 
 #define CLI_FMT_BUFFER_LEN 256
 
+/* Private variables ---------------------------------------------------------*/
+FATFS SDFatFs;  /* File system object for SD card logical drive */
+FIL MyFile;     /* File object */
+char SDPath[4]; /* SD card logical drive path */
+uint8_t workBuffer[2*_MAX_SS];
+
 /*
 void cli_init();
 */
@@ -111,6 +117,7 @@ osThreadId buttonTaskHandle;
 osMessageQId buttonQueueHandle;
 /* USER CODE BEGIN PV */
 osThreadId ledTaskHandle;
+osThreadId sdTaskHandle;
 osMessageQId ledQueueHandle;
 /* USER CODE END PV */
 
@@ -132,6 +139,7 @@ void StartButtonTask(void const * argument);
 
 /* USER CODE BEGIN PFP */
 void StartLEDTask(void const * argument);
+void StartSDTask(void const * argument);
 
 /* USER CODE END PFP */
 
@@ -205,7 +213,7 @@ int main(void)
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of buttonTask */
-  osThreadDef(buttonTask, StartButtonTask, osPriorityIdle, 0, 128);
+  osThreadDef(buttonTask, StartButtonTask, osPriorityIdle, 0, 512);
   buttonTaskHandle = osThreadCreate(osThread(buttonTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -213,6 +221,9 @@ int main(void)
     /* definition and creation of buttonTask */
   osThreadDef(ledTask, StartLEDTask, osPriorityIdle, 0, 512);
   ledTaskHandle = osThreadCreate(osThread(ledTask), NULL);
+  
+  osThreadDef(sdTask, StartSDTask, osPriorityIdle, 0, 2048);
+  sdTaskHandle = osThreadCreate(osThread(sdTask), NULL);
   /* USER CODE END RTOS_THREADS */
 
   /* Create the queue(s) */
@@ -1081,6 +1092,145 @@ void StartLEDTask(void const * argument)
   }
 }
 
+void StartSDTask(void const * argument)
+{
+  
+  FATFS fs;    /* Ponter to the filesystem object */
+  FRESULT fr;   /* FatFs function common result code */
+  char label[12];
+
+
+  BSP_SD_Init();
+
+  fr = f_mount(&SDFatFS, "", 1);
+  cli_printf("f_mount: %d\r\n", fr);
+  
+  fr = f_open(&MyFile, "STM32.TXT", FA_CREATE_ALWAYS | FA_WRITE);
+  cli_printf("f_open: %d\r\n", fr);
+  
+  
+#if 0
+    FRESULT res;                                        /* FatFs function common result code */
+  uint32_t byteswritten, bytesread;                     /* File write/read counts */
+  uint8_t wtext[] = "This is STM32 working with FatFs"; /* File write buffer */
+  uint8_t rtext[100];                                   /* File read buffer */
+  
+  cli_printf("Step #%d\r\n", 1);
+  /*##-1- Link the micro SD disk I/O driver ##################################*/
+  // if(FATFS_LinkDriver(&SD_Driver, SDPath) == 0)
+  {  
+      cli_printf("Step #%d\r\n", 2);
+    /*##-2- Register the file system object to the FatFs module ##############*/
+    if(f_mount(&SDFatFs, (TCHAR const*)SDPath, 0) != FR_OK)
+    {
+      /* FatFs Initialization Error */
+      Error_Handler();
+    }
+    else
+    {
+#if 1
+        cli_printf("Step #%d\r\n", 3);
+
+      /*##-3- Create a FAT file system (format) on the logical drive #########*/
+      /* WARNING: Formatting the uSD card will delete all content on the device */
+if(f_mkfs((TCHAR const*)SDPath, FM_ANY, 0, workBuffer, sizeof(workBuffer)) != FR_OK)
+      {
+        /* FatFs Format Error */
+        Error_Handler();
+      }
+      else
+#endif
+      {
+          cli_printf("Step #%d\r\n", 4);
+
+        /*##-4- Create and Open a new text file object with write access #####*/
+        if(f_open(&MyFile, "STM32.TXT", FA_CREATE_ALWAYS | FA_WRITE) != FR_OK)
+        {
+          /* 'STM32.TXT' file Open for write Error */
+          Error_Handler();
+        }
+        else
+        {
+            cli_printf("Step #%d\r\n", 5);
+
+          /*##-5- Write data to the text file ################################*/
+          res = f_write(&MyFile, wtext, sizeof(wtext), (UINT *)&byteswritten);
+          
+          if((byteswritten == 0) || (res != FR_OK))
+          {
+            /* 'STM32.TXT' file Write or EOF Error */
+            Error_Handler();
+          }
+          else
+          {
+              cli_printf("Step #%d\r\n", 6);
+
+            /*##-6- Close the open text file #################################*/
+            f_close(&MyFile);
+            
+              cli_printf("Step #%d\r\n", 7);
+
+            /*##-7- Open the text file object with read access ###############*/
+            if(f_open(&MyFile, "STM32.TXT", FA_READ) != FR_OK)
+            {
+              /* 'STM32.TXT' file Open for read Error */
+              Error_Handler();
+            }
+            else
+            {
+                cli_printf("Step #%d\r\n", 8);
+
+              /*##-8- Read data from the text file ###########################*/
+              res = f_read(&MyFile, rtext, sizeof(rtext), (UINT*)&bytesread);
+              
+              if((bytesread == 0) || (res != FR_OK))
+              {
+                /* 'STM32.TXT' file Read or EOF Error */
+                Error_Handler();
+              }
+              else
+              {
+                  cli_printf("Step #%d\r\n", 9);
+
+                /*##-9- Close the open text file #############################*/
+                f_close(&MyFile);
+                
+                  cli_printf("Step #%d\r\n", 10);
+
+                /*##-10- Compare read data with the expected data ############*/
+                if ((bytesread != byteswritten))
+                {                
+                  /* Read data is different from the expected data */
+                  Error_Handler();
+                }
+                else
+                {
+                    cli_printf("SUCESS #%X\r\n", 255);
+
+                  /* Success of the demo: no error occurrence */
+                  BSP_LED_On(LED1);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+                    cli_printf("Step #%d\r\n", 11);
+
+  /*##-11- Unlink the micro SD disk I/O driver ###############################*/
+  FATFS_UnLinkDriver(SDPath);
+  
+#endif
+  /* Infinite Loop */
+  for( ;; )
+  {
+  }
+
+}
+
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -1127,7 +1277,10 @@ void StartButtonTask(void const * argument)
     buttonState = BSP_PB_GetState(BUTTON_KEY);
     if (buttonState == 1)
     {
-      xQueueSend(&buttonQueueHandle, (uint8_t*)&buttonState, 0);
+      if(xQueueSend(&buttonQueueHandle, (uint8_t*)&buttonState, 0) == pdTRUE)
+      {
+        cli_printf("HW --> Model::tick: %d\r\n", buttonState);
+      }
     }
     osDelay(100);
   }
