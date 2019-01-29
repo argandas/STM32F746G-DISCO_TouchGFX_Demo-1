@@ -100,6 +100,7 @@ DMA_HandleTypeDef hdma_sdmmc1_rx;
 DMA_HandleTypeDef hdma_sdmmc1_tx;
 
 UART_HandleTypeDef huart1;
+UART_HandleTypeDef huart6;
 
 osThreadId defaultTaskHandle;
 osThreadId buttonTaskHandle;
@@ -133,6 +134,7 @@ extern void GRAPHICS_Init(void);
 extern void GRAPHICS_MainTask(void);
 static void MX_SDMMC1_SD_Init(void);
 static void MX_RNG_Init(void);
+static void MX_USART6_UART_Init(void);
 void StartDefaultTask(void const * argument);
 void StartButtonTask(void const * argument);
 void StartLEDTask(void const * argument);
@@ -187,6 +189,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_SDMMC1_SD_Init();
   MX_RNG_Init();
+  MX_USART6_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -314,9 +317,9 @@ void SystemClock_Config(void)
     Error_Handler();
   }
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_LTDC|RCC_PERIPHCLK_RTC
-                              |RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_I2C1
-                              |RCC_PERIPHCLK_I2C3|RCC_PERIPHCLK_SDMMC1
-                              |RCC_PERIPHCLK_CLK48;
+                              |RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_USART6
+                              |RCC_PERIPHCLK_I2C1|RCC_PERIPHCLK_I2C3
+                              |RCC_PERIPHCLK_SDMMC1|RCC_PERIPHCLK_CLK48;
   PeriphClkInitStruct.PLLSAI.PLLSAIN = 384;
   PeriphClkInitStruct.PLLSAI.PLLSAIR = 5;
   PeriphClkInitStruct.PLLSAI.PLLSAIQ = 2;
@@ -325,6 +328,7 @@ void SystemClock_Config(void)
   PeriphClkInitStruct.PLLSAIDivR = RCC_PLLSAIDIVR_8;
   PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
   PeriphClkInitStruct.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK2;
+  PeriphClkInitStruct.Usart6ClockSelection = RCC_USART6CLKSOURCE_PCLK2;
   PeriphClkInitStruct.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
   PeriphClkInitStruct.I2c3ClockSelection = RCC_I2C3CLKSOURCE_PCLK1;
   PeriphClkInitStruct.Clk48ClockSelection = RCC_CLK48SOURCE_PLLSAIP;
@@ -711,6 +715,41 @@ static void MX_USART1_UART_Init(void)
 
 }
 
+/**
+  * @brief USART6 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART6_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART6_Init 0 */
+
+  /* USER CODE END USART6_Init 0 */
+
+  /* USER CODE BEGIN USART6_Init 1 */
+
+  /* USER CODE END USART6_Init 1 */
+  huart6.Instance = USART6;
+  huart6.Init.BaudRate = 9600;
+  huart6.Init.WordLength = UART_WORDLENGTH_8B;
+  huart6.Init.StopBits = UART_STOPBITS_1;
+  huart6.Init.Parity = UART_PARITY_NONE;
+  huart6.Init.Mode = UART_MODE_TX_RX;
+  huart6.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart6.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart6.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart6.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart6) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART6_Init 2 */
+
+  /* USER CODE END USART6_Init 2 */
+
+}
+
 /** 
   * Enable DMA controller clock
   */
@@ -963,14 +1002,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(LCD_INT_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : ARDUINO_RX_D0_Pin ARDUINO_TX_D1_Pin */
-  GPIO_InitStruct.Pin = ARDUINO_RX_D0_Pin|ARDUINO_TX_D1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  GPIO_InitStruct.Alternate = GPIO_AF8_USART6;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
   /*Configure GPIO pin : ULPI_NXT_Pin */
   GPIO_InitStruct.Pin = ULPI_NXT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -1078,6 +1109,7 @@ uint16_t cli_printf(const char* fmt, ...)
 uint16_t cli_write(const char* src, uint16_t len)
 {
     HAL_UART_Transmit(&huart1, (uint8_t*)src, len, 100);
+    HAL_UART_Transmit(&huart6, (uint8_t*)src, len, 100);
 }
 
 FRESULT get_free_clusters(FATFS* fs)
@@ -1116,16 +1148,18 @@ FRESULT scan_files(char* path)
         for (;;) {
             res = f_readdir(&dir, &fno);                   /* Read a directory item */
             if (res != FR_OK || fno.fname[0] == 0) break;  /* Break on error or end of dir */
-            if (fno.fattrib & AM_DIR) {                    /* It is a directory */
+            if (fno.fattrib & AM_DIR) {                    
+                /* It is a directory */
                 i = strlen(path);
-                sprintf(&path[i], "/%s", fno.fname);
+                sprintf(&path[i], "/%s (%4d bytes)", fno.fname, fno.fsize);
                 res = scan_files(path);                    /* Enter the directory */
                 if (res != FR_OK) break;
                 path[i] = 0;
             }
             else 
-            {                                       /* It is a file. */
-                cli_printf("%s/%s\r\n", path, fno.fname);
+            {                                       
+                /* It is a file. */
+                cli_printf("%s/%s  (%4d bytes)\r\n", path, fno.fname, fno.fsize);
             }
         }
         f_closedir(&dir);
@@ -1241,7 +1275,7 @@ void StartSDTask(void const * argument)
   /* USER CODE BEGIN StartSDTask */
   FRESULT fr;                                           /* FatFs function common result code */
   uint32_t byteswritten, bytesread;                     /* File write/read counts */
-  uint8_t wtext[] = "This is STM32 working with FatFs"; /* File write buffer */
+  uint8_t wtext[] = "This is STM32 working with FatFs\r\n"; /* File write buffer */
   uint8_t rtext[100];                                   /* File read buffer */
   uint32_t rng_value = 0;
   
@@ -1263,31 +1297,31 @@ void StartSDTask(void const * argument)
     }
     else
     {
-#if 1      
-      fr = get_free_clusters(&SDFatFs);
-#else
+#if 0      
       /*##-3- Create a FAT file system (format) on the logical drive #########*/
       /* WARNING: Formatting the uSD card will delete all content on the device */
       fr = f_mkfs((TCHAR const*)SDPath, FM_ANY, 0, workBuffer, sizeof(workBuffer));
       cli_printf("f_mkfs: %d\r\n", fr);
-#endif
       if(fr != FR_OK)
       {
         /* FatFs Format Error */
         Error_Handler();
       }
       else
+#endif
       {
         HAL_RNG_GenerateRandomNumber(&hrng, &rng_value);
         file_name_buff[4] = '0' + (uint8_t)(rng_value % 10);
         
+        /* 10 - 99 files
         HAL_RNG_GenerateRandomNumber(&hrng, &rng_value);
         file_name_buff[5] = '0' + (uint8_t)(rng_value % 10);
+        */
         
         cli_printf("file_name_buff: %s\r\n", file_name_buff);
 
         /*##-4- Create and Open a new text file object with write access #####*/
-        fr = f_open(&MyFile, (char*)file_name_buff, FA_CREATE_ALWAYS | FA_WRITE);
+        fr = f_open(&MyFile, (char*)file_name_buff, FA_OPEN_ALWAYS | FA_WRITE);
         cli_printf("f_open: %d\r\n", fr);
         if(fr != FR_OK)
         {
@@ -1296,69 +1330,86 @@ void StartSDTask(void const * argument)
         }
         else
         {
-          /*##-5- Write data to the text file ################################*/
-          fr = f_write(&MyFile, wtext, sizeof(wtext), (UINT *)&byteswritten);
-          cli_printf("f_write: %d\r\n", fr);
+#if 1
+          /*##-5- Prepare to append data to the text file ################################*/
+          fr = f_lseek(&MyFile, f_size(&MyFile));
+          cli_printf("f_lseek: %d\r\n", fr);
+
           if((byteswritten == 0) || (fr != FR_OK))
           {
             /* 'STM32.TXT' file Write or EOF Error */
             Error_Handler();
           }
           else
+#endif
           {
-            /*##-6- Close the open text file #################################*/
-            fr = f_close(&MyFile);
-            cli_printf("f_close: %d\r\n", fr);
-            
-            /*##-7- Open the text file object with read access ###############*/
-            fr = f_open(&MyFile, (char*)file_name_buff, FA_READ);
-            cli_printf("f_open: %d\r\n", fr);
-            if(fr != FR_OK)
+            /*##-5- Write data to the text file ################################*/
+            fr = f_write(&MyFile, wtext, sizeof(wtext), (UINT *)&byteswritten);
+            cli_printf("f_write: %d (%d bytes)\r\n", fr, byteswritten);
+            if((byteswritten == 0) || (fr != FR_OK))
             {
-              /* 'STM32.TXT' file Open for read Error */
+              /* 'STM32.TXT' file Write or EOF Error */
               Error_Handler();
             }
             else
             {
-              /*##-8- Read data from the text file ###########################*/
-              fr = f_read(&MyFile, rtext, sizeof(rtext), (UINT*)&bytesread);
-              cli_printf("f_read: %d\r\n", fr);
-              if((bytesread == 0) || (fr != FR_OK))
+              /*##-6- Close the open text file #################################*/
+              fr = f_close(&MyFile);
+              cli_printf("f_close: %d\r\n", fr);
+              
+              /*##-7- Open the text file object with read access ###############*/
+              fr = f_open(&MyFile, (char*)file_name_buff, FA_READ);
+              cli_printf("f_open: %d\r\n", fr);
+              if(fr != FR_OK)
               {
-                /* 'STM32.TXT' file Read or EOF Error */
+                /* 'STM32.TXT' file Open for read Error */
                 Error_Handler();
               }
               else
               {
-                /*##-9- Close the open text file #############################*/
-                fr = f_close(&MyFile);
-                cli_printf("f_close: %d\r\n", fr);
-                
-                /*##-10- Compare read data with the expected data ############*/
-                if ((bytesread != byteswritten))
-                {                
-                  /* Read data is different from the expected data */
+                /*##-8- Read data from the text file ###########################*/
+                fr = f_read(&MyFile, rtext, sizeof(rtext), (UINT*)&bytesread);
+                cli_printf("f_read: %d\r\n", fr);
+                if((bytesread == 0) || (fr != FR_OK))
+                {
+                  /* 'STM32.TXT' file Read or EOF Error */
                   Error_Handler();
                 }
                 else
-                {
-                    cli_printf("FATFS %s\r\n", "Success");
+                { 
+                  /*##-10- Compare read data with the expected data ############*/
+                  if ((bytesread != byteswritten))
+                  {                
+                    /* Read data is different from the expected data */
+                    Error_Handler();
+                  }
+                  else
+                  {
+                      cli_printf("FATFS %s\r\n", "Success");
+                  }
                 }
               }
             }
           }
+          
+          /*##-6- Close the open text file #################################*/
+          fr = f_close(&MyFile);
+          cli_printf("f_close: %d\r\n", fr);
         }
       }
       
-      /*##-10++ - Scan files in the device ###############################*/
+      /*##-11 - Scan files in the device ###############################*/
       strcpy((char*)rtext, "/");
       rtext[2] = 0x00;
       fr = scan_files((char*)rtext);
       cli_printf("scan_files: %d\r\n", fr);
     }
   }
+  
+  /*##-12 - Scan files in the device ###############################*/
+  fr = get_free_clusters(&SDFatFs);
 
-  /*##-11- Unlink the micro SD disk I/O driver ###############################*/
+  /*##-13- Unlink the micro SD disk I/O driver ###############################*/
   cli_printf("FATFS %s\r\n", "End");
   FATFS_UnLinkDriver(SDPath);
   
