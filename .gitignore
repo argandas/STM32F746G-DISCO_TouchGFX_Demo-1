@@ -1,2 +1,18 @@
+# Prerequisites
+*.d
+ 
+# Object files
+*.o
+*.obj
+*.elf
 
-/Debug/
+# Temp Files
+*.tmp
+
+# Linker output
+*.ilk
+*.map
+*.exp
+
+# IAR Settings folder
+EWARM/settings/
