@@ -280,13 +280,13 @@ board_include_paths := \
 	$(Drivers_path)/STM32F7xx_HAL_Driver/Inc \
 	$(Drivers_path)/CMSIS/Include \
 	$(Drivers_path)/CMSIS/Device/ST/STM32f7xx/Include \
+	$(Drivers_path)/Console/inc \
 	Core/Inc \
 	FATFS/App \
 	FATFS/Target \
 	FATFS/Target \
 	$(Middlewares_path)/Third_Party/FatFs/src \
 	$(Middlewares_path)/Third_Party/FatFs/src/option \
-	$(Drivers_path)/Console/inc/
 
 asm_source_files := \
 	$(Drivers_path)/CMSIS/Device/ST/STM32F7xx/Source/Templates/gcc/startup_stm32f746xx.s

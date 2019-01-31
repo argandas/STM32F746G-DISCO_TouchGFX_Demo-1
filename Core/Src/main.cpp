@@ -1110,6 +1110,7 @@ uint16_t cli_write(const char* src, uint16_t len)
 {
     HAL_UART_Transmit(&huart1, (uint8_t*)src, len, 100);
     HAL_UART_Transmit(&huart6, (uint8_t*)src, len, 100);
+    tfp_vsnprintf();
 }
 
 FRESULT get_free_clusters(FATFS* fs)
