@@ -371,7 +371,7 @@
           <state>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include</state>
           <state>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include</state>
           <state>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include</state>
-          <state>$PROJ_DIR$/../Middlewares/ST/TouchGFX/touchgfx/framework/include</state>
+          <state>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\framework\include</state>
           <state>$PROJ_DIR$/../FATFS/Target</state>
           <state>$PROJ_DIR$/../FATFS/App</state>
           <state>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src</state>
@@ -1588,7 +1588,7 @@
         <name>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\lib\core\cortex_m7\IAR8.x\touchgfx_core_release.a</name>
       </file>
       <file>
-        <name>$PROJ_DIR$/../Middlewares/ST/TouchGFX/touchgfx/lib/core/cortex_m7/IAR8.x/touchgfx_core_release.a</name>
+        <name>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\lib\core\cortex_m7\IAR8.x\touchgfx_core_release.a</name>
       </file>
       <file>
         <name>$PROJ_DIR$/../Middlewares/ST/TouchGFX/touchgfx/os/OSWrappers.cpp</name>
@@ -1611,4 +1611,3 @@
     </group>
   </group>
 </project>
-

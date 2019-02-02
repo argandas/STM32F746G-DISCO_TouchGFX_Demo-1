@@ -45,7 +45,7 @@ C:\TouchGFXProjects\MyApplication5\EWARM\..\Middlewares\ST\TouchGFX\touchgfx\fra
 -I
 C:\TouchGFXProjects\MyApplication5\EWARM\..\Middlewares\ST\TouchGFX\touchgfx\framework\include
 -I
-C:\TouchGFXProjects\MyApplication5\EWARM/../Middlewares/ST/TouchGFX/touchgfx/framework/include
+C:\TouchGFXProjects\MyApplication5\EWARM\..\Middlewares\ST\TouchGFX\touchgfx\framework\include
 -I
 C:\TouchGFXProjects\MyApplication5\EWARM/../FATFS/Target
 -I
