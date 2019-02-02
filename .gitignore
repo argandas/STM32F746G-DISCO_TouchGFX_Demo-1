@@ -9,6 +9,9 @@
 # Temp Files
 *.tmp
 
+# Log files
+*.log
+
 # Linker output
 *.ilk
 *.map
