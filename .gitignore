@@ -17,8 +17,11 @@
 *.map
 *.exp
 
-# TouchGFX simulator EXE
-TouchGFX/build/bin/simulator.exe
-
 # IAR Settings folder
 EWARM/settings/
+
+# TouchGFX generated files
+TouchGFX/build
+TouchGFX/generated/images
+TouchGFX/generated/fonts
+TouchGFX/generated/texts
