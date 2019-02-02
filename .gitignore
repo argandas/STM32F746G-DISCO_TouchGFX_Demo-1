@@ -17,11 +17,22 @@
 *.map
 *.exp
 
-# IAR Settings folder
-EWARM/settings/
-
 # TouchGFX generated files
 TouchGFX/build
 TouchGFX/generated/images
 TouchGFX/generated/fonts
 TouchGFX/generated/texts
+
+# EWARM project files
+EWARM/STM32F746G-DISCO/Exe
+EWARM/STM32F746G-DISCO/Obj
+EWARM/settings/
+
+# IAR Debug Exe  
+*/Exe/*.sim  
+
+# IAR Debug Obj  
+*/Obj/*.pbd  
+*/Obj/*.pbd.*  
+*/Obj/*.pbi  
+*/Obj/*.pbi.* 
