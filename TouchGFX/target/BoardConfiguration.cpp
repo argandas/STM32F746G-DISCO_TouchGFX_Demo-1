@@ -119,6 +119,9 @@ void touchgfx_init()
     //Set MCU instrumentation and Load calculation
     hal.setMCUInstrumentation(&mcuInstr);
     hal.enableMCULoadCalculation(true);
+    
+    //Enable CRC engine for STM32 Lock check 
+    __HAL_RCC_CRC_CLK_ENABLE(); 
 }
 }
 

@@ -19,7 +19,7 @@ MainViewBase::MainViewBase() :
     counterBackgroundImage.setXY(121, 68);
     counterBackgroundImage.setBitmap(Bitmap(BITMAP_COUNTER_BOX_ID));
 
-    countTxt.setPosition(121, 99, 152, 90);
+    countTxt.setPosition(-14, 189, 152, 90);
     countTxt.setColor(touchgfx::Color::getColorFrom24BitRGB(222, 222, 222));
     countTxt.setLinespacing(0);
     Unicode::snprintf(countTxtBuffer, COUNTTXT_SIZE, "%s", TypedText(T_SINGLEUSEID1).getText());

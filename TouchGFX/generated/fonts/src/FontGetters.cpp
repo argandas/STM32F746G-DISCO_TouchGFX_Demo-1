@@ -14,7 +14,7 @@ touchgfx::InternalFlashFont& getFont_Asap_Regular_15_4bpp();
 
 touchgfx::InternalFlashFont& getFont_Asap_Regular_15_4bpp()
 {
-    static touchgfx::InternalFlashFont Asap_Regular_15_4bpp(glyphs_Asap_Regular_15_4bpp, 16, 15, 3, 4, 0, 1, unicodes_Asap_Regular_15_4bpp, kerning_Asap_Regular_15_4bpp, 63, 0);
+    static touchgfx::InternalFlashFont Asap_Regular_15_4bpp(glyphs_Asap_Regular_15_4bpp, 15, 15, 3, 4, 0, 1, unicodes_Asap_Regular_15_4bpp, kerning_Asap_Regular_15_4bpp, 63, 0);
     return Asap_Regular_15_4bpp;
 }
 
