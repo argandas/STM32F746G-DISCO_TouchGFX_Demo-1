@@ -53,6 +53,8 @@ C:\TouchGFXProjects\MyApplication5\EWARM/../FATFS/App
 -I
 C:\TouchGFXProjects\MyApplication5\EWARM/../Middlewares/Third_Party/FatFs/src
 -I
+C:\TouchGFXProjects\MyApplication5\EWARM\..\Drivers\Console\inc
+-I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\CMSIS\Core\Include
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\CMSIS\DSP\Include
@@ -110,6 +112,8 @@ C:\TouchGFXProjects\MyApplication5\FATFS\Target
 C:\TouchGFXProjects\MyApplication5\FATFS\App
 -I
 C:\TouchGFXProjects\MyApplication5\Middlewares\Third_Party\FatFs\src
+-I
+C:\TouchGFXProjects\MyApplication5\Drivers\Console\inc
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\CMSIS\Core\Include
 -I

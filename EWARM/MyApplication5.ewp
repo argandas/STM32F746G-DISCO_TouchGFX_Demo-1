@@ -375,6 +375,7 @@
           <state>$PROJ_DIR$/../FATFS/Target</state>
           <state>$PROJ_DIR$/../FATFS/App</state>
           <state>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src</state>
+          <state>$PROJ_DIR$\..\Drivers\Console\inc</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1088,24 +1089,30 @@
         <file>
           <name>$PROJ_DIR$\..\Core\Src\stm32f7xx_it.c</name>
         </file>
-        <file>
-          <name>$PROJ_DIR$/../Core/Src/main.cpp</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$/../Core/Src/freertos.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$/../Core/Src/stm32f7xx_it.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$/../Core/Src/stm32f7xx_hal_msp.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$/../Core/Src/stm32f7xx_hal_timebase_tim.c</name>
-        </file>
       </group>
       <group>
         <name>Drivers</name>
+      </group>
+      <group>
+        <name>FatFs</name>
+        <group>
+          <name>App</name>
+          <file>
+            <name>$PROJ_DIR$\..\FATFS\App\fatfs.c</name>
+          </file>
+        </group>
+        <group>
+          <name>Target</name>
+          <file>
+            <name>$PROJ_DIR$\..\FATFS\Target\bsp_driver_sd.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\FATFS\Target\fatfs_platform.c</name>
+          </file>
+          <file>
+            <name>$PROJ_DIR$\..\FATFS\Target\sd_diskio.c</name>
+          </file>
+        </group>
       </group>
       <group>
         <name>TouchGFX</name>
@@ -1131,48 +1138,6 @@
           </file>
           <file>
             <name>$PROJ_DIR$\..\TouchGFX\target\STM32F7TouchController.cpp</name>
-          </file>
-          <file>
-            <name>$PROJ_DIR$/../TouchGFX/target/BoardConfiguration.cpp</name>
-          </file>
-          <file>
-            <name>$PROJ_DIR$/../TouchGFX/target/GPIO.cpp</name>
-          </file>
-          <file>
-            <name>$PROJ_DIR$/../TouchGFX/target/STM32F7DMA.cpp</name>
-          </file>
-          <file>
-            <name>$PROJ_DIR$/../TouchGFX/target/STM32F7HAL.cpp</name>
-          </file>
-          <file>
-            <name>$PROJ_DIR$/../TouchGFX/target/STM32F7TouchController.cpp</name>
-          </file>
-          <file>
-            <name>$PROJ_DIR$/../TouchGFX/target/STM32F7Instrumentation.cpp</name>
-          </file>
-          <file>
-            <name>$PROJ_DIR$/../TouchGFX/target/HW_Init.cpp</name>
-          </file>
-        </group>
-      </group>
-      <group>
-        <name>FatFs</name>
-        <group>
-          <name>App</name>
-          <file>
-            <name>$PROJ_DIR$/../FATFS/App/fatfs.c</name>
-          </file>
-        </group>
-        <group>
-          <name>Target</name>
-          <file>
-            <name>$PROJ_DIR$/../FATFS/Target/bsp_driver_sd.c</name>
-          </file>
-          <file>
-            <name>$PROJ_DIR$/../FATFS/Target/sd_diskio.c</name>
-          </file>
-          <file>
-            <name>$PROJ_DIR$/../FATFS/Target/fatfs_platform.c</name>
           </file>
         </group>
       </group>
@@ -1329,9 +1294,6 @@
       <file>
         <name>$PROJ_DIR$\..\Core\Src\system_stm32f7xx.c</name>
       </file>
-      <file>
-        <name>$PROJ_DIR$/../Core/Src/system_stm32f7xx.c</name>
-      </file>
     </group>
     <group>
       <name>Console</name>
@@ -1402,10 +1364,16 @@
         <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rcc_ex.c</name>
       </file>
       <file>
+        <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rng.c</name>
+      </file>
+      <file>
         <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rtc.c</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_rtc_ex.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_sd.c</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_hal_sdram.c</name>
@@ -1423,99 +1391,27 @@
         <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_ll_fmc.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dma2d.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_fmc.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_sdram.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_ltdc.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_ltdc_ex.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dsi.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_tim_ex.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_cortex.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_crc.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_crc_ex.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_i2c_ex.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_qspi.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rng.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rtc.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rtc_ex.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_sdmmc.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_sd.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rcc_ex.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_flash.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_flash_ex.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_gpio.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dma.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_dma_ex.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_pwr_ex.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Drivers/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal.c</name>
+        <name>$PROJ_DIR$\..\Drivers\STM32F7xx_HAL_Driver\Src\stm32f7xx_ll_sdmmc.c</name>
       </file>
     </group>
   </group>
   <group>
     <name>Middlewares</name>
+    <group>
+      <name>FatFs</name>
+      <file>
+        <name>$PROJ_DIR$\..\Middlewares\Third_Party\FatFs\src\diskio.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\Middlewares\Third_Party\FatFs\src\ff.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\Middlewares\Third_Party\FatFs\src\ff_gen_drv.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\Middlewares\Third_Party\FatFs\src\option\syscall.c</name>
+      </file>
+    </group>
     <group>
       <name>FreeRTOS</name>
       <file>
@@ -1548,36 +1444,6 @@
       <file>
         <name>$PROJ_DIR$\..\Middlewares\Third_Party\FreeRTOS\Source\timers.c</name>
       </file>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/Third_Party/FreeRTOS/Source/croutine.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/Third_Party/FreeRTOS/Source/event_groups.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/Third_Party/FreeRTOS/Source/list.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/Third_Party/FreeRTOS/Source/queue.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/Third_Party/FreeRTOS/Source/tasks.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/Third_Party/FreeRTOS/Source/timers.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/Third_Party/FreeRTOS/Source/portable/IAR/ARM_CM7/r0p1/port.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/Third_Party/FreeRTOS/Source/portable/IAR/ARM_CM7/r0p1/portasm.s</name>
-      </file>
     </group>
     <group>
       <name>TouchGFX</name>
@@ -1586,27 +1452,6 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\lib\core\cortex_m7\IAR8.x\touchgfx_core_release.a</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\lib\core\cortex_m7\IAR8.x\touchgfx_core_release.a</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/ST/TouchGFX/touchgfx/os/OSWrappers.cpp</name>
-      </file>
-    </group>
-    <group>
-      <name>FatFs</name>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src/diskio.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src/ff.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src/ff_gen_drv.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$/../Middlewares/Third_Party/FatFs/src/option/syscall.c</name>
       </file>
     </group>
   </group>

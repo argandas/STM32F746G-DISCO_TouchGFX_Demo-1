@@ -112,7 +112,6 @@ osMessageQId ledQueueHandle;
 
 FATFS SDFatFs;  /* File system object for SD card logical drive */
 FIL MyFile;     /* File object */
-char SDPath[4]; /* SD card logical drive path */
 uint8_t workBuffer[2*_MAX_SS];
 
 char cli_buff[64];
@@ -1105,12 +1104,16 @@ uint16_t cli_printf(const char* fmt, ...)
     // tfp_vsnprintf(cli_buff, sizeof(cli_buff), fmt, args);
     cli_write(&cli_buff[0], strlen(cli_buff));
     va_end(args);    
+    
+    return 0;
 }
 
 uint16_t cli_write(const char* src, uint16_t len)
 {
     HAL_UART_Transmit(&huart1, (uint8_t*)src, len, 100);
     HAL_UART_Transmit(&huart6, (uint8_t*)src, len, 100);
+    
+    return 0;
 }
 
 FRESULT get_free_clusters(FATFS* fs)
@@ -1275,7 +1278,7 @@ void StartSDTask(void const * argument)
 {
   /* USER CODE BEGIN StartSDTask */
   FRESULT fr;                                           /* FatFs function common result code */
-  uint32_t byteswritten, bytesread;                     /* File write/read counts */
+  uint32_t byteswritten, bytesread = 0;                     /* File write/read counts */
   uint8_t wtext[] = "This is STM32 working with FatFs\r\n"; /* File write buffer */
   uint8_t rtext[100];                                   /* File read buffer */
   uint32_t rng_value = 0;
