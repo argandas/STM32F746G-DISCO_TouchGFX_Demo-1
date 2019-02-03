@@ -38,121 +38,22 @@
             "Moveable": false
           },
           {
-            "RelativeFilename": "counter_box.png",
-            "Alpha": 255,
-            "Name": "counterBackgroundImage",
-            "X": 121,
-            "Y": 68,
-            "Width": 152,
-            "Height": 154,
-            "Type": "Image",
-            "Visible": true,
-            "Draggable": false,
-            "Clickable": false,
-            "Fadeable": false,
-            "Moveable": false
-          },
-          {
-            "TextId": "numberText",
-            "TextRotation": "0",
-            "Color": {
-              "Red": 222,
-              "Green": 222,
-              "Blue": 222
-            },
-            "Alpha": 255,
-            "AutoSize": false,
-            "LineSpacing": 0,
-            "Wildcard1": {
-              "TextId": "SingleUseId1",
-              "UseBuffer": true,
-              "BufferSize": 3
-            },
-            "Name": "countTxt",
-            "X": 121,
-            "Y": 99,
-            "Width": 152,
-            "Height": 90,
-            "Type": "TextArea",
-            "Visible": true,
-            "Draggable": false,
-            "Clickable": false,
-            "Fadeable": false,
-            "Moveable": false
-          },
-          {
             "Alpha": 255,
             "ButtonTrigger": {
-              "Type": "RepeatButtonTrigger",
-              "Delay": 100,
-              "Interval": 100
-            },
-            "ButtonStyles": [
-              {
-                "Type": "IconButtonStyle",
-                "X": 34,
-                "Y": 14,
-                "IconReleased": "black_arrow.png",
-                "IconPressed": "orange_arrow.png"
-              },
-              {
-                "Type": "BoxWithBorderButtonStyle",
-                "X": 0,
-                "Y": 0,
-                "Width": 100,
-                "Height": 45,
-                "LockToFlexButtonSize": false,
-                "BorderSize": 5,
-                "ColorReleased": {
-                  "Red": 222,
-                  "Green": 222,
-                  "Blue": 222
-                },
-                "ColorPressed": {
-                  "Red": 48,
-                  "Green": 58,
-                  "Blue": 64
-                },
-                "ColorBorderReleased": {
-                  "Red": 54,
-                  "Green": 62,
-                  "Blue": 65
-                },
-                "ColorBorderPressed": {
-                  "Red": 128,
-                  "Green": 136,
-                  "Blue": 143
-                }
-              }
-            ],
-            "Name": "repeatButton",
-            "X": 12,
-            "Y": 173,
-            "Width": 100,
-            "Height": 45,
-            "Type": "FlexButton",
-            "Visible": true,
-            "Draggable": false,
-            "Clickable": false,
-            "Fadeable": false,
-            "Moveable": false
-          },
-          {
-            "Alpha": 255,
-            "ButtonTrigger": {
-              "Type": "ClickButtonTrigger"
+              "Type": "ToggleButtonTrigger",
+              "InitalStatePressed": false
             },
             "ButtonStyles": [
               {
                 "Type": "TextButtonStyle",
-                "X": -2,
-                "Y": 12,
-                "TextId": "SingleUseId3",
+                "X": 0,
+                "Y": 19,
+                "TextId": "toggleButtonWhite",
                 "TextRotation": "0",
                 "ColorReleased": {
-                  "Red": 70,
-                  "Green": 70,
-                  "Blue": 70
+                  "Red": 82,
+                  "Green": 82,
+                  "Blue": 82
                 },
                 "ColorPressed": {
                   "Red": 231,
@@ -164,14 +65,14 @@
                 "Type": "ImageButtonStyle",
                 "X": 0,
                 "Y": 0,
-                "LockFlexButtonToImageSize": true,
+                "LockFlexButtonToImageSize": false,
                 "ImageReleased": "small_btn.png",
                 "ImagePressed": "small_btn_pressed.png"
               }
             ],
-            "Name": "zeroButton",
-            "X": 12,
-            "Y": 117,
+            "Name": "toggleButton",
+            "X": 348,
+            "Y": 60,
             "Width": 100,
             "Height": 56,
             "Type": "FlexButton",
@@ -225,71 +126,11 @@
               }
             ],
             "Name": "touchButton",
-            "X": 12,
-            "Y": 68,
+            "X": 32,
+            "Y": 61,
             "Width": 100,
             "Height": 45,
             "Type": "FlexButton",
-            "Visible": true,
-            "Draggable": false,
-            "Clickable": false,
-            "Fadeable": false,
-            "Moveable": false
-          },
-          {
-            "Alpha": 255,
-            "ButtonTrigger": {
-              "Type": "ToggleButtonTrigger",
-              "InitalStatePressed": false
-            },
-            "ButtonStyles": [
-              {
-                "Type": "TextButtonStyle",
-                "X": 0,
-                "Y": 0,
-                "TextId": "toggleButtonWhite",
-                "TextRotation": "0",
-                "ColorReleased": {
-                  "Red": 222,
-                  "Green": 222,
-                  "Blue": 222
-                },
-                "ColorPressed": {
-                  "Red": 231,
-                  "Green": 154,
-                  "Blue": 9
-                }
-              }
-            ],
-            "Name": "toggleButton",
-            "X": 293,
-            "Y": 41,
-            "Width": 152,
-            "Height": 36,
-            "Type": "FlexButton",
-            "Visible": true,
-            "Draggable": false,
-            "Clickable": false,
-            "Fadeable": false,
-            "Moveable": false
-          },
-          {
-            "TextId": "SingleUseId8",
-            "TextRotation": "0",
-            "Color": {
-              "Red": 222,
-              "Green": 222,
-              "Blue": 222
-            },
-            "Alpha": 255,
-            "AutoSize": true,
-            "LineSpacing": 0,
-            "Name": "toggleLabel",
-            "X": 283,
-            "Y": 20,
-            "Width": 174,
-            "Height": 18,
-            "Type": "TextArea",
             "Visible": true,
             "Draggable": false,
             "Clickable": false,
@@ -306,6 +147,150 @@
                 "Type": "TextButtonStyle",
                 "X": -2,
                 "Y": 12,
+                "TextId": "SingleUseId3",
+                "TextRotation": "0",
+                "ColorReleased": {
+                  "Red": 70,
+                  "Green": 70,
+                  "Blue": 70
+                },
+                "ColorPressed": {
+                  "Red": 231,
+                  "Green": 154,
+                  "Blue": 9
+                }
+              },
+              {
+                "Type": "ImageButtonStyle",
+                "X": 0,
+                "Y": 0,
+                "LockFlexButtonToImageSize": true,
+                "ImageReleased": "small_btn.png",
+                "ImagePressed": "small_btn_pressed.png"
+              }
+            ],
+            "Name": "zeroButton",
+            "X": 32,
+            "Y": 110,
+            "Width": 100,
+            "Height": 56,
+            "Type": "FlexButton",
+            "Visible": true,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          },
+          {
+            "Alpha": 255,
+            "ButtonTrigger": {
+              "Type": "RepeatButtonTrigger",
+              "Delay": 100,
+              "Interval": 100
+            },
+            "ButtonStyles": [
+              {
+                "Type": "IconButtonStyle",
+                "X": 34,
+                "Y": 14,
+                "IconReleased": "black_arrow.png",
+                "IconPressed": "orange_arrow.png"
+              },
+              {
+                "Type": "BoxWithBorderButtonStyle",
+                "X": 0,
+                "Y": 0,
+                "Width": 100,
+                "Height": 45,
+                "LockToFlexButtonSize": false,
+                "BorderSize": 5,
+                "ColorReleased": {
+                  "Red": 222,
+                  "Green": 222,
+                  "Blue": 222
+                },
+                "ColorPressed": {
+                  "Red": 48,
+                  "Green": 58,
+                  "Blue": 64
+                },
+                "ColorBorderReleased": {
+                  "Red": 54,
+                  "Green": 62,
+                  "Blue": 65
+                },
+                "ColorBorderPressed": {
+                  "Red": 128,
+                  "Green": 136,
+                  "Blue": 143
+                }
+              }
+            ],
+            "Name": "repeatButton",
+            "X": 32,
+            "Y": 166,
+            "Width": 100,
+            "Height": 45,
+            "Type": "FlexButton",
+            "Visible": true,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          },
+          {
+            "RelativeFilename": "counter_box.png",
+            "Alpha": 255,
+            "Name": "counterBackgroundImage",
+            "X": 164,
+            "Y": 59,
+            "Width": 152,
+            "Height": 154,
+            "Type": "Image",
+            "Visible": true,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          },
+          {
+            "TextId": "numberText",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 222,
+              "Green": 222,
+              "Blue": 222
+            },
+            "Alpha": 255,
+            "AutoSize": false,
+            "LineSpacing": 0,
+            "Wildcard1": {
+              "TextId": "SingleUseId1",
+              "UseBuffer": true,
+              "BufferSize": 3
+            },
+            "Name": "countTxt",
+            "X": 164,
+            "Y": 91,
+            "Width": 152,
+            "Height": 90,
+            "Type": "TextArea",
+            "Visible": true,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          },
+          {
+            "Alpha": 255,
+            "ButtonTrigger": {
+              "Type": "ClickButtonTrigger"
+            },
+            "ButtonStyles": [
+              {
+                "Type": "TextButtonStyle",
+                "X": 0,
+                "Y": 19,
                 "TextId": "SingleUseId9",
                 "TextRotation": "0",
                 "ColorReleased": {
@@ -329,8 +314,8 @@
               }
             ],
             "Name": "ledButton",
-            "X": 320,
-            "Y": 117,
+            "X": 348,
+            "Y": 156,
             "Width": 100,
             "Height": 56,
             "Type": "FlexButton",
@@ -420,10 +405,6 @@
       },
       {
         "TextEntryId": "SingleUseId3",
-        "IsResource": false
-      },
-      {
-        "TextEntryId": "SingleUseId8",
         "IsResource": false
       },
       {
