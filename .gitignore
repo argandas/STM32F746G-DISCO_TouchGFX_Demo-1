@@ -17,11 +17,23 @@
 *.map
 *.exp
 
-# TouchGFX generated files
-# TouchGFX/build
-# TouchGFX/generated/images
-# TouchGFX/generated/fonts
-# TouchGFX/generated/texts
+# TouchGFX Generated Build
+TouchGFX/build/bin/*.exe
+TouchGFX/build/bin/*.bin
+TouchGFX/build/bin/*.hex
+
+# TouchGFX Generated Images
+TouchGFX/generated/images/include/*.hpp
+TouchGFX/generated/images/src/*.cpp
+
+# TouchGFX Generated Fonts
+TouchGFX/generated/fonts/*.txt
+TouchGFX/generated/fonts/include/fonts/*.hpp
+TouchGFX/generated/fonts/src/*.cpp
+
+# TouchGFX Generated Texts
+TouchGFX/generated/texts/include/texts/*.hpp
+TouchGFX/generated/texts/src/*.cpp
 
 # EWARM project files
 EWARM/STM32F746G-DISCO/Exe
