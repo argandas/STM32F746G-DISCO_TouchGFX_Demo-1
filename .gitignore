@@ -18,10 +18,10 @@
 *.exp
 
 # TouchGFX generated files
-TouchGFX/build
-TouchGFX/generated/images
-TouchGFX/generated/fonts
-TouchGFX/generated/texts
+# TouchGFX/build
+# TouchGFX/generated/images
+# TouchGFX/generated/fonts
+# TouchGFX/generated/texts
 
 # EWARM project files
 EWARM/STM32F746G-DISCO/Exe
