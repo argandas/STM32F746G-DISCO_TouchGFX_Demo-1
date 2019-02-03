@@ -2,7 +2,7 @@
 <project>
 	<fileVersion>3</fileVersion>
 	<configuration>
-		<name>STM32F746G-DISCO</name>
+		<name>MyApplication5</name>
 		<toolchain>
 			<name>ARM</name>
 		</toolchain>

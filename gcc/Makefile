@@ -235,12 +235,27 @@ board_c_files += \
 	$(Drivers_path)/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_uart.c \
 	$(Drivers_path)/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_fmc.c \
 	$(Drivers_path)/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_sdmmc.c \
+	$(Drivers_path)/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rng.c \
 	Core/Src/system_stm32f7xx.c \
 	Core/Src/freertos.c \
 	Core/Src/stm32f7xx_hal_msp.c \
 	Core/Src/stm32f7xx_hal_timebase_tim.c \
 	Core/Src/stm32f7xx_it.c \
 	$(Middlewares_path)/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c
+
+board_c_files += \
+	$(Drivers_path)/Console/src/sprintf.c \
+
+board_c_files += \
+    $(Middlewares_path)/Third_Party/FatFs/src/diskio.c \
+    $(Middlewares_path)/Third_Party/FatFs/src/ff.c \
+    $(Middlewares_path)/Third_Party/FatFs/src/ff_gen_drv.c \
+    $(Middlewares_path)/Third_Party/FatFs/src/option/syscall.c \
+    $(Middlewares_path)/Third_Party/FatFs/src/option/unicode.c \
+    FATFS/Target/bsp_driver_sd.c \
+    FATFS/Target/fatfs_platform.c \
+    FATFS/Target/sd_diskio.c \
+    FATFS/App/fatfs.c
 
 board_cpp_files := \
 	Core/Src/main.cpp \
@@ -265,7 +280,13 @@ board_include_paths := \
 	$(Drivers_path)/STM32F7xx_HAL_Driver/Inc \
 	$(Drivers_path)/CMSIS/Include \
 	$(Drivers_path)/CMSIS/Device/ST/STM32f7xx/Include \
-	Core/Inc
+	$(Drivers_path)/Console/inc \
+	Core/Inc \
+	FATFS/App \
+	FATFS/Target \
+	FATFS/Target \
+	$(Middlewares_path)/Third_Party/FatFs/src \
+	$(Middlewares_path)/Third_Party/FatFs/src/option \
 
 asm_source_files := \
 	$(Drivers_path)/CMSIS/Device/ST/STM32F7xx/Source/Templates/gcc/startup_stm32f746xx.s

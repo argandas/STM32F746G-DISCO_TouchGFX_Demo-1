@@ -66,7 +66,7 @@ void STM32F7HAL::enableLCDControllerInterrupt()
     lcd_int_porch_line = (LTDC->AWCR & 0x7FF) - 1;
 
     HAL_LTDC_ProgramLineEvent(&hltdc, lcd_int_active_line);
-    __HAL_LTDC_ENABLE_IT(&hltdc, LTDC_IT_LI | LTDC_IT_FU); /* Enable line and FIFO underrun interrupts */
+    __HAL_LTDC_ENABLE_IT(&hltdc, LTDC_IT_LI|LTDC_IT_FU); /* Enable line and FIFO underrun interrupts */
 }
 
 void STM32F7HAL::disableInterrupts()
@@ -93,7 +93,7 @@ void STM32F7HAL::flushFrameBuffer(const touchgfx::Rect& rect)
 }
 
 extern "C"
-void HAL_LTDC_LineEvenCallback(LTDC_HandleTypeDef* hltdc)
+void HAL_LTDC_LineEvenCallback(LTDC_HandleTypeDef *hltdc)
 {
     if (LTDC->LIPCR == lcd_int_active_line)
     {

@@ -9,9 +9,8 @@
 #include <gui/main_screen/MainPresenter.hpp>
 #include <touchgfx/widgets/Box.hpp>
 #include <touchgfx/widgets/Image.hpp>
-#include <touchgfx/widgets/TextAreaWithWildcard.hpp>
 #include <touchgfx/containers/buttons/Buttons.hpp>
-#include <touchgfx/widgets/TextArea.hpp>
+#include <touchgfx/widgets/TextAreaWithWildcard.hpp>
 
 class MainViewBase : public touchgfx::View<MainPresenter>
 {
@@ -44,6 +43,11 @@ public:
         // Override and implement this function in MainView
     }
 
+    virtual void ledButtonPressed()
+    {
+        // Override and implement this function in MainView
+    }
+
 protected:
     FrontendApplication& application() {
         return *static_cast<FrontendApplication*>(Application::getInstance());
@@ -54,13 +58,13 @@ protected:
      */
     touchgfx::Box backgroundBox;
     touchgfx::Image backgroundImage;
+    touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ToggleButtonTrigger > > toggleButton;
+    touchgfx::IconButtonStyle< touchgfx::BoxWithBorderButtonStyle< touchgfx::TouchButtonTrigger > > touchButton;
+    touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > zeroButton;
+    touchgfx::IconButtonStyle< touchgfx::BoxWithBorderButtonStyle< touchgfx::RepeatButtonTrigger > > repeatButton;
     touchgfx::Image counterBackgroundImage;
     touchgfx::TextAreaWithOneWildcard countTxt;
-    touchgfx::IconButtonStyle< touchgfx::BoxWithBorderButtonStyle< touchgfx::RepeatButtonTrigger > > repeatButton;
-    touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > zeroButton;
-    touchgfx::IconButtonStyle< touchgfx::BoxWithBorderButtonStyle< touchgfx::TouchButtonTrigger > > touchButton;
-    touchgfx::TextButtonStyle< touchgfx::ToggleButtonTrigger > toggleButton;
-    touchgfx::TextArea toggleLabel;
+    touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > ledButton;
 
     /*
      * Wildcard Buffers

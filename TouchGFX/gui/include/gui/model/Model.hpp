@@ -35,6 +35,10 @@ public:
      * the ModelListener interface.
      */
     void tick();
+    
+    /* to be called from presenter */
+    void p2m_SetLEDState(bool led_state);
+        
 protected:
     /**
      * Pointer to the currently active presenter.
