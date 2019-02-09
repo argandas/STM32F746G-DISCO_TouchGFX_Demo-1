@@ -52,6 +52,7 @@
 #include "main.h"
 #include "cmsis_os.h"
 #include "fatfs.h"
+#include "lwip.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -106,8 +107,10 @@ osThreadId defaultTaskHandle;
 osThreadId buttonTaskHandle;
 osThreadId ledTaskHandle;
 osThreadId sdTaskHandle;
+osThreadId lwipTaskHandle;
 osMessageQId buttonQueueHandle;
 osMessageQId ledQueueHandle;
+osMessageQId lwipQueueHandle;
 /* USER CODE BEGIN PV */
 
 FATFS SDFatFs;  /* File system object for SD card logical drive */
@@ -138,6 +141,7 @@ void StartDefaultTask(void const * argument);
 void StartButtonTask(void const * argument);
 void StartLEDTask(void const * argument);
 void StartSDTask(void const * argument);
+void StartLWIPTask(void const * argument);
 
 /* USER CODE BEGIN PFP */
 uint16_t cli_printf(const char* fmt, ...);
@@ -230,6 +234,10 @@ int main(void)
   osThreadDef(sdTask, StartSDTask, osPriorityIdle, 0, 512);
   sdTaskHandle = osThreadCreate(osThread(sdTask), NULL);
 
+  /* definition and creation of lwipTask */
+  osThreadDef(lwipTask, StartLWIPTask, osPriorityIdle, 0, 512);
+  lwipTaskHandle = osThreadCreate(osThread(lwipTask), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
     /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -242,6 +250,10 @@ int main(void)
   /* definition and creation of ledQueue */
   osMessageQDef(ledQueue, 16, uint8_t);
   ledQueueHandle = osMessageCreate(osMessageQ(ledQueue), NULL);
+
+  /* definition and creation of lwipQueue */
+  osMessageQDef(lwipQueue, 8, uint16_t);
+  lwipQueueHandle = osMessageCreate(osMessageQ(lwipQueue), NULL);
 
   /* USER CODE BEGIN RTOS_QUEUES */
     /* add queues, ... */
@@ -813,14 +825,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(OTG_HS_OverCurrent_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : RMII_TXD1_Pin RMII_TXD0_Pin RMII_TX_EN_Pin */
-  GPIO_InitStruct.Pin = RMII_TXD1_Pin|RMII_TXD0_Pin|RMII_TX_EN_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
-  HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
-
   /*Configure GPIO pins : ULPI_D7_Pin ULPI_D6_Pin ULPI_D5_Pin ULPI_D3_Pin 
                            ULPI_D2_Pin ULPI_D1_Pin ULPI_D4_Pin */
   GPIO_InitStruct.Pin = ULPI_D7_Pin|ULPI_D6_Pin|ULPI_D5_Pin|ULPI_D3_Pin 
@@ -1032,27 +1036,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF10_OTG_HS;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : RMII_MDC_Pin RMII_RXD0_Pin RMII_RXD1_Pin */
-  GPIO_InitStruct.Pin = RMII_MDC_Pin|RMII_RXD0_Pin|RMII_RXD1_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
-  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
   /*Configure GPIO pin : RMII_RXER_Pin */
   GPIO_InitStruct.Pin = RMII_RXER_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(RMII_RXER_GPIO_Port, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : RMII_REF_CLK_Pin RMII_MDIO_Pin RMII_CRS_DV_Pin */
-  GPIO_InitStruct.Pin = RMII_REF_CLK_Pin|RMII_MDIO_Pin|RMII_CRS_DV_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : ARDUINO_A0_Pin */
   GPIO_InitStruct.Pin = ARDUINO_A0_Pin;
@@ -1185,6 +1173,9 @@ void StartDefaultTask(void const * argument)
 {
   /* init code for FATFS */
   MX_FATFS_Init();
+
+  /* init code for LWIP */
+  MX_LWIP_Init();
 
 /* Graphic application */  
   GRAPHICS_MainTask();
@@ -1423,6 +1414,24 @@ void StartSDTask(void const * argument)
     osDelay(1);
   }
   /* USER CODE END StartSDTask */
+}
+
+/* USER CODE BEGIN Header_StartLWIPTask */
+/**
+* @brief Function implementing the lwipTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartLWIPTask */
+void StartLWIPTask(void const * argument)
+{
+  /* USER CODE BEGIN StartLWIPTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartLWIPTask */
 }
 
 /**
