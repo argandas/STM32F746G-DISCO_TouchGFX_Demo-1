@@ -150,3 +150,10 @@ void MainView::ledButtonPressed()
   touchgfx_printf("MainView::ledButtonPressed %d\r\n", led_state);
   presenter->v2p_SetLEDState(led_state);
 }
+
+void MainView::tcpButtonPressed()
+{
+  int tmpVal = Unicode::atoi(countTxt.getWildcard());
+  touchgfx_printf("MainView::tcpButtonPressed = %d\r\n", tmpVal);
+  presenter->v2p_SendTCPData(tmpVal);
+}

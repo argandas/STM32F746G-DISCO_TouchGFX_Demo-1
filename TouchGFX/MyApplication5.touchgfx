@@ -72,7 +72,7 @@
             ],
             "Name": "toggleButton",
             "X": 348,
-            "Y": 60,
+            "Y": 34,
             "Width": 100,
             "Height": 56,
             "Type": "FlexButton",
@@ -127,7 +127,7 @@
             ],
             "Name": "touchButton",
             "X": 32,
-            "Y": 61,
+            "Y": 35,
             "Width": 100,
             "Height": 45,
             "Type": "FlexButton",
@@ -171,7 +171,7 @@
             ],
             "Name": "zeroButton",
             "X": 32,
-            "Y": 110,
+            "Y": 84,
             "Width": 100,
             "Height": 56,
             "Type": "FlexButton",
@@ -228,7 +228,7 @@
             ],
             "Name": "repeatButton",
             "X": 32,
-            "Y": 166,
+            "Y": 140,
             "Width": 100,
             "Height": 45,
             "Type": "FlexButton",
@@ -243,7 +243,7 @@
             "Alpha": 255,
             "Name": "counterBackgroundImage",
             "X": 164,
-            "Y": 59,
+            "Y": 33,
             "Width": 152,
             "Height": 154,
             "Type": "Image",
@@ -271,7 +271,7 @@
             },
             "Name": "countTxt",
             "X": 164,
-            "Y": 91,
+            "Y": 65,
             "Width": 152,
             "Height": 90,
             "Type": "TextArea",
@@ -315,8 +315,52 @@
             ],
             "Name": "ledButton",
             "X": 348,
-            "Y": 156,
+            "Y": 130,
             "Width": 100,
+            "Height": 56,
+            "Type": "FlexButton",
+            "Visible": true,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          },
+          {
+            "Alpha": 255,
+            "ButtonTrigger": {
+              "Type": "ClickButtonTrigger"
+            },
+            "ButtonStyles": [
+              {
+                "Type": "TextButtonStyle",
+                "X": 0,
+                "Y": 19,
+                "TextId": "SingleUseId10",
+                "TextRotation": "0",
+                "ColorReleased": {
+                  "Red": 70,
+                  "Green": 70,
+                  "Blue": 70
+                },
+                "ColorPressed": {
+                  "Red": 231,
+                  "Green": 154,
+                  "Blue": 9
+                }
+              },
+              {
+                "Type": "ImageButtonStyle",
+                "X": 0,
+                "Y": 0,
+                "LockFlexButtonToImageSize": true,
+                "ImageReleased": "btn_long.png",
+                "ImagePressed": "btn_long_pressed.png"
+              }
+            ],
+            "Name": "tcpButton",
+            "X": 140,
+            "Y": 200,
+            "Width": 200,
             "Height": 56,
             "Type": "FlexButton",
             "Visible": true,
@@ -386,6 +430,18 @@
               "FunctionName": "ledButtonPressed",
               "Type": "ActionCustom"
             }
+          },
+          {
+            "InteractionName": "tcpButtonInteraction",
+            "HasCompletedTrigger": false,
+            "Trigger": {
+              "TriggerComponent": "tcpButton",
+              "Type": "TriggerClicked"
+            },
+            "Action": {
+              "FunctionName": "tcpButtonPressed",
+              "Type": "ActionCustom"
+            }
           }
         ],
         "Name": "Main",
@@ -417,6 +473,10 @@
       },
       {
         "TextEntryId": "SingleUseId9",
+        "IsResource": false
+      },
+      {
+        "TextEntryId": "SingleUseId10",
         "IsResource": false
       }
     ],

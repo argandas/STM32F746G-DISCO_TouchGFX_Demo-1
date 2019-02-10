@@ -30,6 +30,7 @@ public:
     
     /* to be called from view */
     void v2p_SetLEDState(bool state);
+    void v2p_SendTCPData(int data);
 
     virtual ~MainPresenter() {};
 

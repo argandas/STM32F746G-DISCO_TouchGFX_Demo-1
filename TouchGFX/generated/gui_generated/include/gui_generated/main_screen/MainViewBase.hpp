@@ -48,6 +48,11 @@ public:
         // Override and implement this function in MainView
     }
 
+    virtual void tcpButtonPressed()
+    {
+        // Override and implement this function in MainView
+    }
+
 protected:
     FrontendApplication& application() {
         return *static_cast<FrontendApplication*>(Application::getInstance());
@@ -65,6 +70,7 @@ protected:
     touchgfx::Image counterBackgroundImage;
     touchgfx::TextAreaWithOneWildcard countTxt;
     touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > ledButton;
+    touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > tcpButton;
 
     /*
      * Wildcard Buffers

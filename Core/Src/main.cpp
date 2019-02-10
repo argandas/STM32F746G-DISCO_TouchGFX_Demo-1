@@ -66,6 +66,7 @@
 #include <string.h>
 #include "sprintf.h"
 
+#include "lwip/api.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -1250,7 +1251,7 @@ void StartLEDTask(void const * argument)
         BSP_LED_Off(LED_GREEN);
       }
       
-      cli_printf("[Queue] Model -> HW (%d)\r\n", led_state);
+      cli_printf("[Queue] Model -> HW (led = %d)\r\n", led_state);
     }
     
     osDelay(20);
@@ -1426,10 +1427,34 @@ void StartSDTask(void const * argument)
 void StartLWIPTask(void const * argument)
 {
   /* USER CODE BEGIN StartLWIPTask */
+  struct netconn *conn, *newconn;
+  err_t err, accept_err;
+  uint8_t data = 0;
+
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    if(xQueueReceive(lwipQueueHandle, &data, 0) == pdTRUE)
+    {
+      cli_printf("[Queue] Model -> HW (data = %u)\r\n", data);
+
+      /* Create a new TCP connection handle */
+      conn = netconn_new(NETCONN_TCP);
+
+      if (conn!= NULL)
+      {
+        cli_printf("netconn_new : OK\r\n");
+      }
+      else
+      {
+        cli_printf("netconn_new : ERR\r\n");
+      }
+
+      /* Delete TCP connection */
+      netconn_delete(conn);      
+    }
+    
+    osDelay(20);
   }
   /* USER CODE END StartLWIPTask */
 }

@@ -236,6 +236,7 @@ board_c_files += \
 	$(Drivers_path)/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_fmc.c \
 	$(Drivers_path)/STM32F7xx_HAL_Driver/Src/stm32f7xx_ll_sdmmc.c \
 	$(Drivers_path)/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_rng.c \
+	$(Drivers_path)/STM32F7xx_HAL_Driver/Src/stm32f7xx_hal_eth.c \
 	Core/Src/system_stm32f7xx.c \
 	Core/Src/freertos.c \
 	Core/Src/stm32f7xx_hal_msp.c \
@@ -256,6 +257,83 @@ board_c_files += \
     FATFS/Target/fatfs_platform.c \
     FATFS/Target/sd_diskio.c \
     FATFS/App/fatfs.c
+
+board_c_files += \
+	$(Middlewares_path)/Third_Party/LwIP/system/OS/sys_arch.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/api/api_lib.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/api/api_msg.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/api/err.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/api/netbuf.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/api/netdb.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/api/netifapi.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/api/sockets.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/api/tcpip.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/apps/mqtt/mqtt.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/def.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/dns.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/inet_chksum.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/init.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/ip.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/mem.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/memp.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/netif.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/pbuf.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/raw.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/stats.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/sys.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/tcp.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/tcp_in.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/tcp_out.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/timeouts.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/udp.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/ipv4/autoip.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/ipv4/dhcp.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/ipv4/etharp.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/ipv4/icmp.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/ipv4/igmp.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/ipv4/ip4.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/ipv4/ip4_addr.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/ipv4/ip4_frag.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/ipv6/dhcp6.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/ipv6/ethip6.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/ipv6/icmp6.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/ipv6/inet6.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/ipv6/ip6.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/ipv6/ip6_addr.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/ipv6/ip6_frag.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/ipv6/mld6.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/core/ipv6/nd6.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ethernet.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ethernetif_template.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/lowpan6.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/slipif.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/auth.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/ccp.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/chap_ms.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/chap-md5.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/chap-new.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/demand.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/eap.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/ecp.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/eui64.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/fsm.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/ipcp.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/ipv6cp.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/lcp.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/magic.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/mppe.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/multilink.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/ppp.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/pppapi.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/pppcrypt.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/pppoe.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/pppol2tp.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/pppos.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/upap.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/utils.c \
+	$(Middlewares_path)/Third_Party/LwIP/src/netif/ppp/vj.c \
+	LWIP/Target/ethernetif.c \
+	LWIP/App/lwip.c
 
 board_cpp_files := \
 	Core/Src/main.cpp \
@@ -281,12 +359,16 @@ board_include_paths := \
 	$(Drivers_path)/CMSIS/Include \
 	$(Drivers_path)/CMSIS/Device/ST/STM32f7xx/Include \
 	$(Drivers_path)/Console/inc \
-	Core/Inc \
+	$(Middlewares_path)/Third_Party/LwIP \
+	$(Middlewares_path)/Third_Party/LwIP/system \
+	$(Middlewares_path)/Third_Party/LwIP/src/include \
+	LWIP/App \
+	LWIP/Target \
 	FATFS/App \
-	FATFS/Target \
 	FATFS/Target \
 	$(Middlewares_path)/Third_Party/FatFs/src \
 	$(Middlewares_path)/Third_Party/FatFs/src/option \
+	Core/Inc
 
 asm_source_files := \
 	$(Drivers_path)/CMSIS/Device/ST/STM32F7xx/Source/Templates/gcc/startup_stm32f746xx.s

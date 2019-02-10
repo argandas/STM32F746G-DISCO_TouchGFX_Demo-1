@@ -2,7 +2,7 @@
 
 "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\bin\armstlink2.dll" 
 
-"C:\TouchGFXProjects\MyApplication5\EWARM\STM32F746G-DISCO\Exe\MyApplication5.out" 
+"C:\TouchGFXProjects\STM32F746G-DISCO_TouchGFX_Demo-1\EWARM\STM32F746G-DISCO\Exe\MyApplication5.out" 
 
 --plugin="C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\bin\armbat.dll" 
 

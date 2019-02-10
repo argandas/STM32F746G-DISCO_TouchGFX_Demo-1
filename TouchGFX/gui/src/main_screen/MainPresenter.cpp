@@ -25,3 +25,11 @@ void MainPresenter::v2p_SetLEDState(bool state)
   touchgfx_printf("MainPresenter::v2p_SetLEDState: %d\r\n", state);
   model->p2m_SetLEDState(state);
 }
+
+void MainPresenter::v2p_SendTCPData(int data)
+{
+  touchgfx_printf("MainPresenter::v2p_SendTCPData: %d\r\n", data);
+  model->p2m_SendTCPData(data);
+}
+
+

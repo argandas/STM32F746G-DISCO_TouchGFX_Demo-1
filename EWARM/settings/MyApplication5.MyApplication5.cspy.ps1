@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "C:\TouchGFXProjects\MyApplication5\EWARM\settings\MyApplication5.MyApplication5.general.xcl" --backend -f "C:\TouchGFXProjects\MyApplication5\EWARM\settings\MyApplication5.MyApplication5.driver.xcl" 
+& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "C:\TouchGFXProjects\STM32F746G-DISCO_TouchGFX_Demo-1\EWARM\settings\MyApplication5.MyApplication5.general.xcl" --backend -f "C:\TouchGFXProjects\STM32F746G-DISCO_TouchGFX_Demo-1\EWARM\settings\MyApplication5.MyApplication5.driver.xcl" 
 }
 else
 {
-& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "C:\TouchGFXProjects\MyApplication5\EWARM\settings\MyApplication5.MyApplication5.general.xcl" --debug_file=$debugfile --backend -f "C:\TouchGFXProjects\MyApplication5\EWARM\settings\MyApplication5.MyApplication5.driver.xcl" 
+& "C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\common\bin\cspybat" -f "C:\TouchGFXProjects\STM32F746G-DISCO_TouchGFX_Demo-1\EWARM\settings\MyApplication5.MyApplication5.general.xcl" --debug_file=$debugfile --backend -f "C:\TouchGFXProjects\STM32F746G-DISCO_TouchGFX_Demo-1\EWARM\settings\MyApplication5.MyApplication5.driver.xcl" 
 }
