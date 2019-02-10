@@ -149,11 +149,13 @@ uint16_t cli_printf(const char* fmt, ...);
 uint16_t cli_write(const char* src, uint16_t len);
 FRESULT scan_files(char* path);
 FRESULT get_free_clusters(FATFS* fs);
+void print_netif_status(struct netif *netif);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+extern struct netif gnetif;
+extern ip4_addr_t ipaddr;
 /* USER CODE END 0 */
 
 /**
@@ -1161,6 +1163,20 @@ FRESULT scan_files(char* path)
     return res;
 }
 
+void print_netif_status(struct netif *netif) 
+{
+  if (netif_is_up(netif))
+  {
+    uint8_t iptxt[20];
+    sprintf((char *)iptxt, "%s", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
+    cli_printf("Static IP address: %s\n", iptxt);
+  }
+  else
+  {  
+    cli_printf("The network cable is not connected \n");
+  } 
+}
+
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -1175,10 +1191,7 @@ void StartDefaultTask(void const * argument)
   /* init code for FATFS */
   MX_FATFS_Init();
 
-  /* init code for LWIP */
-  MX_LWIP_Init();
-
-/* Graphic application */  
+  /* Graphic application */  
   GRAPHICS_MainTask();
 
   /* USER CODE BEGIN 5 */
@@ -1425,18 +1438,25 @@ void StartSDTask(void const * argument)
 */
 /* USER CODE END Header_StartLWIPTask */
 void StartLWIPTask(void const * argument)
-{
+{ 
   /* USER CODE BEGIN StartLWIPTask */
   struct netconn *conn, *newconn;
   err_t err, accept_err;
   uint8_t data = 0;
+  uint8_t iptxt[20];
+
+  /* init code for LWIP */
+  MX_LWIP_Init();
+  
+  /* Print network interface status */
+  print_netif_status(&gnetif);
 
   /* Infinite loop */
   for(;;)
   {
     if(xQueueReceive(lwipQueueHandle, &data, 0) == pdTRUE)
     {
-      cli_printf("[Queue] Model -> HW (data = %u)\r\n", data);
+      cli_printf("[Queue] Model -> %s (data = %u)\r\n", __func__, data);
 
       /* Create a new TCP connection handle */
       conn = netconn_new(NETCONN_TCP);
@@ -1448,6 +1468,16 @@ void StartLWIPTask(void const * argument)
       else
       {
         cli_printf("netconn_new : ERR\r\n");
+      }
+            
+      if (dhcp_supplied_address(&gnetif)) 
+      {       
+        sprintf((char *)iptxt, "%s", ip4addr_ntoa((const ip4_addr_t *)&gnetif.ip_addr));   
+        cli_printf("IP address assigned by a DHCP server: %s\r\n", iptxt);
+      }
+      else
+      {
+        
       }
 
       /* Delete TCP connection */
