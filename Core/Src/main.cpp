@@ -251,7 +251,7 @@ int main(void)
   ledTaskHandle = osThreadCreate(osThread(ledTask), NULL);
 
   /* definition and creation of sdTask */
-  osThreadDef(sdTask, StartSDTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 5);
+  osThreadDef(sdTask, StartSDTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 6);
   sdTaskHandle = osThreadCreate(osThread(sdTask), NULL);
 
   /* definition and creation of lwipTask */
@@ -1498,20 +1498,22 @@ void StartLWIPTask(void const * argument)
       if (DHCP_state == DHCP_ADDRESS_ASSIGNED)
       {
         /* Create a new TCP connection handle */
-        conn = netconn_new(NETCONN_TCP);
-        
+        conn = netconn_new(NETCONN_TCP);        
         if (conn == NULL)
         {
           cli_printf("[LWIP] netconn_new : FAILED\r\n");
         }
         else
         {
+#if 0 
+          /* Bind a netconn to a specific local IP address and port (optional) */
           err = netconn_bind(conn, &netif->ip_addr, 0 );
           if (err != ERR_OK)
           {
             cli_printf("[LWIP] netconn_bind: ERR (%d)\r\n", err);
           }
           else
+#endif
           {
             err = netconn_gethostbyname(server, &remote_ip);
             if (err != ERR_OK)
@@ -1522,6 +1524,8 @@ void StartLWIPTask(void const * argument)
             {
               sprintf((char *)iptxt, "%s", ip4addr_ntoa((const ip4_addr_t *)&remote_ip));   
               cli_printf("Remote IP address to server: %s (%s)\r\n", server, iptxt);
+              
+              /* Connect to server */
               err = netconn_connect(conn, &remote_ip, 80); 
               if (err != ERR_OK)
               {
@@ -1530,7 +1534,9 @@ void StartLWIPTask(void const * argument)
               else
               {
                 cli_printf("Connected to server: %s\r\n", server);
-                sprintf((char *)request, request_fmt, key, data, server);   
+                sprintf((char *)request, request_fmt, key, data, server);  
+                
+                /* Write data to server */
                 err = netconn_write(conn, request, strlen((char*)request), NETCONN_NOFLAG);
                 if (err != ERR_OK)
                 {
@@ -1577,7 +1583,11 @@ void StartLWIPTask(void const * argument)
         }
 
         /* Delete TCP connection */
-        netconn_delete(conn);     
+        err = netconn_delete(conn);  
+        if (err != ERR_OK)
+        {
+          cli_printf("[LWIP] netconn_close: ERR (%d)\r\n", err);
+        }
       }
     }
     
