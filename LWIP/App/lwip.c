@@ -85,9 +85,9 @@ void MX_LWIP_Init(void)
   tcpip_init( NULL, NULL );
 
   /* IP addresses initialization with DHCP (IPv4) */
-  ip_addr_set_zero_ip4(&ipaddr);
-  ip_addr_set_zero_ip4(&netmask);
-  ip_addr_set_zero_ip4(&gw);
+  ipaddr.addr = 0;
+  netmask.addr = 0;
+  gw.addr = 0;
 
   /* add the network interface (IPv4/IPv6) with RTOS */
   netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
@@ -107,7 +107,7 @@ void MX_LWIP_Init(void)
   }
 
   /* Start DHCP negotiation for a network interface (IPv4) */
-  // dhcp_start(&gnetif);
+  dhcp_start(&gnetif);
 
 /* USER CODE BEGIN 3 */
 

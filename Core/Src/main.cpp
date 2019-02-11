@@ -77,6 +77,11 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
+/* Enable/Disable usage for FatFs mkfs function */
+// #define USE_FATFS_MKFS 0
+
+#define MAX_DHCP_TRIES  4
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -109,16 +114,23 @@ osThreadId buttonTaskHandle;
 osThreadId ledTaskHandle;
 osThreadId sdTaskHandle;
 osThreadId lwipTaskHandle;
+osThreadId dhcpTaskHandle;
 osMessageQId buttonQueueHandle;
 osMessageQId ledQueueHandle;
-osMessageQId lwipQueueHandle;
+osMessageQId tcpQueueHandle;
+osSemaphoreId dhcpBinarySemHandle;
 /* USER CODE BEGIN PV */
 
 FATFS SDFatFs;  /* File system object for SD card logical drive */
 FIL MyFile;     /* File object */
-uint8_t workBuffer[2*_MAX_SS];
 
-char cli_buff[64];
+#ifdef USE_FATFS_MKFS
+uint8_t workBuffer[2*_MAX_SS];
+#endif
+
+char cli_buff[128];
+
+uint8_t DHCP_state = DHCP_OFF;
 
 /* USER CODE END PV */
 
@@ -143,13 +155,13 @@ void StartButtonTask(void const * argument);
 void StartLEDTask(void const * argument);
 void StartSDTask(void const * argument);
 void StartLWIPTask(void const * argument);
+void StartDHCPTask(void const * argument);
 
 /* USER CODE BEGIN PFP */
 uint16_t cli_printf(const char* fmt, ...);
 uint16_t cli_write(const char* src, uint16_t len);
 FRESULT scan_files(char* path);
 FRESULT get_free_clusters(FATFS* fs);
-void print_netif_status(struct netif *netif);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -212,6 +224,11 @@ int main(void)
     /* add mutexes, ... */
   /* USER CODE END RTOS_MUTEX */
 
+  /* Create the semaphores(s) */
+  /* definition and creation of dhcpBinarySem */
+  osSemaphoreDef(dhcpBinarySem);
+  dhcpBinarySemHandle = osSemaphoreCreate(osSemaphore(dhcpBinarySem), 1);
+
   /* USER CODE BEGIN RTOS_SEMAPHORES */
     /* add semaphores, ... */
   /* USER CODE END RTOS_SEMAPHORES */
@@ -222,24 +239,28 @@ int main(void)
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 640);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityHigh, 0, configMINIMAL_STACK_SIZE * 5);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of buttonTask */
-  osThreadDef(buttonTask, StartButtonTask, osPriorityIdle, 0, 256);
+  osThreadDef(buttonTask, StartButtonTask, osPriorityIdle, 0, configMINIMAL_STACK_SIZE * 5);
   buttonTaskHandle = osThreadCreate(osThread(buttonTask), NULL);
 
   /* definition and creation of ledTask */
-  osThreadDef(ledTask, StartLEDTask, osPriorityIdle, 0, 256);
+  osThreadDef(ledTask, StartLEDTask, osPriorityIdle, 0, configMINIMAL_STACK_SIZE * 5);
   ledTaskHandle = osThreadCreate(osThread(ledTask), NULL);
 
   /* definition and creation of sdTask */
-  osThreadDef(sdTask, StartSDTask, osPriorityIdle, 0, 256);
+  osThreadDef(sdTask, StartSDTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 5);
   sdTaskHandle = osThreadCreate(osThread(sdTask), NULL);
 
   /* definition and creation of lwipTask */
-  osThreadDef(lwipTask, StartLWIPTask, osPriorityIdle, 0, 256);
-  lwipTaskHandle = osThreadCreate(osThread(lwipTask), NULL);
+  osThreadDef(lwipTask, StartLWIPTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 5);
+  lwipTaskHandle = osThreadCreate(osThread(lwipTask), (void*)&gnetif);
+
+  /* definition and creation of dhcpTask */
+  osThreadDef(dhcpTask, StartDHCPTask, osPriorityBelowNormal, 0, configMINIMAL_STACK_SIZE * 5);
+  dhcpTaskHandle = osThreadCreate(osThread(dhcpTask), (void*)&gnetif);
 
   /* USER CODE BEGIN RTOS_THREADS */
     /* add threads, ... */
@@ -254,9 +275,9 @@ int main(void)
   osMessageQDef(ledQueue, 16, uint8_t);
   ledQueueHandle = osMessageCreate(osMessageQ(ledQueue), NULL);
 
-  /* definition and creation of lwipQueue */
-  osMessageQDef(lwipQueue, 8, uint16_t);
-  lwipQueueHandle = osMessageCreate(osMessageQ(lwipQueue), NULL);
+  /* definition and creation of tcpQueue */
+  osMessageQDef(tcpQueue, 8, uint16_t);
+  tcpQueueHandle = osMessageCreate(osMessageQ(tcpQueue), NULL);
 
   /* USER CODE BEGIN RTOS_QUEUES */
     /* add queues, ... */
@@ -1089,22 +1110,25 @@ static void MX_GPIO_Init(void)
 
 uint16_t cli_printf(const char* fmt, ...)
 {
-    va_list args;
-    va_start(args, fmt);
-    vsnprintf(cli_buff, sizeof(cli_buff), fmt, args);
-    // tfp_vsnprintf(cli_buff, sizeof(cli_buff), fmt, args);
-    cli_write(&cli_buff[0], strlen(cli_buff));
-    va_end(args);    
-    
-    return 0;
+  uint16_t len = 0;
+  va_list args;
+  va_start(args, fmt);
+  vsnprintf(cli_buff, sizeof(cli_buff), fmt, args);
+  // tfp_vsnprintf(cli_buff, sizeof(cli_buff), fmt, args);
+  len = cli_write(&cli_buff[0], strlen(cli_buff));
+  va_end(args);    
+
+  return len;
 }
 
 uint16_t cli_write(const char* src, uint16_t len)
 {
+  if ((src != NULL) && (len > 0))
+  {
     HAL_UART_Transmit(&huart1, (uint8_t*)src, len, 100);
-    HAL_UART_Transmit(&huart6, (uint8_t*)src, len, 100);
-    
-    return 0;
+    // HAL_UART_Transmit(&huart6, (uint8_t*)src, len, 100);
+  }
+  return len;
 }
 
 FRESULT get_free_clusters(FATFS* fs)
@@ -1161,31 +1185,6 @@ FRESULT scan_files(char* path)
     }
 
     return res;
-}
-
-void print_netif_status(struct netif *netif) 
-{
-  err_t err;
-  if (netif_is_up(netif))
-  {
-    ip_addr_set_zero_ip4(&netif->ip_addr);
-    ip_addr_set_zero_ip4(&netif->netmask);
-    ip_addr_set_zero_ip4(&netif->gw);  
-    /* Start DHCP negotiation for a network interface (IPv4) */
-    err = dhcp_start(netif);
-    cli_printf ("State: Looking for DHCP server ... (%d)\r\n", err);
-#if 0
-    uint8_t iptxt[20];
-    sprintf((char *)iptxt, "%s", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
-    cli_printf("Static IP address: %s\n", iptxt);
-#endif
-    
-  }
-  else
-  {  
-    dhcp_stop(netif);
-    cli_printf("The network cable is not connected \r\n");
-  } 
 }
 
 /* USER CODE END 4 */
@@ -1289,7 +1288,7 @@ void StartLEDTask(void const * argument)
 */
 /* USER CODE END Header_StartSDTask */
 void StartSDTask(void const * argument)
-{ 
+{
   /* USER CODE BEGIN StartSDTask */
   
   FRESULT fr;                                               /* FatFs function common result code */
@@ -1319,7 +1318,7 @@ void StartSDTask(void const * argument)
     }
     else
     {
-#if 0      
+#ifdef USE_FATFS_MKFS      
       /*##-3- Create a FAT file system (format) on the logical drive #########*/
       /* WARNING: Formatting the uSD card will delete all content on the device */
       fr = f_mkfs((TCHAR const*)SDPath, FM_ANY, 0, workBuffer, sizeof(workBuffer));
@@ -1449,67 +1448,246 @@ void StartSDTask(void const * argument)
 * @param argument: Not used
 * @retval None
 */
+portCHAR PAGE_BODY[256];
+
 /* USER CODE END Header_StartLWIPTask */
 void StartLWIPTask(void const * argument)
 {
   /* USER CODE BEGIN StartLWIPTask */
-  struct netconn *conn, *newconn;
-  err_t err, accept_err;
+  struct netif* netif = (struct netif*)argument;
+  struct netconn *conn;
+  err_t err;
   uint8_t data = 0;
-  uint8_t iptxt[20];
-  struct dhcp *dhcp;
+  
+  /* netconn_recv buffer variables */
+  struct netbuf *netbuf = NULL;
+  uint16_t buf_len = 0;
+  void* buf_data = NULL;
+  
+  uint8_t iptxt[64];
+  uint8_t request[512];
+  
+  ip4_addr_t local_ip; 
+  ip4_addr_t remote_ip; 
+  
+  const char* key = "WTN6FH385TCUNDMU";
+  const char* request_fmt = "GET /update?api_key=%s&field1=%d HTTP/1.0\r\nHost: mywebsite.com\r\n\r\n ";
+  const char* server = "thingspeak.com";
 
   /* init code for LWIP */
   MX_LWIP_Init();
   
-  cli_printf ("State: Looking for DHCP server ...\r\n");
-
-  /* Print network interface status */
-  print_netif_status(&gnetif);
+  /* Check interface status */
+  if (netif_is_up(netif))
+  {
+    DHCP_state = DHCP_START;
+  }
+  else
+  {  
+    DHCP_state = DHCP_LINK_DOWN;
+    cli_printf("The network cable is not connected \r\n");
+  }
 
   /* Infinite loop */
   for(;;)
   {
-    if(xQueueReceive(lwipQueueHandle, &data, 0) == pdTRUE)
+    if(xQueueReceive(tcpQueueHandle, &data, 0) == pdTRUE)
     {
       cli_printf("[Queue] Model -> %s (data = %u)\r\n", __func__, data);
 
-      /* Create a new TCP connection handle */
-      conn = netconn_new(NETCONN_TCP);
-
-      if (conn!= NULL)
+      if (DHCP_state == DHCP_ADDRESS_ASSIGNED)
       {
-        cli_printf("netconn_new : OK\r\n");
-      }
-      else
-      {
-        cli_printf("netconn_new : ERR\r\n");
-      }
+        /* Create a new TCP connection handle */
+        conn = netconn_new(NETCONN_TCP);
+        
+        if (conn == NULL)
+        {
+          cli_printf("[LWIP] netconn_new : FAILED\r\n");
+        }
+        else
+        {
+          err = netconn_bind(conn, &netif->ip_addr, 0 );
+          if (err != ERR_OK)
+          {
+            cli_printf("[LWIP] netconn_bind: ERR (%d)\r\n", err);
+          }
+          else
+          {
+            err = netconn_gethostbyname(server, &remote_ip);
+            if (err != ERR_OK)
+            {
+              cli_printf("[LWIP] netconn_gethostbyname: ERR (%d)\r\n", err);
+            }
+            else
+            {
+              sprintf((char *)iptxt, "%s", ip4addr_ntoa((const ip4_addr_t *)&remote_ip));   
+              cli_printf("Remote IP address to server: %s (%s)\r\n", server, iptxt);
+              err = netconn_connect(conn, &remote_ip, 80); 
+              if (err != ERR_OK)
+              {
+                cli_printf("[LWIP] netconn_connect: ERR (%d)\r\n", err);
+              }
+              else
+              {
+                cli_printf("Connected to server: %s\r\n", server);
+                sprintf((char *)request, request_fmt, key, data, server);   
+                err = netconn_write(conn, request, strlen((char*)request), NETCONN_NOFLAG);
+                if (err != ERR_OK)
+                {
+                  cli_printf("[LWIP] netconn_write: ERR (%d)\r\n", err);
+                }
+                else
+                {
+                  cli_printf("[LWIP] netconn_write:\r\n%s \r\n", request);
+                  
+                  /* Get pointer to buffer where response data is stored */
+                  while (( err = netconn_recv(conn, &netbuf)) == ERR_OK)
+                  {
+                      do
+                      {
+                        /* Get pointer to data and length*/
+                        netbuf_data(netbuf, &buf_data, &buf_len);
+                        
+                        /* Print data to console */
+                        cli_write((char*)buf_data, buf_len);
+                      }
+                      while (netbuf_next(netbuf) >= 0);
+                      
+                      /* Free data buffer */
+                      netbuf_delete(netbuf);
+                  }
+                  
+                  cli_printf("\r\n");
+                  
+                  if ((err != ERR_OK) && (err != ERR_CLSD))
+                  {
+                    cli_printf("[LWIP] netconn_recv: ERR (%d)\r\n", err);
+                  }
+                }
+                
+                /* Close connection from local side */
+                err = netconn_close(conn);
+                if (err != ERR_OK)
+                {
+                  cli_printf("[LWIP] netconn_close: ERR (%d)\r\n", err);
+                }
+              }
+            }
+          }
+        }
 
-      /* Delete TCP connection */
-      netconn_delete(conn);      
+        /* Delete TCP connection */
+        netconn_delete(conn);     
+      }
     }
     
-    if (dhcp_supplied_address(&gnetif)) 
-    {       
-      sprintf((char *)iptxt, "%s", ip4addr_ntoa((const ip4_addr_t *)&gnetif.ip_addr));   
-      cli_printf("IP address assigned by a DHCP server: %s\r\n", iptxt);
-    }
-    else
-    {
-      dhcp = (struct dhcp *)netif_get_client_data(&gnetif, LWIP_NETIF_CLIENT_DATA_INDEX_DHCP);
-      cli_printf("DHCP state: %d\r\n", dhcp->state);
-      cli_printf("DHCP retries: %d\r\n", dhcp->tries);
-      if (dhcp->tries > 4)
-      {
-        cli_printf("DHCP Timeout !! \r\n");
-        dhcp_stop(&gnetif);
-      }
-    }
-    
-    osDelay(100);
+    osDelay(10);
   }
   /* USER CODE END StartLWIPTask */
+}
+
+/* USER CODE BEGIN Header_StartDHCPTask */
+/**
+* @brief Function implementing the dhcpTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartDHCPTask */
+void StartDHCPTask(void const * argument)
+{
+  /* USER CODE BEGIN StartDHCPTask */
+
+  struct netif* netif = (struct netif*)argument;
+  ip_addr_t ipaddr;
+  ip_addr_t netmask;
+  ip_addr_t gw;
+  struct dhcp *dhcp;
+  uint8_t iptxt[20];
+  
+  /* Get DHCP instance */
+  dhcp = (struct dhcp *)netif_get_client_data(netif, LWIP_NETIF_CLIENT_DATA_INDEX_DHCP);
+  
+  for (;;)
+  {
+    switch (DHCP_state)
+    {
+    case DHCP_START:
+      {
+        ip_addr_set_zero_ip4(&netif->ip_addr);
+        ip_addr_set_zero_ip4(&netif->netmask);
+        ip_addr_set_zero_ip4(&netif->gw);       
+        dhcp_start(netif);
+        DHCP_state = DHCP_WAIT_ADDRESS;
+        cli_printf("[DHCP] Looking for server ...\r\n");
+      }
+      break;
+      
+    case DHCP_WAIT_ADDRESS:
+      {                
+        if (dhcp_supplied_address(netif)) 
+        {
+          DHCP_state = DHCP_ADDRESS_ASSIGNED;	
+          sprintf((char *)iptxt, "%s", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));   
+          cli_printf("[DHCP] Supplied address: %s\r\n", iptxt);
+        }
+        else
+        {
+          dhcp = (struct dhcp *)netif_get_client_data(netif, LWIP_NETIF_CLIENT_DATA_INDEX_DHCP);
+    
+          /* DHCP timeout */
+          if (dhcp->tries > MAX_DHCP_TRIES)
+          {
+            DHCP_state = DHCP_TIMEOUT;
+            
+            /* Stop DHCP */
+            dhcp_stop(netif);
+            
+            /* Static address used */
+            IP_ADDR4(&ipaddr, IP_ADDR0 ,IP_ADDR1 , IP_ADDR2 , IP_ADDR3 );
+            IP_ADDR4(&netmask, NETMASK_ADDR0, NETMASK_ADDR1, NETMASK_ADDR2, NETMASK_ADDR3);
+            IP_ADDR4(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
+            netif_set_addr(netif, ip_2_ip4(&ipaddr), ip_2_ip4(&netmask), ip_2_ip4(&gw));
+            
+            sprintf((char *)iptxt, "%s", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
+            cli_printf("[DHCP] Timeout\r\n");
+            cli_printf("[DHCP] Static IP address: %s\r\n", iptxt);
+          }
+        }
+      }
+      break;
+    case DHCP_LINK_DOWN:
+      {
+        /* Stop DHCP */
+        dhcp_stop(netif);
+        DHCP_state = DHCP_OFF; 
+      }
+      break;
+    default: 
+      break;
+    }
+    
+    /* wait 250 ms */
+    osDelay(250);
+  }
+  
+#if 0  
+  /* Infinite loop */
+  for(;;)
+  {
+    memset(PAGE_BODY, 0,256);
+    /* The list of tasks and their status */
+    osThreadList((unsigned char *)PAGE_BODY);
+
+    cli_printf("\r\nName          State  Priority  Stack   Num\r\n" );
+    cli_printf("---------------------------------------------\r\n");
+    cli_write((char*)PAGE_BODY, strlen((char*)PAGE_BODY));
+    cli_printf("---------------------------------------------\r\n");
+    cli_printf("B : Blocked, R : Ready, D : Deleted, S : Suspended\r\n");
+    osDelay(1000);
+  }
+#endif
+
+  /* USER CODE END StartDHCPTask */
 }
 
 /**
