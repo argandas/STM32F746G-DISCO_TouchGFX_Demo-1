@@ -59,7 +59,7 @@ C:\TouchGFXProjects\STM32F746G-DISCO_TouchGFX_Demo-1\EWARM/../LWIP/App
 -I
 C:\TouchGFXProjects\STM32F746G-DISCO_TouchGFX_Demo-1\EWARM/../LWIP/Target
 -I
-C:\TouchGFXProjects\STM32F746G-DISCO_TouchGFX_Demo-1\EWARM/../Middlewares/ST/TouchGFX/touchgfx/framework/include
+C:\TouchGFXProjects\STM32F746G-DISCO_TouchGFX_Demo-1\EWARM\..\Middlewares\ST\TouchGFX\touchgfx\framework\include
 -I
 C:\TouchGFXProjects\STM32F746G-DISCO_TouchGFX_Demo-1\EWARM/../Middlewares/Third_Party/LwIP/src/include
 -I
@@ -82,6 +82,8 @@ C:\TouchGFXProjects\STM32F746G-DISCO_TouchGFX_Demo-1\EWARM/../Middlewares/Third_
 C:\TouchGFXProjects\STM32F746G-DISCO_TouchGFX_Demo-1\EWARM/../Middlewares/Third_Party/LwIP/src/include/posix/sys
 -I
 C:\TouchGFXProjects\STM32F746G-DISCO_TouchGFX_Demo-1\EWARM/../Middlewares/Third_Party/LwIP/system/arch
+-I
+C:\TouchGFXProjects\STM32F746G-DISCO_TouchGFX_Demo-1\EWARM/../Middlewares/ST/TouchGFX/touchgfx/framework/include
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\CMSIS\Core\Include
 -I
@@ -168,6 +170,8 @@ C:\TouchGFXProjects\STM32F746G-DISCO_TouchGFX_Demo-1\Middlewares\Third_Party\LwI
 C:\TouchGFXProjects\STM32F746G-DISCO_TouchGFX_Demo-1\Middlewares\Third_Party\LwIP\src\include\posix\sys
 -I
 C:\TouchGFXProjects\STM32F746G-DISCO_TouchGFX_Demo-1\Middlewares\Third_Party\LwIP\system\arch
+-I
+C:\TouchGFXProjects\STM32F746G-DISCO_TouchGFX_Demo-1\Middlewares\ST\TouchGFX\touchgfx\framework\include
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\CMSIS\Core\Include
 -I

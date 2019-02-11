@@ -222,23 +222,23 @@ int main(void)
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 2048);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 640);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of buttonTask */
-  osThreadDef(buttonTask, StartButtonTask, osPriorityIdle, 0, 512);
+  osThreadDef(buttonTask, StartButtonTask, osPriorityIdle, 0, 256);
   buttonTaskHandle = osThreadCreate(osThread(buttonTask), NULL);
 
   /* definition and creation of ledTask */
-  osThreadDef(ledTask, StartLEDTask, osPriorityIdle, 0, 512);
+  osThreadDef(ledTask, StartLEDTask, osPriorityIdle, 0, 256);
   ledTaskHandle = osThreadCreate(osThread(ledTask), NULL);
 
   /* definition and creation of sdTask */
-  osThreadDef(sdTask, StartSDTask, osPriorityIdle, 0, 512);
+  osThreadDef(sdTask, StartSDTask, osPriorityIdle, 0, 256);
   sdTaskHandle = osThreadCreate(osThread(sdTask), NULL);
 
   /* definition and creation of lwipTask */
-  osThreadDef(lwipTask, StartLWIPTask, osPriorityIdle, 0, 1024);
+  osThreadDef(lwipTask, StartLWIPTask, osPriorityIdle, 0, 256);
   lwipTaskHandle = osThreadCreate(osThread(lwipTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -1199,7 +1199,8 @@ void print_netif_status(struct netif *netif)
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void const * argument)
 {
-  /* Graphic application */  
+
+/* Graphic application */  
   GRAPHICS_MainTask();
 
   /* USER CODE BEGIN 5 */
@@ -1288,19 +1289,20 @@ void StartLEDTask(void const * argument)
 */
 /* USER CODE END Header_StartSDTask */
 void StartSDTask(void const * argument)
-{
-  /* init code for FATFS */
-  MX_FATFS_Init();
-  
+{ 
   /* USER CODE BEGIN StartSDTask */
-  FRESULT fr;                                           /* FatFs function common result code */
+  
+  FRESULT fr;                                               /* FatFs function common result code */
   uint32_t byteswritten, bytesread = 0;                     /* File write/read counts */
   uint8_t wtext[] = "This is STM32 working with FatFs\r\n"; /* File write buffer */
-  uint8_t rtext[100];                                   /* File read buffer */
+  uint8_t rtext[100];                                       /* File read buffer */
   uint32_t rng_value = 0;
-  
   uint8_t file_name_buff[16];
   
+  /* init code for FATFS */
+  MX_FATFS_Init();  
+
+  /* Start filename */
   strcpy((char*)file_name_buff, "filenn.TXT");
     
   cli_printf("FATFS %s\r\n", "Start");
@@ -1449,7 +1451,7 @@ void StartSDTask(void const * argument)
 */
 /* USER CODE END Header_StartLWIPTask */
 void StartLWIPTask(void const * argument)
-{ 
+{
   /* USER CODE BEGIN StartLWIPTask */
   struct netconn *conn, *newconn;
   err_t err, accept_err;

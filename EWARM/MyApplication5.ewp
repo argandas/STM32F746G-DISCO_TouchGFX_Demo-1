@@ -390,6 +390,7 @@
           <state>$PROJ_DIR$/../Middlewares/Third_Party/LwIP/src/include/posix</state>
           <state>$PROJ_DIR$/../Middlewares/Third_Party/LwIP/src/include/posix/sys</state>
           <state>$PROJ_DIR$/../Middlewares/Third_Party/LwIP/system/arch</state>
+          <state>$PROJ_DIR$/../Middlewares/ST/TouchGFX/touchgfx/framework/include</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1672,6 +1673,9 @@
         <name>$PROJ_DIR$\..\Middlewares\ST\TouchGFX\touchgfx\lib\core\cortex_m7\IAR8.x\touchgfx_core_release.a</name>
       </file>
       <file>
+        <name>$PROJ_DIR$/../Middlewares/ST/TouchGFX/touchgfx/lib/core/cortex_m7/IAR8.x/touchgfx_core_release.a</name>
+      </file>
+      <file>
         <name>$PROJ_DIR$/../Middlewares/ST/TouchGFX/touchgfx/os/OSWrappers.cpp</name>
       </file>
     </group>
@@ -1893,6 +1897,10 @@
       <file>
         <name>$PROJ_DIR$/../Middlewares/Third_Party/LwIP/src/apps/mqtt/mqtt.c</name>
       </file>
+      <file>
+        <name>$PROJ_DIR$/../Middlewares/Third_Party/LwIP/src/apps/sntp/sntp.c</name>
+      </file>
     </group>
   </group>
 </project>
+
