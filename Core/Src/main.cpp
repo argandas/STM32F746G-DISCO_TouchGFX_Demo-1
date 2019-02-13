@@ -128,7 +128,7 @@ FIL MyFile;     /* File object */
 uint8_t workBuffer[2*_MAX_SS];
 #endif
 
-char cli_buff[128];
+char cli_buff[256];
 
 uint8_t DHCP_state = DHCP_OFF;
 
@@ -731,7 +731,7 @@ static void MX_USART1_UART_Init(void)
 
   /* USER CODE END USART1_Init 1 */
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 115200;
+  huart1.Init.BaudRate = 921600;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;
@@ -1471,7 +1471,18 @@ void StartLWIPTask(void const * argument)
   ip4_addr_t remote_ip; 
   
   const char* key = "WTN6FH385TCUNDMU";
-  const char* request_fmt = "GET /update?api_key=%s&field1=%d HTTP/1.0\r\nHost: mywebsite.com\r\n\r\n ";
+  const char* request_fmt = "GET /update.json HTTP/1.0\r\n"
+                          "Content-Type: application/json\r\n"
+                          "Content-Length: 57\r\n" /* 42 + 44 = 86, 42 + 15 = 57*/
+                          "\r\n"
+                          "{" /* 1 */
+                              "\"api_key\": \"%s\"," /* 30 */
+                              "\"delta_t\": 5," /* 13 */
+                              //"\"created_at\": \"2019-02-12 23:48:20 +0600\"," /* 42 */
+                              "\"field1\": %d" /* 12 */
+                          "}" /* 1 */
+                          "\r\n\r\n"; /* 2 */
+  
   const char* server = "thingspeak.com";
 
   /* init code for LWIP */
@@ -1544,7 +1555,8 @@ void StartLWIPTask(void const * argument)
                 }
                 else
                 {
-                  cli_printf("[LWIP] netconn_write:\r\n%s \r\n", request);
+                  cli_printf("\r\n[LWIP] netconn_write:\r\n\r\n%s", request);
+                  cli_printf("\r\n[LWIP] netconn_recv:\r\n\r\n");
                   
                   /* Get pointer to buffer where response data is stored */
                   while (( err = netconn_recv(conn, &netbuf)) == ERR_OK)
