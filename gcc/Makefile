@@ -245,7 +245,8 @@ board_c_files += \
 	$(Middlewares_path)/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c
 
 board_c_files += \
-	$(Drivers_path)/Console/src/sprintf.c \
+	Core/Src/jsmn.c \
+	Core/Src/lwhttp.c \
 
 board_c_files += \
     $(Middlewares_path)/Third_Party/FatFs/src/diskio.c \

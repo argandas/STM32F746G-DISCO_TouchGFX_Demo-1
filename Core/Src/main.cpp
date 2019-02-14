@@ -67,6 +67,9 @@
 #include "sprintf.h"
 
 #include "lwip/api.h"
+
+#include "jsmn.h"
+#include "lwhttp.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -132,6 +135,12 @@ char cli_buff[256];
 
 uint8_t DHCP_state = DHCP_OFF;
 
+static const char *JSON_STRING =
+	"{\"user\": \"johndoe\", \"admin\": false, \"uid\": 1000,\n  "
+	"\"groups\": [\"users\", \"wheel\", \"audio\", \"video\"]}";
+
+lwhttp_builder_t myBuilder;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -162,6 +171,7 @@ uint16_t cli_printf(const char* fmt, ...);
 uint16_t cli_write(const char* src, uint16_t len);
 FRESULT scan_files(char* path);
 FRESULT get_free_clusters(FATFS* fs);
+static int jsoneq(const char *json, jsmntok_t *tok, const char *s);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -251,7 +261,7 @@ int main(void)
   ledTaskHandle = osThreadCreate(osThread(ledTask), NULL);
 
   /* definition and creation of sdTask */
-  osThreadDef(sdTask, StartSDTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 6);
+  osThreadDef(sdTask, StartSDTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 9);
   sdTaskHandle = osThreadCreate(osThread(sdTask), NULL);
 
   /* definition and creation of lwipTask */
@@ -1187,6 +1197,14 @@ FRESULT scan_files(char* path)
     return res;
 }
 
+static int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
+	if (tok->type == JSMN_STRING && (int) strlen(s) == tok->end - tok->start &&
+			strncmp(json + tok->start, s, tok->end - tok->start) == 0) {
+		return 0;
+	}
+	return -1;
+}
+
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -1201,7 +1219,7 @@ void StartDefaultTask(void const * argument)
 
 /* Graphic application */  
   GRAPHICS_MainTask();
-
+        
   /* USER CODE BEGIN 5 */
     /* Infinite loop */
     for (;;)
@@ -1434,6 +1452,58 @@ void StartSDTask(void const * argument)
   cli_printf("FATFS %s\r\n", "End");
   FATFS_UnLinkDriver(SDPath);
   
+  int i;
+  int r;
+  jsmn_parser p;
+  jsmntok_t t[128]; /* We expect no more than 128 tokens */
+
+  jsmn_init(&p);
+  r = jsmn_parse(&p, JSON_STRING, strlen(JSON_STRING), t, sizeof(t)/sizeof(t[0]));
+  if (r < 0) {
+          cli_printf("Failed to parse JSON: %d\r\n", r);
+          //return 1;
+  }
+
+  /* Assume the top-level element is an object */
+  if (r < 1 || t[0].type != JSMN_OBJECT) {
+          cli_printf("Object expected\r\n");
+          // return 1;
+  }
+
+  /* Loop over all keys of the root object */
+  for (i = 1; i < r; i++) {
+          if (jsoneq(JSON_STRING, &t[i], "user") == 0) {
+                  /* We may use strndup() to fetch string value */
+                  cli_printf("- User: %.*s\r\n", t[i+1].end-t[i+1].start,
+                                  JSON_STRING + t[i+1].start);
+                  i++;
+          } else if (jsoneq(JSON_STRING, &t[i], "admin") == 0) {
+                  /* We may additionally check if the value is either "true" or "false" */
+                  cli_printf("- Admin: %.*s\r\n", t[i+1].end-t[i+1].start,
+                                  JSON_STRING + t[i+1].start);
+                  i++;
+          } else if (jsoneq(JSON_STRING, &t[i], "uid") == 0) {
+                  /* We may want to do strtol() here to get numeric value */
+                  cli_printf("- UID: %.*s\r\n", t[i+1].end-t[i+1].start,
+                                  JSON_STRING + t[i+1].start);
+                  i++;
+          } else if (jsoneq(JSON_STRING, &t[i], "groups") == 0) {
+                  int j;
+                  cli_printf("- Groups:\r\n");
+                  if (t[i+1].type != JSMN_ARRAY) {
+                          continue; /* We expect groups to be an array of strings */
+                  }
+                  for (j = 0; j < t[i+1].size; j++) {
+                          jsmntok_t *g = &t[i+j+2];
+                          cli_printf("  * %.*s\r\n", g->end - g->start, JSON_STRING + g->start);
+                  }
+                  i += t[i+1].size + 1;
+          } else {
+                  cli_printf("Unexpected key: %.*s\r\n", t[i].end-t[i].start,
+                                  JSON_STRING + t[i].start);
+          }
+  }
+  
   /* Infinite loop */
   for(;;)
   {
@@ -1465,25 +1535,21 @@ void StartLWIPTask(void const * argument)
   void* buf_data = NULL;
   
   uint8_t iptxt[64];
-  uint8_t request[512];
+  uint8_t http_body[128];
+  uint8_t http_body_length[4];
   
   ip4_addr_t local_ip; 
   ip4_addr_t remote_ip; 
   
   const char* key = "WTN6FH385TCUNDMU";
-  const char* request_fmt = "GET /update.json HTTP/1.0\r\n"
-                          "Content-Type: application/json\r\n"
-                          "Content-Length: 57\r\n" /* 42 + 44 = 86, 42 + 15 = 57*/
-                          "\r\n"
-                          "{" /* 1 */
-                              "\"api_key\": \"%s\"," /* 30 */
-                              "\"delta_t\": 5," /* 13 */
-                              //"\"created_at\": \"2019-02-12 23:48:20 +0600\"," /* 42 */
-                              "\"field1\": %d" /* 12 */
-                          "}" /* 1 */
-                          "\r\n\r\n"; /* 2 */
   
   const char* server = "thingspeak.com";
+  const char* url = "/update.json";
+  const char* content_type = "application/json";
+  
+  const char* json_data_fmt = "{\"api_key\": \"%s\", \"delta_t\": %d, \"field1\": %d}";
+  
+  char myBuilder_buf[256];
 
   /* init code for LWIP */
   MX_LWIP_Init();
@@ -1545,17 +1611,26 @@ void StartLWIPTask(void const * argument)
               else
               {
                 cli_printf("Connected to server: %s\r\n", server);
-                sprintf((char *)request, request_fmt, key, data, server);  
+                
+                sprintf((char *)http_body, json_data_fmt, key, 5, data);  
+                sprintf((char *)http_body_length, "%d", strlen((char *)http_body));  
+                
+                lwhttp_new_builder(&myBuilder, (char*)myBuilder_buf, sizeof(myBuilder_buf));
+                lwhttp_add_request(&myBuilder, LwHHTP_POST, url);
+                lwhttp_add_header(&myBuilder, "Content-Type", content_type);
+                lwhttp_add_header(&myBuilder, "Content-Length", (char *)http_body_length);
+                lwhttp_add_body(&myBuilder, (char*)http_body, strlen((char *)http_body));
+                lwhttp_end(&myBuilder);
                 
                 /* Write data to server */
-                err = netconn_write(conn, request, strlen((char*)request), NETCONN_NOFLAG);
+                err = netconn_write(conn, myBuilder.data, myBuilder.len, NETCONN_NOFLAG);
                 if (err != ERR_OK)
                 {
                   cli_printf("[LWIP] netconn_write: ERR (%d)\r\n", err);
                 }
                 else
                 {
-                  cli_printf("\r\n[LWIP] netconn_write:\r\n\r\n%s", request);
+                  cli_printf("\r\n[LWIP] netconn_write:\r\n\r\n%s", myBuilder.data);
                   cli_printf("\r\n[LWIP] netconn_recv:\r\n\r\n");
                   
                   /* Get pointer to buffer where response data is stored */
