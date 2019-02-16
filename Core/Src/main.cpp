@@ -131,15 +131,12 @@ FIL MyFile;     /* File object */
 uint8_t workBuffer[2*_MAX_SS];
 #endif
 
-char cli_buff[256];
+char cli_buff[512];
 
 uint8_t DHCP_state = DHCP_OFF;
 
-static const char *JSON_STRING =
-	"{\"user\": \"johndoe\", \"admin\": false, \"uid\": 1000,\n  "
-	"\"groups\": [\"users\", \"wheel\", \"audio\", \"video\"]}";
-
 lwhttp_builder_t myBuilder;
+lwhttp_parser_t myParser;
 
 /* USER CODE END PV */
 
@@ -261,11 +258,11 @@ int main(void)
   ledTaskHandle = osThreadCreate(osThread(ledTask), NULL);
 
   /* definition and creation of sdTask */
-  osThreadDef(sdTask, StartSDTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 9);
+  osThreadDef(sdTask, StartSDTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 10);
   sdTaskHandle = osThreadCreate(osThread(sdTask), NULL);
 
   /* definition and creation of lwipTask */
-  osThreadDef(lwipTask, StartLWIPTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 5);
+  osThreadDef(lwipTask, StartLWIPTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 6);
   lwipTaskHandle = osThreadCreate(osThread(lwipTask), (void*)&gnetif);
 
   /* definition and creation of dhcpTask */
@@ -1131,6 +1128,62 @@ uint16_t cli_printf(const char* fmt, ...)
   return len;
 }
 
+void jsmn_parser_example(char* json_string, uint16_t len)
+{
+  int i;
+  int r;
+  jsmn_parser p;
+  jsmntok_t t[128]; /* We expect no more than 128 tokens */
+
+  jsmn_init(&p);
+  r = jsmn_parse(&p, json_string, len, t, sizeof(t)/sizeof(t[0]));
+  if (r < 0) {
+          cli_printf("Failed to parse JSON: %d\r\n", r);
+          //return 1;
+  }
+
+  /* Assume the top-level element is an object */
+  if (r < 1 || t[0].type != JSMN_OBJECT) {
+          cli_printf("Object expected\r\n");
+          // return 1;
+  }
+
+  /* Loop over all keys of the root object */
+  for (i = 1; i < r; i++) {
+          if (jsoneq(json_string, &t[i], "channel_id") == 0) {
+                  /* We may use strndup() to fetch string value */
+                  cli_printf("- Channel ID: %.*s\r\n", t[i+1].end-t[i+1].start,
+                                  json_string + t[i+1].start);
+                  i++;
+          } else if (jsoneq(json_string, &t[i], "entry_id") == 0) {
+                  /* We may additionally check if the value is either "true" or "false" */
+                  cli_printf("- Entry ID: %.*s\r\n", t[i+1].end-t[i+1].start,
+                                  json_string + t[i+1].start);
+                  i++;
+          } else if (jsoneq(json_string, &t[i], "field1") == 0) {
+                  /* We may want to do strtol() here to get numeric value */
+                  cli_printf("- Field1: %.*s\r\n", t[i+1].end-t[i+1].start,
+                                  json_string + t[i+1].start);
+                  i++;
+          } else if (jsoneq(json_string, &t[i], "groups") == 0) {
+                  int j;
+                  cli_printf("- Groups:\r\n");
+                  if (t[i+1].type != JSMN_ARRAY) {
+                          continue; /* We expect groups to be an array of strings */
+                  }
+                  for (j = 0; j < t[i+1].size; j++) {
+                          jsmntok_t *g = &t[i+j+2];
+                          cli_printf("  * %.*s\r\n", g->end - g->start, json_string + g->start);
+                  }
+                  i += t[i+1].size + 1;
+          } else {
+                  cli_printf("Unexpected key: %.*s\r\n", t[i].end-t[i].start,
+                                  json_string + t[i].start);
+          }
+  }
+}
+
+
 uint16_t cli_write(const char* src, uint16_t len)
 {
   if ((src != NULL) && (len > 0))
@@ -1309,6 +1362,7 @@ void StartSDTask(void const * argument)
 {
   /* USER CODE BEGIN StartSDTask */
   
+#if 1
   FRESULT fr;                                               /* FatFs function common result code */
   uint32_t byteswritten, bytesread = 0;                     /* File write/read counts */
   uint8_t wtext[] = "This is STM32 working with FatFs\r\n"; /* File write buffer */
@@ -1452,58 +1506,7 @@ void StartSDTask(void const * argument)
   cli_printf("FATFS %s\r\n", "End");
   FATFS_UnLinkDriver(SDPath);
   
-  int i;
-  int r;
-  jsmn_parser p;
-  jsmntok_t t[128]; /* We expect no more than 128 tokens */
-
-  jsmn_init(&p);
-  r = jsmn_parse(&p, JSON_STRING, strlen(JSON_STRING), t, sizeof(t)/sizeof(t[0]));
-  if (r < 0) {
-          cli_printf("Failed to parse JSON: %d\r\n", r);
-          //return 1;
-  }
-
-  /* Assume the top-level element is an object */
-  if (r < 1 || t[0].type != JSMN_OBJECT) {
-          cli_printf("Object expected\r\n");
-          // return 1;
-  }
-
-  /* Loop over all keys of the root object */
-  for (i = 1; i < r; i++) {
-          if (jsoneq(JSON_STRING, &t[i], "user") == 0) {
-                  /* We may use strndup() to fetch string value */
-                  cli_printf("- User: %.*s\r\n", t[i+1].end-t[i+1].start,
-                                  JSON_STRING + t[i+1].start);
-                  i++;
-          } else if (jsoneq(JSON_STRING, &t[i], "admin") == 0) {
-                  /* We may additionally check if the value is either "true" or "false" */
-                  cli_printf("- Admin: %.*s\r\n", t[i+1].end-t[i+1].start,
-                                  JSON_STRING + t[i+1].start);
-                  i++;
-          } else if (jsoneq(JSON_STRING, &t[i], "uid") == 0) {
-                  /* We may want to do strtol() here to get numeric value */
-                  cli_printf("- UID: %.*s\r\n", t[i+1].end-t[i+1].start,
-                                  JSON_STRING + t[i+1].start);
-                  i++;
-          } else if (jsoneq(JSON_STRING, &t[i], "groups") == 0) {
-                  int j;
-                  cli_printf("- Groups:\r\n");
-                  if (t[i+1].type != JSMN_ARRAY) {
-                          continue; /* We expect groups to be an array of strings */
-                  }
-                  for (j = 0; j < t[i+1].size; j++) {
-                          jsmntok_t *g = &t[i+j+2];
-                          cli_printf("  * %.*s\r\n", g->end - g->start, JSON_STRING + g->start);
-                  }
-                  i += t[i+1].size + 1;
-          } else {
-                  cli_printf("Unexpected key: %.*s\r\n", t[i].end-t[i].start,
-                                  JSON_STRING + t[i].start);
-          }
-  }
-  
+#endif
   /* Infinite loop */
   for(;;)
   {
@@ -1532,6 +1535,7 @@ void StartLWIPTask(void const * argument)
   /* netconn_recv buffer variables */
   struct netbuf *netbuf = NULL;
   uint16_t buf_len = 0;
+  uint16_t total_len = 0;
   void* buf_data = NULL;
   
   uint8_t iptxt[64];
@@ -1544,12 +1548,15 @@ void StartLWIPTask(void const * argument)
   const char* key = "WTN6FH385TCUNDMU";
   
   const char* server = "thingspeak.com";
-  const char* url = "/update.json";
+  const char* url = "/update.json?headers=false";
   const char* content_type = "application/json";
   
   const char* json_data_fmt = "{\"api_key\": \"%s\", \"delta_t\": %d, \"field1\": %d}";
   
-  char myBuilder_buf[256];
+  char* http_request = NULL;
+  uint16_t http_request_len = 0;
+  
+  char lwhttp_buf[1024];
 
   /* init code for LWIP */
   MX_LWIP_Init();
@@ -1615,15 +1622,17 @@ void StartLWIPTask(void const * argument)
                 sprintf((char *)http_body, json_data_fmt, key, 5, data);  
                 sprintf((char *)http_body_length, "%d", strlen((char *)http_body));  
                 
-                lwhttp_new_builder(&myBuilder, (char*)myBuilder_buf, sizeof(myBuilder_buf));
-                lwhttp_add_request(&myBuilder, LwHHTP_POST, url);
-                lwhttp_add_header(&myBuilder, "Content-Type", content_type);
-                lwhttp_add_header(&myBuilder, "Content-Length", (char *)http_body_length);
-                lwhttp_add_body(&myBuilder, (char*)http_body, strlen((char *)http_body));
-                lwhttp_end(&myBuilder);
+                lwhttp_builder_init(&myBuilder, (char*)lwhttp_buf, sizeof(lwhttp_buf), LwHHTP_POST, url);
+                lwhttp_builder_add_header(&myBuilder, "Content-Type", content_type);
+                // lwhttp_builder_add_header(&myBuilder, "Headers", "false");
+                lwhttp_builder_add_header(&myBuilder, "Content-Length", (char *)http_body_length);
+                lwhttp_builder_add_body(&myBuilder, (char*)http_body, strlen((char *)http_body));
+                lwhttp_builder_end(&myBuilder);
+                
+                lwhttp_builder_get_data(&myBuilder, &http_request, &http_request_len);
                 
                 /* Write data to server */
-                err = netconn_write(conn, myBuilder.data, myBuilder.len, NETCONN_NOFLAG);
+                err = netconn_write(conn, http_request, http_request_len, NETCONN_NOFLAG);
                 if (err != ERR_OK)
                 {
                   cli_printf("[LWIP] netconn_write: ERR (%d)\r\n", err);
@@ -1631,6 +1640,12 @@ void StartLWIPTask(void const * argument)
                 else
                 {
                   cli_printf("\r\n[LWIP] netconn_write:\r\n\r\n%s", myBuilder.data);
+                  
+                  /* Restart length counter */
+                  total_len = 0;
+                  
+                  lwhttp_parser_init(&myParser, (char*)lwhttp_buf, sizeof(lwhttp_buf), NULL, 0);
+                  
                   cli_printf("\r\n[LWIP] netconn_recv:\r\n\r\n");
                   
                   /* Get pointer to buffer where response data is stored */
@@ -1640,6 +1655,10 @@ void StartLWIPTask(void const * argument)
                       {
                         /* Get pointer to data and length*/
                         netbuf_data(netbuf, &buf_data, &buf_len);
+                        
+                        total_len += buf_len;
+                        
+                        lwhttp_parser_write(&myParser, (char*)buf_data, buf_len);
                         
                         /* Print data to console */
                         cli_write((char*)buf_data, buf_len);
@@ -1651,6 +1670,18 @@ void StartLWIPTask(void const * argument)
                   }
                   
                   cli_printf("\r\n");
+                  
+                  cli_printf("[LWIP] netconn_recv: Received %d bytes\r\n", total_len);
+                  
+                  lwhttp_parser_run(&myParser);
+                  lwhttp_parser_get_body(&myParser, &http_request, &http_request_len);
+
+                  cli_printf("[LWIP] Parser (state = %d, size = %d, idx = %d, headers = %d)\r\n", myParser.state, myParser.buff_size, myParser.buff_idx, myParser.headers_len);
+                  
+                  cli_printf("[LWIP] Parsed Request Initial >>> %.*s <<<\r\n", myParser.initial_len, myParser.initial);
+                  cli_printf("[LWIP] Parsed Request Payload (%d) >>> %.*s <<<\r\n", http_request_len, http_request_len, http_request);
+                  
+                  jsmn_parser_example(http_request, http_request_len);
                   
                   if ((err != ERR_OK) && (err != ERR_CLSD))
                   {
