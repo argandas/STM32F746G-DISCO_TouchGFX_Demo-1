@@ -2,18 +2,14 @@
 
 char* LwHTTP_methods[LwHHTP_MAX] = {"POST", "GET"};
 
-uint16_t lwhttp_parser_init(lwhttp_parser_t* parser, char* buff, uint16_t buff_size, lwhttp_header_token_t* header_tokens, uint16_t num_tokens)
+uint16_t lwhttp_parser_init(lwhttp_parser_t* parser, lwhttp_header_token_t* header_tokens, uint16_t num_tokens)
 {
   uint16_t ret = 0;
-  if ((parser != NULL) && (buff != NULL) && (buff_size > 0))
-  {
-    /* Clean buffer */
-    memset(buff, 0x00, buff_size);
-
-    parser->buff = buff;
-    parser->buff_idx = 0;
-    parser->buff_size = buff_size;
-
+  if (parser != NULL)
+  {    
+    parser->data = NULL;
+    parser->data_len = 0;
+    
     parser->initial = NULL;
     parser->initial_len = 0;
 
@@ -36,17 +32,16 @@ uint16_t lwhttp_parser_write(lwhttp_parser_t* parser, char* src, uint16_t len)
   uint16_t idx = 0;
   if ((parser != NULL) && (src != NULL) && (len > 0))
   {
-    /* check for available storage space in the buffer */
-    if (parser->buff_idx + len <= parser->buff_size)
+    /* allocate enough space for response */
+    parser->data = realloc(parser->data, sizeof(char) * (parser->data_len + len));
+
+    /* fill the buffer */
+    for (idx = 0; idx < len; idx++)
     {
-      /* fill the buffer */
-      for (idx = 0; idx < len; idx++)
-      {
-        parser->buff[parser->buff_idx++] = *src++;
-      }
-      
-      parser->state = LwHHTP_PARSER_READY;
+      parser->data[parser->data_len++] = *src++;
     }
+    
+    parser->state = LwHHTP_PARSER_READY;
   }
   return ret;
 }
@@ -56,7 +51,6 @@ uint16_t lwhttp_parser_run(lwhttp_parser_t* parser)
   uint16_t ret = 0;
   uint16_t parser_idx = 0;
   uint16_t length_before_body = 0;
-  char* data_ptr = NULL;
   char* start = NULL;
   char* end = NULL;
   char* token = "\r\n";
@@ -65,19 +59,16 @@ uint16_t lwhttp_parser_run(lwhttp_parser_t* parser)
   
   if (parser != NULL)
   {
-    start = parser->buff;
-    end = parser->buff;
+    start = parser->data;
+    end = parser->data;
   
-    for (start = parser->buff; end != NULL; parser_idx++)
+    for (start = parser->data; end != NULL; parser_idx++)
     {
       /* Response body */
       if (1 == empty_line_found)
       {
-        /* Calculate data length before the body */
-        // length_before_body = (uint16_t)(start - parser->buff);
-
         parser->body = start;
-        parser->body_len = (uint16_t)(&parser->buff[parser->buff_idx] - start); 
+        parser->body_len = (uint16_t)(&parser->data[parser->data_len] - start); 
         
         /* Quit loop intentionally */
         end = NULL;
@@ -167,6 +158,18 @@ uint16_t lwhttp_parser_get_body(lwhttp_parser_t* parser, char** dest, uint16_t* 
   return ret;
 }
 
+uint16_t lwhttp_response_parser_free(lwhttp_parser_t* parser)
+{
+  uint16_t ret = 0;
+  if (parser != NULL)
+  {
+    free(parser->data);
+    ret = 1;
+  }
+  return ret;
+}
+
+
 uint16_t lwhttp_builder_init(lwhttp_builder_t* builder, char* dest, uint16_t size, lwhttp_method_t method, const char* url)
 {
   uint16_t ret = 0;
@@ -176,16 +179,15 @@ uint16_t lwhttp_builder_init(lwhttp_builder_t* builder, char* dest, uint16_t siz
     memset(dest, 0x00, size);
     
     builder->data = dest;
-    builder->data_ptr = dest;
     builder->len = 0;
     builder->size = size;
 
-    strcpy(builder->data_ptr, LwHTTP_methods[method]);
-    strcat(builder->data_ptr, " ");
-    strcat(builder->data_ptr, url);
-    strcat(builder->data_ptr, " HTTP/1.0\r\n");
+    strcpy(builder->data, LwHTTP_methods[method]);
+    strcat(builder->data, " ");
+    strcat(builder->data, url);
+    strcat(builder->data, " HTTP/1.0\r\n");
     
-    builder->len += strlen(builder->data_ptr);
+    builder->len += strlen(builder->data);
     
     builder->state = LwHHTP_BUILDER_INIT;
 
@@ -198,16 +200,25 @@ uint16_t lwhttp_builder_init(lwhttp_builder_t* builder, char* dest, uint16_t siz
 uint16_t lwhttp_builder_add_header(lwhttp_builder_t* builder, const char* header, const char* value)
 {
   uint16_t ret = 0;
+  char* str_ptr = NULL; 
   if ((builder != NULL) && (header != NULL) && (value != NULL))
   {
     if ((builder->state >= LwHHTP_BUILDER_INIT) && (builder->state <= LwHHTP_BUILDER_ADDED_HEADER))
     {
-      strcat(builder->data_ptr, header);
-      strcat(builder->data_ptr, ": ");
-      strcat(builder->data_ptr, value);
-      strcat(builder->data_ptr, "\r\n");
+      str_ptr = builder->data_ptr;
       
-      builder->len = strlen(builder->data_ptr);
+      if (builder->state == LwHHTP_BUILDER_ADDED_HEADER)
+      {
+        /* Overwrite EOL chars from last line */
+        str_ptr -= 2;
+      }
+      
+      strcat(str_ptr, header);
+      strcat(str_ptr, ": ");
+      strcat(str_ptr, value);
+      strcat(str_ptr, "\r\n");
+      
+      builder->len = strlen(str_ptr);
       
       builder->state = LwHHTP_BUILDER_ADDED_HEADER;
       ret = 1;

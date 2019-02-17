@@ -38,13 +38,14 @@ typedef enum {
  * type		type (initial, header, body)
  * start	start position in JSON data string
  * end		end position in JSON data string
+ * note         HTTP/1.1 Sec4.2 HTTP Message - Message headers
  */
 typedef struct {
-	char* key;
-	uint16_t key_len;
-	char* value;
-	uint16_t value_len;
-} lwhttp_header_token_t;
+	char* field_name;
+	uint16_t field_name_len;
+	char* field_value;
+	uint16_t field_value_len;
+} lwhttp_message_header_t;
 
 /**
  * LwHTTP token description.
@@ -58,7 +59,25 @@ typedef struct {
 	uint16_t size;
 	uint16_t len;
         lwhttp_builder_state_t state;
-} lwhttp_builder_t;
+} lwhttp_request_t;
+
+typedef struct {
+        /* Parser internals */
+	char* data;
+	uint16_t data_len;
+        
+        /* HTTP/1.1 Sec3.1 Protocol parameters - HTTP Version */
+        char* http_version;
+        uint16_t http_version_len;
+        
+        /* HTTP/1.1 Sec6.1.1 Response - Status Code and Reason Phrase */
+        char* status_code;
+	uint16_t status_code_len;
+
+        /* HTTP/1.1 Sec6.1.1 Response - Status Code and Reason Phrase */
+        char* reason_phrase;
+	uint16_t reason_phrase_len;
+} lwhttp_status_line_t;
 
 /**
  * LwHTTP token description.
@@ -67,22 +86,58 @@ typedef struct {
  * len          Builder used buffer length
  */
 typedef struct {
+        /* Parser internals */
         lwhttp_parser_state_t state;
-
-	char* buff;
-	uint16_t buff_idx;
-        uint16_t buff_size;
+	char* data;
+	uint16_t data_len;
 	
-        char* initial;
-	uint16_t initial_len;
+        /* HTTP/1.1 Sec6.1 Response - Status line */
+        lwhttp_status_line_t status_line;
 
-        lwhttp_header_token_t* headers;
-	uint16_t headers_len;
-	uint16_t headers_size;
+        /* HTTP/1.1 Sec4.2 HTTP Message - Message headers */
+        lwhttp_message_header_t* message_headers;
+	uint16_t message_headers_len;
 
-        char* body;
-        uint16_t body_len;
-} lwhttp_parser_t;
+        /* HTTP/1.1 Sec4.3 HTTP Message - Message body */
+        char* message_body;
+        uint16_t message_body_len;
+} lwhttp_response_t;
+
+typedef struct {
+        /* Parser internals */
+	char* data;
+	uint16_t data_len;
+        
+        /* HTTP/1.1 Sec5.1.1 Request - Method */
+        char* method;
+	uint16_t method_len;
+
+        /* HTTP/1.1 Sec5.1.2 Request - Request-URI */
+        char* request_uri;
+	uint16_t request_uri_len;
+
+        /* HTTP/1.1 Sec3.1 Protocol parameters - HTTP Version */
+        char* http_version;
+        uint16_t http_version_len;
+} lwhttp_request_line_t;
+
+typedef struct {
+        /* Parser internals */
+        lwhttp_builder_state_t state;
+	char* data;
+	uint16_t data_len;
+	
+        /* HTTP/1.1 Sec5.1 Request - Request line */
+        lwhttp_request_line_t request_line;
+
+        /* HTTP/1.1 Sec4.2 HTTP Message - Message headers */
+        lwhttp_message_header_t* message_headers;
+	uint16_t message_headers_len;
+
+        /* HTTP/1.1 Sec4.3 HTTP Message - Message body */
+        char* message_body;
+        uint16_t message_body_len;
+} lwhttp_request_t;
 
 /**
  * LwHTTP Parse function.
@@ -92,18 +147,28 @@ typedef struct {
  * tok_len      Number of available tokens to populate
  * return       Number of parsed tokens
  */
-uint16_t lwhttp_parser_init(lwhttp_parser_t* parser, char* buff, uint16_t buff_size, lwhttp_header_token_t* header_tokens, uint16_t num_tokens);
-uint16_t lwhttp_parser_write(lwhttp_parser_t* parser, char* src, uint16_t len);
-uint16_t lwhttp_parser_run(lwhttp_parser_t* parser);
-uint16_t lwhttp_parser_get_status(lwhttp_parser_t* parser);
-uint16_t lwhttp_parser_get_header(lwhttp_parser_t* parser, char* key, lwhttp_header_token_t** header_token);
-uint16_t lwhttp_parser_get_body(lwhttp_parser_t* parser, char** dest, uint16_t* len);
 
-uint16_t lwhttp_builder_init(lwhttp_builder_t* builder, char* dest, uint16_t size, lwhttp_method_t method, const char* url);
-uint16_t lwhttp_builder_add_header(lwhttp_builder_t* builder, const char* header, const char* value);
-uint16_t lwhttp_builder_add_body(lwhttp_builder_t* builder, const char* body, uint16_t len);
-uint16_t lwhttp_builder_end(lwhttp_builder_t* builder);
-uint16_t lwhttp_builder_get_data(lwhttp_builder_t* builder, char** dest, uint16_t* len);
+/* LwHTTP Response Parse functions */
+uint16_t lwhttp_response_parser_init(lwhttp_response_t* response);
+uint16_t lwhttp_response_parser_free(lwhttp_response_t* response);
+uint16_t lwhttp_response_parser_write(lwhttp_response_t* response, char* src, uint16_t len);
+uint16_t lwhttp_response_parser_run(lwhttp_response_t* response);
+
+/* LwHTTP Response functions */
+uint16_t lwhttp_response_get(lwhttp_response_t* response, char** dest, uint16_t* len);
+uint16_t lwhttp_response_get_status_code(lwhttp_response_t* response, uint16_t* status_code);
+uint16_t lwhttp_response_get_message_header(lwhttp_response_t* response, char* field_name, lwhttp_message_header_t* header_ptr);
+uint16_t lwhttp_response_get_message_body(lwhttp_response_t* response, char** dest, uint16_t* len);
+
+/* LwHTTP Request Parse functions */
+uint16_t lwhttp_request_parser_init(lwhttp_request_t* request);
+uint16_t lwhttp_request_parser_free(lwhttp_request_t* request);
+
+/* LwHTTP Request functions */
+uint16_t lwhttp_request_get(lwhttp_request_t* request, char** dest, uint16_t* len);
+uint16_t lwhttp_request_put_request_line(lwhttp_request_t* request, lwhttp_method_t method, const char* request_uri, const char* http_version);
+uint16_t lwhttp_request_put_message_header(lwhttp_request_t* request, const char* header, const char* value);
+uint16_t lwhttp_request_put_message_body(lwhttp_request_t* request, const char* body, uint16_t len);
 
 
 
