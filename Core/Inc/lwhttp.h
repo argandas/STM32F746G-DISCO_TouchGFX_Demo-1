@@ -17,10 +17,10 @@ typedef enum {
 
 typedef enum {
 	LwHHTP_BUILDER_INIT = 0,
-	LwHHTP_BUILDER_ADDED_HEADER = 1,
-	LwHHTP_BUILDER_ADDED_BODY = 2,
-	LwHHTP_BUILDER_ADDED_END = 3,
-	LwHHTP_BUILDER_ERROR = 4,
+	LwHHTP_BUILDER_ADDED_REQUEST = 1,
+	LwHHTP_BUILDER_ADDED_HEADER = 2,
+	LwHHTP_BUILDER_ADDED_BODY = 3,
+	LwHHTP_BUILDER_ERROR,
 } lwhttp_builder_state_t;
 
 typedef enum {
@@ -47,19 +47,23 @@ typedef struct {
 	uint16_t field_value_len;
 } lwhttp_message_header_t;
 
-/**
- * LwHTTP token description.
- * buf          Buffer to store builder data
- * size         Builder buffer size
- * len          Builder used buffer length
- */
 typedef struct {
+        /* Parser internals */
 	char* data;
-	char* data_ptr;
-	uint16_t size;
-	uint16_t len;
-        lwhttp_builder_state_t state;
-} lwhttp_request_t;
+	uint16_t data_len;
+        
+        /* HTTP/1.1 Sec5.1.1 Request - Method */
+        char* method;
+	uint16_t method_len;
+
+        /* HTTP/1.1 Sec5.1.2 Request - Request-URI */
+        char* request_uri;
+	uint16_t request_uri_len;
+
+        /* HTTP/1.1 Sec3.1 Protocol parameters - HTTP Version */
+        char* http_version;
+        uint16_t http_version_len;
+} lwhttp_request_line_t;
 
 typedef struct {
         /* Parser internals */
@@ -79,12 +83,6 @@ typedef struct {
 	uint16_t reason_phrase_len;
 } lwhttp_status_line_t;
 
-/**
- * LwHTTP token description.
- * buf          Buffer to store builder data
- * size         Builder buffer size
- * len          Builder used buffer length
- */
 typedef struct {
         /* Parser internals */
         lwhttp_parser_state_t state;
@@ -102,24 +100,6 @@ typedef struct {
         char* message_body;
         uint16_t message_body_len;
 } lwhttp_response_t;
-
-typedef struct {
-        /* Parser internals */
-	char* data;
-	uint16_t data_len;
-        
-        /* HTTP/1.1 Sec5.1.1 Request - Method */
-        char* method;
-	uint16_t method_len;
-
-        /* HTTP/1.1 Sec5.1.2 Request - Request-URI */
-        char* request_uri;
-	uint16_t request_uri_len;
-
-        /* HTTP/1.1 Sec3.1 Protocol parameters - HTTP Version */
-        char* http_version;
-        uint16_t http_version_len;
-} lwhttp_request_line_t;
 
 typedef struct {
         /* Parser internals */
@@ -150,12 +130,13 @@ typedef struct {
 
 /* LwHTTP Response Parse functions */
 uint16_t lwhttp_response_parser_init(lwhttp_response_t* response);
-uint16_t lwhttp_response_parser_free(lwhttp_response_t* response);
 uint16_t lwhttp_response_parser_write(lwhttp_response_t* response, char* src, uint16_t len);
 uint16_t lwhttp_response_parser_run(lwhttp_response_t* response);
+uint16_t lwhttp_response_parser_free(lwhttp_response_t* response);
 
 /* LwHTTP Response functions */
 uint16_t lwhttp_response_get(lwhttp_response_t* response, char** dest, uint16_t* len);
+uint16_t lwhttp_response_get_status_line(lwhttp_response_t* response, char** dest, uint16_t* len);
 uint16_t lwhttp_response_get_status_code(lwhttp_response_t* response, uint16_t* status_code);
 uint16_t lwhttp_response_get_message_header(lwhttp_response_t* response, char* field_name, lwhttp_message_header_t* header_ptr);
 uint16_t lwhttp_response_get_message_body(lwhttp_response_t* response, char** dest, uint16_t* len);
@@ -166,7 +147,7 @@ uint16_t lwhttp_request_parser_free(lwhttp_request_t* request);
 
 /* LwHTTP Request functions */
 uint16_t lwhttp_request_get(lwhttp_request_t* request, char** dest, uint16_t* len);
-uint16_t lwhttp_request_put_request_line(lwhttp_request_t* request, lwhttp_method_t method, const char* request_uri, const char* http_version);
+uint16_t lwhttp_request_put_request_line(lwhttp_request_t* request, lwhttp_method_t method, const char* request_uri);
 uint16_t lwhttp_request_put_message_header(lwhttp_request_t* request, const char* header, const char* value);
 uint16_t lwhttp_request_put_message_body(lwhttp_request_t* request, const char* body, uint16_t len);
 

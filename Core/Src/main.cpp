@@ -135,8 +135,8 @@ char cli_buff[512];
 
 uint8_t DHCP_state = DHCP_OFF;
 
-lwhttp_builder_t myBuilder;
-lwhttp_parser_t myParser;
+lwhttp_request_t httpRequest;
+lwhttp_response_t httpResponse;
 
 /* USER CODE END PV */
 
@@ -1527,37 +1527,32 @@ portCHAR PAGE_BODY[256];
 void StartLWIPTask(void const * argument)
 {
   /* USER CODE BEGIN StartLWIPTask */
+
+  /* Queue PV */
+  uint8_t queueData = 0;
+
+  /* LwIP PV */
   struct netif* netif = (struct netif*)argument;
   struct netconn *conn;
-  err_t err;
-  uint8_t data = 0;
-  
-  /* netconn_recv buffer variables */
   struct netbuf *netbuf = NULL;
-  uint16_t buf_len = 0;
-  uint16_t total_len = 0;
-  void* buf_data = NULL;
-  
-  uint8_t iptxt[64];
-  uint8_t http_body[128];
-  uint8_t http_body_length[4];
-  
   ip4_addr_t local_ip; 
   ip4_addr_t remote_ip; 
+  err_t netErr;
   
+  /* Temp Buffer PV */
+  char* temp_buf_data = NULL;
+  uint16_t temp_buf_data_len = 0;
+  
+  /* JSON PV */
+  const char* json_data_fmt = "{\"api_key\": \"%s\", \"delta_t\": %d, \"field1\": %d}";
+  uint8_t json_data[128];
+  uint8_t json_data_len[4];
+  
+  /* Thingspeak server PV */
   const char* key = "WTN6FH385TCUNDMU";
-  
   const char* server = "thingspeak.com";
   const char* url = "/update.json?headers=false";
-  const char* content_type = "application/json";
   
-  const char* json_data_fmt = "{\"api_key\": \"%s\", \"delta_t\": %d, \"field1\": %d}";
-  
-  char* http_request = NULL;
-  uint16_t http_request_len = 0;
-  
-  char lwhttp_buf[1024];
-
   /* init code for LWIP */
   MX_LWIP_Init();
   
@@ -1575,136 +1570,152 @@ void StartLWIPTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    if(xQueueReceive(tcpQueueHandle, &data, 0) == pdTRUE)
+    if(xQueueReceive(tcpQueueHandle, &queueData, 0) == pdTRUE)
     {
-      cli_printf("[Queue] Model -> %s (data = %u)\r\n", __func__, data);
+      cli_printf("[Queue] Model -> %s (queueData = %u)\r\n", __func__, queueData);
+      
+      /* Parse HTTP Body in JSON format */
+      sprintf((char *)json_data, json_data_fmt, key, 5, queueData);  
+      sprintf((char *)json_data_len, "%d", strlen((char *)json_data));  
+      
+      /* LwHTTP Request Builder */
+      lwhttp_request_parser_init(&httpRequest);
+      lwhttp_request_put_request_line(&httpRequest, LwHHTP_POST, url);
+      lwhttp_request_put_message_header(&httpRequest, "Content-Type", "application/json");
+      lwhttp_request_put_message_header(&httpRequest, "Content-Length", (char *)json_data_len);
+      lwhttp_request_put_message_body(&httpRequest, (char*)json_data, strlen((char *)json_data));      
+      
+      /* LwHTTP Response Builder */
+      lwhttp_response_parser_init(&httpResponse);  
 
+      /* Init error as fatal */
+      netErr = ERR_ABRT;
+      
+      /* Send HTTP Request */
       if (DHCP_state == DHCP_ADDRESS_ASSIGNED)
       {
         /* Create a new TCP connection handle */
         conn = netconn_new(NETCONN_TCP);        
         if (conn == NULL)
         {
+          netErr = ERR_CONN;
           cli_printf("[LWIP] netconn_new : FAILED\r\n");
         }
         else
         {
 #if 0 
           /* Bind a netconn to a specific local IP address and port (optional) */
-          err = netconn_bind(conn, &netif->ip_addr, 0 );
-          if (err != ERR_OK)
+          netErr = netconn_bind(conn, &netif->ip_addr, 0 );
+          if (netErr != ERR_OK)
           {
-            cli_printf("[LWIP] netconn_bind: ERR (%d)\r\n", err);
+            cli_printf("[LWIP] netconn_bind: ERR (%d)\r\n", netErr);
           }
           else
 #endif
           {
-            err = netconn_gethostbyname(server, &remote_ip);
-            if (err != ERR_OK)
+            netErr = netconn_gethostbyname(server, &remote_ip);
+            if (netErr != ERR_OK)
             {
-              cli_printf("[LWIP] netconn_gethostbyname: ERR (%d)\r\n", err);
+              cli_printf("[LWIP] netconn_gethostbyname: ERR (%d)\r\n", netErr);
             }
             else
             {
-              sprintf((char *)iptxt, "%s", ip4addr_ntoa((const ip4_addr_t *)&remote_ip));   
-              cli_printf("Remote IP address to server: %s (%s)\r\n", server, iptxt);
+              cli_printf("Remote IP address to server: %s [%s]\r\n", server, ip4addr_ntoa((const ip4_addr_t *)&remote_ip));
               
               /* Connect to server */
-              err = netconn_connect(conn, &remote_ip, 80); 
-              if (err != ERR_OK)
+              netErr = netconn_connect(conn, &remote_ip, 80); 
+              if (netErr != ERR_OK)
               {
-                cli_printf("[LWIP] netconn_connect: ERR (%d)\r\n", err);
+                cli_printf("[LWIP] netconn_connect: ERR (%d)\r\n", netErr);
               }
               else
               {
                 cli_printf("Connected to server: %s\r\n", server);
                 
-                sprintf((char *)http_body, json_data_fmt, key, 5, data);  
-                sprintf((char *)http_body_length, "%d", strlen((char *)http_body));  
-                
-                lwhttp_builder_init(&myBuilder, (char*)lwhttp_buf, sizeof(lwhttp_buf), LwHHTP_POST, url);
-                lwhttp_builder_add_header(&myBuilder, "Content-Type", content_type);
-                // lwhttp_builder_add_header(&myBuilder, "Headers", "false");
-                lwhttp_builder_add_header(&myBuilder, "Content-Length", (char *)http_body_length);
-                lwhttp_builder_add_body(&myBuilder, (char*)http_body, strlen((char *)http_body));
-                lwhttp_builder_end(&myBuilder);
-                
-                lwhttp_builder_get_data(&myBuilder, &http_request, &http_request_len);
-                
-                /* Write data to server */
-                err = netconn_write(conn, http_request, http_request_len, NETCONN_NOFLAG);
-                if (err != ERR_OK)
-                {
-                  cli_printf("[LWIP] netconn_write: ERR (%d)\r\n", err);
-                }
-                else
-                {
-                  cli_printf("\r\n[LWIP] netconn_write:\r\n\r\n%s", myBuilder.data);
-                  
-                  /* Restart length counter */
-                  total_len = 0;
-                  
-                  lwhttp_parser_init(&myParser, (char*)lwhttp_buf, sizeof(lwhttp_buf), NULL, 0);
-                  
-                  cli_printf("\r\n[LWIP] netconn_recv:\r\n\r\n");
-                  
-                  /* Get pointer to buffer where response data is stored */
-                  while (( err = netconn_recv(conn, &netbuf)) == ERR_OK)
-                  {
-                      do
-                      {
-                        /* Get pointer to data and length*/
-                        netbuf_data(netbuf, &buf_data, &buf_len);
-                        
-                        total_len += buf_len;
-                        
-                        lwhttp_parser_write(&myParser, (char*)buf_data, buf_len);
-                        
-                        /* Print data to console */
-                        cli_write((char*)buf_data, buf_len);
-                      }
-                      while (netbuf_next(netbuf) >= 0);
-                      
-                      /* Free data buffer */
-                      netbuf_delete(netbuf);
-                  }
-                  
-                  cli_printf("\r\n");
-                  
-                  cli_printf("[LWIP] netconn_recv: Received %d bytes\r\n", total_len);
-                  
-                  lwhttp_parser_run(&myParser);
-                  lwhttp_parser_get_body(&myParser, &http_request, &http_request_len);
+                /* LwHTTP get request from builder */
+                lwhttp_request_get(&httpRequest, &temp_buf_data, &temp_buf_data_len);
 
-                  cli_printf("[LWIP] Parser (state = %d, size = %d, idx = %d, headers = %d)\r\n", myParser.state, myParser.buff_size, myParser.buff_idx, myParser.headers_len);
-                  
-                  cli_printf("[LWIP] Parsed Request Initial >>> %.*s <<<\r\n", myParser.initial_len, myParser.initial);
-                  cli_printf("[LWIP] Parsed Request Payload (%d) >>> %.*s <<<\r\n", http_request_len, http_request_len, http_request);
-                  
-                  jsmn_parser_example(http_request, http_request_len);
-                  
-                  if ((err != ERR_OK) && (err != ERR_CLSD))
-                  {
-                    cli_printf("[LWIP] netconn_recv: ERR (%d)\r\n", err);
-                  }
-                }
-                
-                /* Close connection from local side */
-                err = netconn_close(conn);
-                if (err != ERR_OK)
+                /* Write data to server */
+                netErr = netconn_write(conn, temp_buf_data, temp_buf_data_len, NETCONN_NOFLAG);
+                if (netErr != ERR_OK)
                 {
-                  cli_printf("[LWIP] netconn_close: ERR (%d)\r\n", err);
-                }
+                  cli_printf("[LWIP] netconn_write: ERR (%d)\r\n", netErr);
+                }                
               }
             }
           }
         }
+        
+        /* Request Sent, get response */
+        if (netErr == ERR_OK)
+        {                     
+          /* Get pointer to buffer where response data is stored */
+          while (( netErr = netconn_recv(conn, &netbuf)) == ERR_OK)
+          {
+              do
+              {
+                /* Get pointer to data and length*/
+                netbuf_data(netbuf, (void**)&temp_buf_data, &temp_buf_data_len);
+                
+                /* LwHTTP write response to parser */
+                lwhttp_response_parser_write(&httpResponse, (char*)temp_buf_data, temp_buf_data_len);
+              }
+              while (netbuf_next(netbuf) >= 0);
+              
+              /* Free data buffer */
+              netbuf_delete(netbuf);
+          }
+          
+          if ((netErr != ERR_OK) && (netErr != ERR_CLSD))
+          {
+            cli_printf("[LWIP] netconn_recv: ERR (%d)\r\n", netErr);
+          }
+        }
+        
+        /* Print LwHTTP Request */
+        lwhttp_request_get(&httpRequest, &temp_buf_data, &temp_buf_data_len);
+        cli_printf("[LwHTTP] Request: (%d bytes): >>>%.*s<<<\r\n", 
+                   temp_buf_data_len,
+                   temp_buf_data_len,
+                   temp_buf_data);
+        
+        /* Print LwHTTP Response */
+        lwhttp_response_get(&httpResponse, &temp_buf_data, &temp_buf_data_len);
+        cli_printf("[LwHTTP] Response: (%d bytes): >>>%.*s<<<\r\n", 
+                   temp_buf_data_len,
+                   temp_buf_data_len,
+                   temp_buf_data);
+        
+        /* Run LwHTTP Response Parser */
+        lwhttp_response_parser_run(&httpResponse);
+        
+        /* Print LwHTTP Response Status Code */
+        cli_printf("[LwHTTP] Response status line: \"%.*s\"\r\n", 
+                   httpResponse.status_line.status_code_len,
+                   httpResponse.status_line.status_code);
+        
+        /* Print LwHTTP Response Headers Count */
+        cli_printf("[LwHTTP] Response headers count: %d\r\n", httpResponse.message_headers_len); 
+        
+        /* Print LwHTTP Response Message Body */
+        lwhttp_response_get_message_body(&httpResponse, &temp_buf_data, &temp_buf_data_len);
+        cli_printf("[LwHTTP] Response message body length: %d\r\n", temp_buf_data_len); 
+        cli_printf("[LwHTTP] Response message body: \"%.*s\"\r\n", 
+                   temp_buf_data_len,
+                   temp_buf_data);
+        
+        /* Parse LwHTTP Response message body as JSON */        
+        jsmn_parser_example(temp_buf_data, temp_buf_data_len);
 
+        /* Free LwHTTP Request & Response */
+        lwhttp_request_parser_free(&httpRequest);
+        lwhttp_response_parser_free(&httpResponse);
+        
         /* Delete TCP connection */
-        err = netconn_delete(conn);  
-        if (err != ERR_OK)
+        netErr = netconn_delete(conn);  
+        if (netErr != ERR_OK)
         {
-          cli_printf("[LWIP] netconn_close: ERR (%d)\r\n", err);
+          cli_printf("[LWIP] netconn_close: ERR (%d)\r\n", netErr);
         }
       }
     }
@@ -1730,7 +1741,6 @@ void StartDHCPTask(void const * argument)
   ip_addr_t netmask;
   ip_addr_t gw;
   struct dhcp *dhcp;
-  uint8_t iptxt[20];
   
   /* Get DHCP instance */
   dhcp = (struct dhcp *)netif_get_client_data(netif, LWIP_NETIF_CLIENT_DATA_INDEX_DHCP);
@@ -1755,8 +1765,7 @@ void StartDHCPTask(void const * argument)
         if (dhcp_supplied_address(netif)) 
         {
           DHCP_state = DHCP_ADDRESS_ASSIGNED;	
-          sprintf((char *)iptxt, "%s", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));   
-          cli_printf("[DHCP] Supplied address: %s\r\n", iptxt);
+          cli_printf("[DHCP] Supplied address: %s\r\n", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
         }
         else
         {
@@ -1776,9 +1785,8 @@ void StartDHCPTask(void const * argument)
             IP_ADDR4(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
             netif_set_addr(netif, ip_2_ip4(&ipaddr), ip_2_ip4(&netmask), ip_2_ip4(&gw));
             
-            sprintf((char *)iptxt, "%s", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
             cli_printf("[DHCP] Timeout\r\n");
-            cli_printf("[DHCP] Static IP address: %s\r\n", iptxt);
+            cli_printf("[DHCP] Static IP address: %s\r\n", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
           }
         }
       }

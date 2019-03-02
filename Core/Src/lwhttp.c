@@ -1,52 +1,61 @@
 #include "lwhttp.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 char* LwHTTP_methods[LwHHTP_MAX] = {"POST", "GET"};
 
-uint16_t lwhttp_parser_init(lwhttp_parser_t* parser, lwhttp_header_token_t* header_tokens, uint16_t num_tokens)
+uint16_t lwhttp_response_parser_init(lwhttp_response_t* response)
 {
   uint16_t ret = 0;
-  if (parser != NULL)
-  {    
-    parser->data = NULL;
-    parser->data_len = 0;
+  if (response != NULL)
+  {
+    /* Parser internals */
+    response->state = LwHHTP_PARSER_INIT;
+    response->data = NULL;
+    response->data_len = 0;
     
-    parser->initial = NULL;
-    parser->initial_len = 0;
+    /* HTTP/1.1 Sec6.1 Response - Status line */
+    response->status_line.data = NULL;
+    response->status_line.data_len = 0;
+    response->status_line.http_version = NULL;
+    response->status_line.http_version_len = 0;
+    response->status_line.status_code = NULL;
+    response->status_line.status_code_len = 0;
+    response->status_line.reason_phrase = NULL;
+    response->status_line.reason_phrase_len = 0;
 
-    /* Header tokens are optional and will be handled when parsing the payload */
-    parser->headers = header_tokens;
-    parser->headers_len = 0;
-    parser->headers_size = num_tokens;
+    /* HTTP/1.1 Sec4.2 HTTP Message - Message headers */
+    response->message_headers = NULL;
+    response->message_headers_len = 0;
 
-    parser->body = NULL;
-    parser->body_len = 0;
-        
-    parser->state = LwHHTP_PARSER_INIT;
+    /* HTTP/1.1 Sec4.3 HTTP Message - Message body */
+    response->message_body = NULL;
+    response->message_body_len = 0;        
   }
   return ret;
 }
 
-uint16_t lwhttp_parser_write(lwhttp_parser_t* parser, char* src, uint16_t len)
+uint16_t lwhttp_response_parser_write(lwhttp_response_t* response, char* src, uint16_t len)
 {
   uint16_t ret = 0;
   uint16_t idx = 0;
-  if ((parser != NULL) && (src != NULL) && (len > 0))
+  if ((response != NULL) && (src != NULL) && (len > 0))
   {
     /* allocate enough space for response */
-    parser->data = realloc(parser->data, sizeof(char) * (parser->data_len + len));
+    response->data = realloc(response->data, sizeof(char) * (response->data_len + len));
 
     /* fill the buffer */
     for (idx = 0; idx < len; idx++)
     {
-      parser->data[parser->data_len++] = *src++;
+      response->data[response->data_len++] = *src++;
     }
     
-    parser->state = LwHHTP_PARSER_READY;
+    response->state = LwHHTP_PARSER_READY;
   }
   return ret;
 }
 
-uint16_t lwhttp_parser_run(lwhttp_parser_t* parser)
+uint16_t lwhttp_response_parser_run(lwhttp_response_t* response)
 {
   uint16_t ret = 0;
   uint16_t parser_idx = 0;
@@ -57,23 +66,23 @@ uint16_t lwhttp_parser_run(lwhttp_parser_t* parser)
   
   uint8_t empty_line_found = 0;
   
-  if (parser != NULL)
+  if (response != NULL)
   {
-    start = parser->data;
-    end = parser->data;
+    start = response->data;
+    end = response->data;
   
-    for (start = parser->data; end != NULL; parser_idx++)
+    for (start = response->data; end != NULL; parser_idx++)
     {
       /* Response body */
       if (1 == empty_line_found)
       {
-        parser->body = start;
-        parser->body_len = (uint16_t)(&parser->data[parser->data_len] - start); 
+        response->message_body = start;
+        response->message_body_len = (uint16_t)(&response->data[response->data_len] - start); 
         
         /* Quit loop intentionally */
         end = NULL;
         
-        parser->state = LwHHTP_PARSER_END;
+        response->state = LwHHTP_PARSER_END;
       }
       else
       {
@@ -85,10 +94,10 @@ uint16_t lwhttp_parser_run(lwhttp_parser_t* parser)
           /* request response line */
           if (parser_idx == 0)
           {
-            parser->initial = start;
-            parser->initial_len = (uint16_t)(end-start);
+            response->status_line.status_code = start;
+            response->status_line.status_code_len = (uint16_t)(end-start);
             
-            parser->state = LwHHTP_PARSER_DO_INITIAL;
+            response->state = LwHHTP_PARSER_DO_INITIAL;
           }
           /* header or body line */
           else
@@ -97,26 +106,29 @@ uint16_t lwhttp_parser_run(lwhttp_parser_t* parser)
             if ((end - start) <= 0)
             {
               empty_line_found = 1;
-              parser->state = LwHHTP_PARSER_DO_BODY;
+              response->state = LwHHTP_PARSER_DO_BODY;
               ret = 1;
             }
             /* Header */
             else
             {
               /* Increase header counter */
-              parser->headers_len++;
+              response->message_headers_len++;
 
+#if 0
               /* If header tokens were provided */
-              if ((0 < parser->headers_size) && (parser->headers != NULL))
+              if ((0 < response->headers_size) && (response->headers != NULL))
               {
                 
                 /* if header tokens are available */
-                if (parser->headers_len <= parser->headers_size)
+                if (response->headers_len <= response->headers_size)
                 {
                   /* TODO: Parse headers in tokens */
                 }
               }
-              parser->state = LwHHTP_PARSER_DO_HEADER;
+#endif
+              
+              response->state = LwHHTP_PARSER_DO_HEADER;
             }
           }
           
@@ -125,7 +137,7 @@ uint16_t lwhttp_parser_run(lwhttp_parser_t* parser)
         }
         else
         {
-          parser->state = LwHHTP_PARSER_ERROR;
+          response->state = LwHHTP_PARSER_ERROR;
         }
       }
     }
@@ -134,93 +146,198 @@ uint16_t lwhttp_parser_run(lwhttp_parser_t* parser)
   return ret;
 }
 
-uint16_t lwhttp_parser_get_status(lwhttp_parser_t* parser)
+uint16_t lwhttp_response_get(lwhttp_response_t* response, char** dest, uint16_t* len)
 {
   uint16_t ret = 0;
-  return ret;
-}
-
-uint16_t lwhttp_parser_get_header(lwhttp_parser_t* parser, char* key, lwhttp_header_token_t** header_token)
-{
-  uint16_t ret = 0;
-  return ret;
-}
-
-uint16_t lwhttp_parser_get_body(lwhttp_parser_t* parser, char** dest, uint16_t* len)
-{
-  uint16_t ret = 0;
-  if ((parser != NULL) && (dest != NULL) && (len != NULL))
+  if ((response != NULL) && (dest != NULL) && (len != NULL))
   {
-    *dest = parser->body;
-    *len = parser->body_len;
-    ret = 1;
-  }
-  return ret;
-}
-
-uint16_t lwhttp_response_parser_free(lwhttp_parser_t* parser)
-{
-  uint16_t ret = 0;
-  if (parser != NULL)
-  {
-    free(parser->data);
-    ret = 1;
-  }
-  return ret;
-}
-
-
-uint16_t lwhttp_builder_init(lwhttp_builder_t* builder, char* dest, uint16_t size, lwhttp_method_t method, const char* url)
-{
-  uint16_t ret = 0;
-  if ((builder != NULL) && (dest != NULL) && (size > 0) && ((method >= 0) && (method < LwHHTP_MAX)) && (url != NULL))
-  {
-    /* Clean buffer */
-    memset(dest, 0x00, size);
-    
-    builder->data = dest;
-    builder->len = 0;
-    builder->size = size;
-
-    strcpy(builder->data, LwHTTP_methods[method]);
-    strcat(builder->data, " ");
-    strcat(builder->data, url);
-    strcat(builder->data, " HTTP/1.0\r\n");
-    
-    builder->len += strlen(builder->data);
-    
-    builder->state = LwHHTP_BUILDER_INIT;
-
-    ret = 1;
-  }
-  
-  return ret;
-}
-
-uint16_t lwhttp_builder_add_header(lwhttp_builder_t* builder, const char* header, const char* value)
-{
-  uint16_t ret = 0;
-  char* str_ptr = NULL; 
-  if ((builder != NULL) && (header != NULL) && (value != NULL))
-  {
-    if ((builder->state >= LwHHTP_BUILDER_INIT) && (builder->state <= LwHHTP_BUILDER_ADDED_HEADER))
+    if (response->data != NULL)
     {
-      str_ptr = builder->data_ptr;
+      *dest = response->data;
+      *len = response->data_len;
+      ret = 1;
+    }
+    else
+    {
+      *dest = NULL;
+      *len = 0;
+      ret = 0;
+    }
+  }
+  return ret;
+}
+
+uint16_t lwhttp_response_get_status_line(lwhttp_response_t* response, char** dest, uint16_t* len)
+{
+  uint16_t ret = 0;
+  if ((response != NULL) && (dest != NULL) && (len != NULL))
+  {
+    if (response->status_line.data != NULL)
+    {
+      *dest = response->status_line.data;
+      *len = response->status_line.data_len;
+      ret = 1;
+    }
+    else
+    {
+      *dest = NULL;
+      *len = 0;
+      ret = 0;
+    }
+  }
+  return ret;
+}
+
+uint16_t lwhttp_response_get_status_code(lwhttp_response_t* response, uint16_t* status_code)
+{
+  uint16_t ret = 0;
+  return ret;
+}
+
+uint16_t lwhttp_response_get_message_header(lwhttp_response_t* response, char* field_name, lwhttp_message_header_t* header_ptr)
+{
+  uint16_t ret = 0;
+  return ret;
+}
+
+uint16_t lwhttp_response_get_message_body(lwhttp_response_t* response, char** dest, uint16_t* len)
+{
+  uint16_t ret = 0;
+  if ((response != NULL) && (dest != NULL) && (len != NULL))
+  {
+    if (response->message_body != NULL)
+    {
+      *dest = response->message_body;
+      *len = response->message_body_len;
+      ret = 1;
+    }
+    else
+    {
+      *dest = NULL;
+      *len = 0;
+      ret = 0;
+    }
+  }
+  return ret;
+}
+
+uint16_t lwhttp_response_parser_free(lwhttp_response_t* response)
+{
+  uint16_t ret = 0;
+  if (response != NULL)
+  {
+    free(response->data);
+    ret = lwhttp_response_parser_init(response);
+  }
+  return ret;
+}
+
+uint16_t lwhttp_request_parser_init(lwhttp_request_t* request)
+{
+  if (request != NULL)
+  {
+    /* Parser internals */
+    request->state = LwHHTP_BUILDER_INIT;
+    request->data = NULL;
+    request->data_len = 0;
+    
+    /* HTTP/1.1 Sec5.1 Request - Request line */
+    request->request_line.data = NULL;
+    request->request_line.data_len = 0;
+    request->request_line.method = NULL;
+    request->request_line.method_len = 0;
+    request->request_line.request_uri = NULL;
+    request->request_line.request_uri_len = 0;
+    request->request_line.http_version = NULL;
+    request->request_line.http_version_len = 0;
+
+    /* HTTP/1.1 Sec4.2 HTTP Message - Message headers */
+    request->message_headers = NULL;
+    request->message_headers_len = 0;
+
+    /* HTTP/1.1 Sec4.3 HTTP Message - Message body */
+    request->message_body = NULL;
+    request->message_body_len = 0;
+  }
+}
+
+uint16_t lwhttp_request_put_request_line(lwhttp_request_t* request, lwhttp_method_t method, const char* request_uri)
+{
+  char temp_buff[128];
+  uint16_t ret = 0;
+  uint16_t len = 0;
+  uint16_t idx = 0;
+  
+  if ((request != NULL) && ((method >= 0) && (method < LwHHTP_MAX)) && (request_uri != NULL))
+  {
+    if (request->state == LwHHTP_BUILDER_INIT)
+    {
+      /* Format request line + Empty line */
+      snprintf(&temp_buff[0], sizeof(temp_buff), "%s %s HTTP/1.0\r\n", LwHTTP_methods[method], request_uri);
+      len = strlen(&temp_buff[0]);
       
-      if (builder->state == LwHHTP_BUILDER_ADDED_HEADER)
+      /* Allocate memory + NULL Terminator */
+      request->data = realloc(request->data, sizeof(char) * (len + 1));
+      
+      /* Pointers to request line */
+      request->request_line.data = request->data;
+      request->request_line.data_len = len;
+      
+      /* Copy data */
+      for (idx = 0; idx < len; idx++)
       {
-        /* Overwrite EOL chars from last line */
-        str_ptr -= 2;
+          request->request_line.data[idx] = temp_buff[idx];
+          request->data_len++;
       }
       
-      strcat(str_ptr, header);
-      strcat(str_ptr, ": ");
-      strcat(str_ptr, value);
-      strcat(str_ptr, "\r\n");
+      /* Add NULL Terminator */
+      request->data[request->data_len] = '\0';
       
-      builder->len = strlen(str_ptr);
+      request->state = LwHHTP_BUILDER_ADDED_REQUEST;
+
+      ret = 1;
+    }
+  }
+  
+  return ret;
+}
+
+uint16_t lwhttp_request_put_message_header(lwhttp_request_t* request, const char* header, const char* value)
+{
+  char temp_buff[128];
+  uint16_t ret = 0;
+  uint16_t len = 0;
+  uint16_t idx = 0;
+  
+  char* message_header;
+  uint16_t message_header_len;
+  
+  if ((request != NULL) && (header != NULL) && (value != NULL))
+  {
+    if ((request->state >= LwHHTP_BUILDER_ADDED_REQUEST) && (request->state <= LwHHTP_BUILDER_ADDED_HEADER))
+    {      
+      /* Format message header + Empty line */
+      snprintf(&temp_buff[0], sizeof(temp_buff), "%s: %s\r\n\r\n", header, value);
+      len = strlen(&temp_buff[0]);
       
-      builder->state = LwHHTP_BUILDER_ADDED_HEADER;
+      /* Allocate memory */
+      request->data = realloc(request->data, sizeof(char) * (request->data_len + len));
+
+      /* Pointers to message header, overwrite NULL terminator */
+      message_header = &request->data[request->data_len];
+      message_header_len = len;
+      
+      /* Copy data */
+      for (idx = 0; idx < len; idx++)
+      {
+          message_header[idx] = temp_buff[idx];
+          request->data_len++;
+      }
+      
+      /* Add NULL Terminator */
+      request->data[request->data_len] = '\0';
+
+      request->state = LwHHTP_BUILDER_ADDED_HEADER;
       ret = 1;
     } 
   }
@@ -228,20 +345,37 @@ uint16_t lwhttp_builder_add_header(lwhttp_builder_t* builder, const char* header
   return ret;
 }
 
-uint16_t lwhttp_builder_add_body(lwhttp_builder_t* builder, const char* body, uint16_t len)
+uint16_t lwhttp_request_put_message_body(lwhttp_request_t* request, const char* body, uint16_t len)
 {
   uint16_t ret = 0;
-  if ((builder != NULL) && (body != NULL) && (len > 0))
+  uint16_t idx = 0;
+  
+  if ((request != NULL) && (body != NULL) && (len > 0))
   {
-    if ((builder->state >= LwHHTP_BUILDER_INIT) && (builder->state <= LwHHTP_BUILDER_ADDED_HEADER))
+    if ((request->state >= LwHHTP_BUILDER_ADDED_REQUEST) && (request->state <= LwHHTP_BUILDER_ADDED_HEADER))
     {
-      strcat(builder->data_ptr, "\r\n");
-      strncat(builder->data_ptr, body, len);
-      strcat(builder->data_ptr, "\r\n");
+      /* Allocate memory */
+      request->data = realloc(request->data, sizeof(char) * (request->data_len + len + 2));
       
-      builder->len = strlen(builder->data_ptr);
+      /* Add Empty line, overwrite NULL terminator */
+      request->data[request->data_len++] = '\r';
+      request->data[request->data_len++] = '\n';
       
-      builder->state = LwHHTP_BUILDER_ADDED_BODY;
+      /* Pointers to message body */
+      request->message_body = &request->data[request->data_len];
+      request->message_body_len = len;      
+
+      /* Copy data */
+      for (idx = 0; idx < len; idx++)
+      {
+          request->message_body[idx] = body[idx];
+          request->data_len++;
+      }
+      
+      /* Add NULL Terminator */
+      request->data[request->data_len] = '\0';
+
+      request->state = LwHHTP_BUILDER_ADDED_BODY;
       ret = 1;
     } 
   }
@@ -249,32 +383,34 @@ uint16_t lwhttp_builder_add_body(lwhttp_builder_t* builder, const char* body, ui
   return ret;
 }
 
-uint16_t lwhttp_builder_end(lwhttp_builder_t* builder)
+uint16_t lwhttp_request_get(lwhttp_request_t* request, char** dest, uint16_t* len)
 {
   uint16_t ret = 0;
-  if (builder != NULL)
+  if ((request != NULL) && (dest != NULL) && (len != NULL))
   {
-    if ((builder->state >= LwHHTP_BUILDER_INIT) && (builder->state <= LwHHTP_BUILDER_ADDED_BODY))
+    if (request->data != NULL)
     {
-      strcat(builder->data_ptr, "\r\n");      
-      builder->len = strlen(builder->data_ptr);
-      builder->data_ptr[builder->len] = '\0';
-      builder->state = LwHHTP_BUILDER_ADDED_END;
+      *dest = request->data;
+      *len = request->data_len;
       ret = 1;
-    } 
+    }
+    else
+    {
+      *dest = NULL;
+      *len = 0;
+      ret = 0;
+    }
   }
-  
   return ret;
 }
 
-uint16_t lwhttp_builder_get_data(lwhttp_builder_t* builder, char** dest, uint16_t* len)
+uint16_t lwhttp_request_parser_free(lwhttp_request_t* request)
 {
   uint16_t ret = 0;
-  if ((builder != NULL) && (dest != NULL) && (len != NULL))
+  if (request != NULL)
   {
-    *dest = builder->data;
-    *len = builder->len;
-    ret = 1;
+    free(request->data);
+    ret = lwhttp_request_parser_init(request);
   }
   return ret;
 }
