@@ -1542,6 +1542,8 @@ void StartLWIPTask(void const * argument)
   /* Temp Buffer PV */
   char* temp_buf_data = NULL;
   uint16_t temp_buf_data_len = 0;
+  lwhttp_message_header_t* temp_header_ptr;
+  lwhttp_message_header_t* content_type_header_ptr;
   
   /* JSON PV */
   const char* json_data_fmt = "{\"api_key\": \"%s\", \"delta_t\": %d, \"field1\": %d}";
@@ -1672,41 +1674,54 @@ void StartLWIPTask(void const * argument)
           }
         }
         
-        /* Print LwHTTP Request */
-        lwhttp_request_get(&httpRequest, &temp_buf_data, &temp_buf_data_len);
-        cli_printf("[LwHTTP] Request: (%d bytes): >>>%.*s<<<\r\n", 
-                   temp_buf_data_len,
-                   temp_buf_data_len,
-                   temp_buf_data);
-        
-        /* Print LwHTTP Response */
-        lwhttp_response_get(&httpResponse, &temp_buf_data, &temp_buf_data_len);
-        cli_printf("[LwHTTP] Response: (%d bytes): >>>%.*s<<<\r\n", 
-                   temp_buf_data_len,
-                   temp_buf_data_len,
-                   temp_buf_data);
-        
         /* Run LwHTTP Response Parser */
         lwhttp_response_parser_run(&httpResponse);
         
-        /* Print LwHTTP Response Status Code */
-        cli_printf("[LwHTTP] Response status line: \"%.*s\"\r\n", 
-                   httpResponse.status_line.status_code_len,
-                   httpResponse.status_line.status_code);
+        /* Print LwHTTP Request */
+        lwhttp_request_get(&httpRequest, &temp_buf_data, &temp_buf_data_len);
+        cli_printf("[LwHTTP] Request: (%d bytes):\r\n[START]\r\n", temp_buf_data_len);
+        cli_write(temp_buf_data, temp_buf_data_len);
+        cli_printf("\r\n[END]\r\n\r\n");
+
+        /* Print LwHTTP Response */
+        lwhttp_response_get(&httpResponse, &temp_buf_data, &temp_buf_data_len);
+        cli_printf("[LwHTTP] Response: (%d bytes):\r\n[START]\r\n", temp_buf_data_len);
+        cli_write(temp_buf_data, temp_buf_data_len);
+        cli_printf("\r\n[END]\r\n\r\n");
         
-        /* Print LwHTTP Response Headers Count */
-        cli_printf("[LwHTTP] Response headers count: %d\r\n", httpResponse.message_headers_len); 
+        /* Print LwHTTP Response Status Line */
+        lwhttp_response_get_status_line(&httpResponse, &temp_buf_data, &temp_buf_data_len);
+        cli_printf("[LwHTTP] Response status line: >>>%.*s<<<\r\n", temp_buf_data_len, temp_buf_data);
+        
+        /* Print LwHTTP Message Headers count */
+        cli_printf("[LwHTTP] Message headers count: %d\r\n", httpResponse.message_headers.count);
+        
+        /* Print LwHTTP Date Header */
+        lwhttp_response_get_message_header_by_name(&httpResponse, "Date", &temp_header_ptr);
+        cli_printf("[LwHTTP] Message header \"%s\": >>>%.*s<<<\r\n", "Date", temp_header_ptr->field_value.len, temp_header_ptr->field_value.data);
+        
+        /* Print LwHTTP Content-Type Header */
+        lwhttp_response_get_message_header_by_name(&httpResponse, "Content-Type", &content_type_header_ptr);
+        cli_printf("[LwHTTP] Message header \"%s\": >>>%.*s<<<\r\n", "Content-Type", content_type_header_ptr->field_value.len, content_type_header_ptr->field_value.data);
         
         /* Print LwHTTP Response Message Body */
         lwhttp_response_get_message_body(&httpResponse, &temp_buf_data, &temp_buf_data_len);
-        cli_printf("[LwHTTP] Response message body length: %d\r\n", temp_buf_data_len); 
-        cli_printf("[LwHTTP] Response message body: \"%.*s\"\r\n", 
-                   temp_buf_data_len,
-                   temp_buf_data);
+        cli_printf("[LwHTTP] Response message body: (%d bytes):\r\n[START]\r\n", temp_buf_data_len);
+        cli_write(temp_buf_data, temp_buf_data_len);
+        cli_printf("\r\n[END]\r\n\r\n");
         
-        /* Parse LwHTTP Response message body as JSON */        
-        jsmn_parser_example(temp_buf_data, temp_buf_data_len);
-
+        /* Print LwHTTP Response Status Code */
+        lwhttp_response_get_status_code(&httpResponse, &temp_buf_data, &temp_buf_data_len);
+        cli_printf("[LwHTTP] Response status code: >>>%.*s<<<\r\n", temp_buf_data_len, temp_buf_data);
+        
+        /* If HTTP Status Code is OK (200) and Content-Type is JSON */
+        if ((0 == strncmp(httpResponse.status_line.status_code.data, "200", strlen("200"))) 
+            && (0 == strncmp(content_type_header_ptr->field_value.data, "application/json", strlen("application/json"))))
+        {
+          /* Parse LwHTTP Response message body as JSON */        
+          jsmn_parser_example(httpResponse.message_body.data, httpResponse.message_body.len);  
+        }
+        
         /* Free LwHTTP Request & Response */
         lwhttp_request_parser_free(&httpRequest);
         lwhttp_response_parser_free(&httpResponse);
