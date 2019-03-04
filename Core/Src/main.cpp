@@ -262,7 +262,7 @@ int main(void)
   sdTaskHandle = osThreadCreate(osThread(sdTask), NULL);
 
   /* definition and creation of lwipTask */
-  osThreadDef(lwipTask, StartLWIPTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 6);
+  osThreadDef(lwipTask, StartLWIPTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 8);
   lwipTaskHandle = osThreadCreate(osThread(lwipTask), (void*)&gnetif);
 
   /* definition and creation of dhcpTask */
@@ -1581,14 +1581,15 @@ void StartLWIPTask(void const * argument)
       sprintf((char *)json_data_len, "%d", strlen((char *)json_data));  
       
       /* LwHTTP Request Builder */
-      lwhttp_request_parser_init(&httpRequest);
+      lwhttp_request_init(&httpRequest);
       lwhttp_request_put_request_line(&httpRequest, LwHHTP_POST, url);
+      // lwhttp_request_put_message_header(&httpRequest, "Host", "www.sensait.com"); /* Required for HTTP/1.1 */
       lwhttp_request_put_message_header(&httpRequest, "Content-Type", "application/json");
       lwhttp_request_put_message_header(&httpRequest, "Content-Length", (char *)json_data_len);
       lwhttp_request_put_message_body(&httpRequest, (char*)json_data, strlen((char *)json_data));      
       
       /* LwHTTP Response Builder */
-      lwhttp_response_parser_init(&httpResponse);  
+      lwhttp_response_init(&httpResponse);  
 
       /* Init error as fatal */
       netErr = ERR_ABRT;
@@ -1634,8 +1635,11 @@ void StartLWIPTask(void const * argument)
               {
                 cli_printf("Connected to server: %s\r\n", server);
                 
-                /* LwHTTP get request from builder */
-                lwhttp_request_get(&httpRequest, &temp_buf_data, &temp_buf_data_len);
+        /* Print LwHTTP Request */
+        lwhttp_request_get(&httpRequest, &temp_buf_data, &temp_buf_data_len);
+        cli_printf("[LwHTTP] Request: (%d bytes):\r\n[START]\r\n", temp_buf_data_len);
+        cli_write(temp_buf_data, temp_buf_data_len);
+        cli_printf("\r\n[END]\r\n\r\n");
 
                 /* Write data to server */
                 netErr = netconn_write(conn, temp_buf_data, temp_buf_data_len, NETCONN_NOFLAG);
@@ -1660,7 +1664,7 @@ void StartLWIPTask(void const * argument)
                 netbuf_data(netbuf, (void**)&temp_buf_data, &temp_buf_data_len);
                 
                 /* LwHTTP write response to parser */
-                lwhttp_response_parser_write(&httpResponse, (char*)temp_buf_data, temp_buf_data_len);
+                lwhttp_response_put(&httpResponse, (char*)temp_buf_data, temp_buf_data_len);
               }
               while (netbuf_next(netbuf) >= 0);
               
@@ -1675,7 +1679,8 @@ void StartLWIPTask(void const * argument)
         }
         
         /* Run LwHTTP Response Parser */
-        lwhttp_response_parser_run(&httpResponse);
+        lwhttp_request_parse(&httpRequest);
+        lwhttp_response_parse(&httpResponse);
         
         /* Print LwHTTP Request */
         lwhttp_request_get(&httpRequest, &temp_buf_data, &temp_buf_data_len);
@@ -1691,18 +1696,28 @@ void StartLWIPTask(void const * argument)
         
         /* Print LwHTTP Response Status Line */
         lwhttp_response_get_status_line(&httpResponse, &temp_buf_data, &temp_buf_data_len);
-        cli_printf("[LwHTTP] Response status line: >>>%.*s<<<\r\n", temp_buf_data_len, temp_buf_data);
+        cli_printf("[LwHTTP] Response Start-Line: >>>%.*s<<<\r\n", temp_buf_data_len, temp_buf_data);
+        
+        /* Print LwHTTP Response Status Line */
+        lwhttp_request_get_request_line(&httpRequest, &temp_buf_data, &temp_buf_data_len);
+        cli_printf("[LwHTTP] Request Start-Line: >>>%.*s<<<\r\n", temp_buf_data_len, temp_buf_data);
         
         /* Print LwHTTP Message Headers count */
-        cli_printf("[LwHTTP] Message headers count: %d\r\n", httpResponse.message_headers.count);
+        cli_printf("[LwHTTP] Response Message-Headers count: %d\r\n", httpResponse.message_headers.count);
         
         /* Print LwHTTP Date Header */
-        lwhttp_response_get_message_header_by_name(&httpResponse, "Date", &temp_header_ptr);
-        cli_printf("[LwHTTP] Message header \"%s\": >>>%.*s<<<\r\n", "Date", temp_header_ptr->field_value.len, temp_header_ptr->field_value.data);
+        lwhttp_response_get_message_header(&httpResponse, "Date", &temp_header_ptr);
+        cli_printf("[LwHTTP] Response Message-Header \"%s\": >>>%.*s<<<\r\n", "Date", temp_header_ptr->field_value.len, temp_header_ptr->field_value.data);
         
         /* Print LwHTTP Content-Type Header */
-        lwhttp_response_get_message_header_by_name(&httpResponse, "Content-Type", &content_type_header_ptr);
-        cli_printf("[LwHTTP] Message header \"%s\": >>>%.*s<<<\r\n", "Content-Type", content_type_header_ptr->field_value.len, content_type_header_ptr->field_value.data);
+        lwhttp_response_get_message_header(&httpResponse, "Content-Type", &content_type_header_ptr);
+        cli_printf("[LwHTTP] Response Message-Header \"%s\": >>>%.*s<<<\r\n", "Content-Type", content_type_header_ptr->field_value.len, content_type_header_ptr->field_value.data);
+        
+        /* Print LwHTTP Request Message Body */
+        lwhttp_request_get_message_body(&httpRequest, &temp_buf_data, &temp_buf_data_len);
+        cli_printf("[LwHTTP] Request message body: (%d bytes):\r\n[START]\r\n", temp_buf_data_len);
+        cli_write(temp_buf_data, temp_buf_data_len);
+        cli_printf("\r\n[END]\r\n\r\n");
         
         /* Print LwHTTP Response Message Body */
         lwhttp_response_get_message_body(&httpResponse, &temp_buf_data, &temp_buf_data_len);
@@ -1715,7 +1730,7 @@ void StartLWIPTask(void const * argument)
         cli_printf("[LwHTTP] Response status code: >>>%.*s<<<\r\n", temp_buf_data_len, temp_buf_data);
         
         /* If HTTP Status Code is OK (200) and Content-Type is JSON */
-        if ((0 == strncmp(httpResponse.status_line.status_code.data, "200", strlen("200"))) 
+        if ((0 == strncmp(httpResponse.start_line.status_line.status_code.data, "200", strlen("200"))) 
             && (0 == strncmp(content_type_header_ptr->field_value.data, "application/json", strlen("application/json"))))
         {
           /* Parse LwHTTP Response message body as JSON */        
@@ -1723,8 +1738,8 @@ void StartLWIPTask(void const * argument)
         }
         
         /* Free LwHTTP Request & Response */
-        lwhttp_request_parser_free(&httpRequest);
-        lwhttp_response_parser_free(&httpResponse);
+        lwhttp_request_free(&httpRequest);
+        lwhttp_response_free(&httpResponse);
         
         /* Delete TCP connection */
         netErr = netconn_delete(conn);  
