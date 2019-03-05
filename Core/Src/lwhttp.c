@@ -361,12 +361,12 @@ static uint16_t lwhttp_message_get(lwhttp_message_t* message, char** dest, uint1
   return ret;
 }
 
-uint16_t lwhttp_response_put(lwhttp_response_t* response, char* src, uint16_t len)
+uint16_t lwhttp_response_put(lwhttp_response_t* response, const char* src, uint16_t len)
 {
   return lwhttp_message_put((lwhttp_message_t*) response, src, len);
 }
 
-uint16_t lwhttp_request_put(lwhttp_request_t* request, char* src, uint16_t len)
+uint16_t lwhttp_request_put(lwhttp_request_t* request, const char* src, uint16_t len)
 {
   return lwhttp_message_put((lwhttp_message_t*) request, src, len);
 }
@@ -390,6 +390,16 @@ static uint16_t lwhttp_message_put(lwhttp_message_t* message, const char* src, u
     message->parser_state = LwHHTP_PARSER_READY;
   }
   return ret;
+}
+
+uint16_t lwhttp_response_put_eol(lwhttp_response_t* response)
+{
+  return lwhttp_message_put((lwhttp_message_t*) response, LwHTTP_eol_string, strlen(LwHTTP_eol_string));
+}
+
+uint16_t lwhttp_request_put_eol(lwhttp_request_t* request)
+{
+  return lwhttp_message_put((lwhttp_message_t*) request, LwHTTP_eol_string, strlen(LwHTTP_eol_string));
 }
 
 uint16_t lwhttp_response_get_status_line(lwhttp_response_t* response, char** dest, uint16_t* len)

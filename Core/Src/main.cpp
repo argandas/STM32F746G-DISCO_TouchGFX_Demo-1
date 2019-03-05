@@ -124,19 +124,23 @@ osMessageQId tcpQueueHandle;
 osSemaphoreId dhcpBinarySemHandle;
 /* USER CODE BEGIN PV */
 
+osThreadId httpClientTaskHandle;
+osThreadId httpServerTaskHandle;
+
 FATFS SDFatFs;  /* File system object for SD card logical drive */
 FIL MyFile;     /* File object */
 
-#ifdef USE_FATFS_MKFS
+
+FIL HTTP_File;     /* File object */
+
+
+#if 0
 uint8_t workBuffer[2*_MAX_SS];
 #endif
 
 char cli_buff[512];
 
 uint8_t DHCP_state = DHCP_OFF;
-
-lwhttp_request_t httpRequest;
-lwhttp_response_t httpResponse;
 
 /* USER CODE END PV */
 
@@ -164,11 +168,21 @@ void StartLWIPTask(void const * argument);
 void StartDHCPTask(void const * argument);
 
 /* USER CODE BEGIN PFP */
+void Start_HTTP_Client_Task(void const * argument);
+void Start_HTTP_Server_Task(void const * argument);
+
 uint16_t cli_printf(const char* fmt, ...);
 uint16_t cli_write(const char* src, uint16_t len);
 FRESULT scan_files(char* path);
 FRESULT get_free_clusters(FATFS* fs);
 static int jsoneq(const char *json, jsmntok_t *tok, const char *s);
+
+#if 0
+const uint8_t index_html[] = {
+  0x3c, 0x21, 0x44, 0x4f, 0x43, 0x54, 0x59, 0x50, 0x45, 0x20, 0x68, 0x74, 0x6d, 0x6c, 0x3e, 0x3c, 0x68, 0x74, 0x6d, 0x6c, 0x3e, 0x3c, 0x68, 0x65, 0x61, 0x64, 0x3e, 0x3c, 0x6d, 0x65, 0x74, 0x61, 0x20, 0x68, 0x74, 0x74, 0x70, 0x2d, 0x65, 0x71, 0x75, 0x69, 0x76, 0x3d, 0x22, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x2d, 0x54, 0x79, 0x70, 0x65, 0x22, 0x20, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x3d, 0x22, 0x74, 0x65, 0x78, 0x74, 0x2f, 0x68, 0x74, 0x6d, 0x6c, 0x3b, 0x20, 0x63, 0x68, 0x61, 0x72, 0x73, 0x65, 0x74, 0x3d, 0x77, 0x69, 0x6e, 0x64, 0x6f, 0x77, 0x73, 0x2d, 0x31, 0x32, 0x35, 0x32, 0x22, 0x3e, 0x3c, 0x62, 0x6f, 0x64, 0x79, 0x3e, 0x3c, 0x73, 0x74, 0x79, 0x6c, 0x65, 0x3e, 0x2a, 0x20, 0x7b, 0x62, 0x6f, 0x78, 0x2d, 0x73, 0x69, 0x7a, 0x69, 0x6e, 0x67, 0x3a, 0x20, 0x62, 0x6f, 0x72, 0x64, 0x65, 0x72, 0x2d, 0x62, 0x6f, 0x78, 0x3b, 0x7d, 0x62, 0x6f, 0x64, 0x79, 0x20, 0x7b, 0x20, 0x20, 0x6d, 0x61, 0x72, 0x67, 0x69, 0x6e, 0x3a, 0x20, 0x30, 0x3b, 0x20, 0x20, 0x66, 0x6f, 0x6e, 0x74, 0x2d, 0x66, 0x61, 0x6d, 0x69, 0x6c, 0x79, 0x3a, 0x20, 0x41, 0x72, 0x69, 0x61, 0x6c, 0x2c, 0x20, 0x48, 0x65, 0x6c, 0x76, 0x65, 0x74, 0x69, 0x63, 0x61, 0x2c, 0x20, 0x73, 0x61, 0x6e, 0x73, 0x2d, 0x73, 0x65, 0x72, 0x69, 0x66, 0x3b, 0x7d, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x7b, 0x20, 0x20, 0x6f, 0x76, 0x65, 0x72, 0x66, 0x6c, 0x6f, 0x77, 0x3a, 0x20, 0x68, 0x69, 0x64, 0x64, 0x65, 0x6e, 0x3b, 0x20, 0x20, 0x62, 0x61, 0x63, 0x6b, 0x67, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x2d, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3a, 0x20, 0x23, 0x65, 0x39, 0x65, 0x39, 0x65, 0x39, 0x3b, 0x7d, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x61, 0x20, 0x7b, 0x20, 0x20, 0x66, 0x6c, 0x6f, 0x61, 0x74, 0x3a, 0x20, 0x6c, 0x65, 0x66, 0x74, 0x3b, 0x20, 0x20, 0x64, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x3a, 0x20, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x3b, 0x20, 0x20, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3a, 0x20, 0x62, 0x6c, 0x61, 0x63, 0x6b, 0x3b, 0x20, 0x20, 0x74, 0x65, 0x78, 0x74, 0x2d, 0x61, 0x6c, 0x69, 0x67, 0x6e, 0x3a, 0x20, 0x63, 0x65, 0x6e, 0x74, 0x65, 0x72, 0x3b, 0x20, 0x20, 0x70, 0x61, 0x64, 0x64, 0x69, 0x6e, 0x67, 0x3a, 0x20, 0x31, 0x34, 0x70, 0x78, 0x20, 0x31, 0x36, 0x70, 0x78, 0x3b, 0x20, 0x20, 0x74, 0x65, 0x78, 0x74, 0x2d, 0x64, 0x65, 0x63, 0x6f, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x3a, 0x20, 0x6e, 0x6f, 0x6e, 0x65, 0x3b, 0x20, 0x20, 0x66, 0x6f, 0x6e, 0x74, 0x2d, 0x73, 0x69, 0x7a, 0x65, 0x3a, 0x20, 0x31, 0x37, 0x70, 0x78, 0x3b, 0x7d, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x61, 0x3a, 0x68, 0x6f, 0x76, 0x65, 0x72, 0x20, 0x7b, 0x20, 0x20, 0x62, 0x61, 0x63, 0x6b, 0x67, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x2d, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3a, 0x20, 0x23, 0x64, 0x64, 0x64, 0x3b, 0x20, 0x20, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3a, 0x20, 0x62, 0x6c, 0x61, 0x63, 0x6b, 0x3b, 0x7d, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x61, 0x2e, 0x61, 0x63, 0x74, 0x69, 0x76, 0x65, 0x20, 0x7b, 0x20, 0x20, 0x62, 0x61, 0x63, 0x6b, 0x67, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x2d, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3a, 0x20, 0x23, 0x32, 0x31, 0x39, 0x36, 0x46, 0x33, 0x3b, 0x20, 0x20, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3a, 0x20, 0x77, 0x68, 0x69, 0x74, 0x65, 0x3b, 0x7d, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x2e, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x20, 0x7b, 0x20, 0x20, 0x66, 0x6c, 0x6f, 0x61, 0x74, 0x3a, 0x20, 0x72, 0x69, 0x67, 0x68, 0x74, 0x3b, 0x7d, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x5b, 0x74, 0x79, 0x70, 0x65, 0x3d, 0x74, 0x65, 0x78, 0x74, 0x5d, 0x20, 0x7b, 0x20, 0x20, 0x70, 0x61, 0x64, 0x64, 0x69, 0x6e, 0x67, 0x3a, 0x20, 0x36, 0x70, 0x78, 0x3b, 0x20, 0x20, 0x6d, 0x61, 0x72, 0x67, 0x69, 0x6e, 0x2d, 0x74, 0x6f, 0x70, 0x3a, 0x20, 0x38, 0x70, 0x78, 0x3b, 0x20, 0x20, 0x66, 0x6f, 0x6e, 0x74, 0x2d, 0x73, 0x69, 0x7a, 0x65, 0x3a, 0x20, 0x31, 0x37, 0x70, 0x78, 0x3b, 0x20, 0x20, 0x62, 0x6f, 0x72, 0x64, 0x65, 0x72, 0x3a, 0x20, 0x6e, 0x6f, 0x6e, 0x65, 0x3b, 0x20, 0x20, 0x77, 0x69, 0x64, 0x74, 0x68, 0x3a, 0x31, 0x32, 0x30, 0x70, 0x78, 0x3b, 0x7d, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x2e, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x20, 0x62, 0x75, 0x74, 0x74, 0x6f, 0x6e, 0x20, 0x7b, 0x20, 0x20, 0x66, 0x6c, 0x6f, 0x61, 0x74, 0x3a, 0x20, 0x72, 0x69, 0x67, 0x68, 0x74, 0x3b, 0x20, 0x20, 0x70, 0x61, 0x64, 0x64, 0x69, 0x6e, 0x67, 0x3a, 0x20, 0x36, 0x70, 0x78, 0x20, 0x31, 0x30, 0x70, 0x78, 0x3b, 0x20, 0x20, 0x6d, 0x61, 0x72, 0x67, 0x69, 0x6e, 0x2d, 0x74, 0x6f, 0x70, 0x3a, 0x20, 0x38, 0x70, 0x78, 0x3b, 0x20, 0x20, 0x6d, 0x61, 0x72, 0x67, 0x69, 0x6e, 0x2d, 0x72, 0x69, 0x67, 0x68, 0x74, 0x3a, 0x20, 0x31, 0x36, 0x70, 0x78, 0x3b, 0x20, 0x20, 0x62, 0x61, 0x63, 0x6b, 0x67, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x2d, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3a, 0x20, 0x23, 0x35, 0x35, 0x35, 0x3b, 0x20, 0x20, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3a, 0x20, 0x77, 0x68, 0x69, 0x74, 0x65, 0x3b, 0x20, 0x20, 0x66, 0x6f, 0x6e, 0x74, 0x2d, 0x73, 0x69, 0x7a, 0x65, 0x3a, 0x20, 0x31, 0x37, 0x70, 0x78, 0x3b, 0x20, 0x20, 0x62, 0x6f, 0x72, 0x64, 0x65, 0x72, 0x3a, 0x20, 0x6e, 0x6f, 0x6e, 0x65, 0x3b, 0x20, 0x20, 0x63, 0x75, 0x72, 0x73, 0x6f, 0x72, 0x3a, 0x20, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x3b, 0x7d, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x2e, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x20, 0x62, 0x75, 0x74, 0x74, 0x6f, 0x6e, 0x3a, 0x68, 0x6f, 0x76, 0x65, 0x72, 0x20, 0x7b, 0x20, 0x20, 0x62, 0x61, 0x63, 0x6b, 0x67, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x2d, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3a, 0x20, 0x67, 0x72, 0x65, 0x65, 0x6e, 0x3b, 0x7d, 0x40, 0x6d, 0x65, 0x64, 0x69, 0x61, 0x20, 0x73, 0x63, 0x72, 0x65, 0x65, 0x6e, 0x20, 0x61, 0x6e, 0x64, 0x20, 0x28, 0x6d, 0x61, 0x78, 0x2d, 0x77, 0x69, 0x64, 0x74, 0x68, 0x3a, 0x20, 0x36, 0x30, 0x30, 0x70, 0x78, 0x29, 0x20, 0x7b, 0x20, 0x20, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x2e, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x20, 0x7b, 0x20, 0x20, 0x20, 0x20, 0x66, 0x6c, 0x6f, 0x61, 0x74, 0x3a, 0x20, 0x6e, 0x6f, 0x6e, 0x65, 0x3b, 0x20, 0x20, 0x7d, 0x20, 0x20, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x61, 0x2c, 0x20, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x5b, 0x74, 0x79, 0x70, 0x65, 0x3d, 0x74, 0x65, 0x78, 0x74, 0x5d, 0x2c, 0x20, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x2e, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x20, 0x62, 0x75, 0x74, 0x74, 0x6f, 0x6e, 0x20, 0x7b, 0x20, 0x20, 0x20, 0x20, 0x66, 0x6c, 0x6f, 0x61, 0x74, 0x3a, 0x20, 0x6e, 0x6f, 0x6e, 0x65, 0x3b, 0x20, 0x20, 0x20, 0x20, 0x64, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x3a, 0x20, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x3b, 0x20, 0x20, 0x20, 0x20, 0x74, 0x65, 0x78, 0x74, 0x2d, 0x61, 0x6c, 0x69, 0x67, 0x6e, 0x3a, 0x20, 0x6c, 0x65, 0x66, 0x74, 0x3b, 0x20, 0x20, 0x20, 0x20, 0x77, 0x69, 0x64, 0x74, 0x68, 0x3a, 0x20, 0x31, 0x30, 0x30, 0x25, 0x3b, 0x20, 0x20, 0x20, 0x20, 0x6d, 0x61, 0x72, 0x67, 0x69, 0x6e, 0x3a, 0x20, 0x30, 0x3b, 0x20, 0x20, 0x20, 0x20, 0x70, 0x61, 0x64, 0x64, 0x69, 0x6e, 0x67, 0x3a, 0x20, 0x31, 0x34, 0x70, 0x78, 0x3b, 0x20, 0x20, 0x7d, 0x20, 0x20, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x5b, 0x74, 0x79, 0x70, 0x65, 0x3d, 0x74, 0x65, 0x78, 0x74, 0x5d, 0x20, 0x7b, 0x20, 0x20, 0x20, 0x20, 0x62, 0x6f, 0x72, 0x64, 0x65, 0x72, 0x3a, 0x20, 0x31, 0x70, 0x78, 0x20, 0x73, 0x6f, 0x6c, 0x69, 0x64, 0x20, 0x23, 0x63, 0x63, 0x63, 0x3b, 0x20, 0x20, 0x20, 0x20, 0x7d, 0x7d, 0x3c, 0x2f, 0x73, 0x74, 0x79, 0x6c, 0x65, 0x3e, 0x3c, 0x2f, 0x68, 0x65, 0x61, 0x64, 0x3e, 0x3c, 0x64, 0x69, 0x76, 0x20, 0x63, 0x6c, 0x61, 0x73, 0x73, 0x3d, 0x22, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x22, 0x3e, 0x20, 0x20, 0x3c, 0x61, 0x20, 0x63, 0x6c, 0x61, 0x73, 0x73, 0x3d, 0x22, 0x61, 0x63, 0x74, 0x69, 0x76, 0x65, 0x22, 0x20, 0x68, 0x72, 0x65, 0x66, 0x3d, 0x22, 0x23, 0x68, 0x6f, 0x6d, 0x65, 0x22, 0x3e, 0x48, 0x6f, 0x6d, 0x65, 0x3c, 0x2f, 0x61, 0x3e, 0x20, 0x20, 0x3c, 0x61, 0x20, 0x68, 0x72, 0x65, 0x66, 0x3d, 0x22, 0x23, 0x61, 0x62, 0x6f, 0x75, 0x74, 0x22, 0x3e, 0x41, 0x62, 0x6f, 0x75, 0x74, 0x3c, 0x2f, 0x61, 0x3e, 0x20, 0x20, 0x3c, 0x61, 0x20, 0x68, 0x72, 0x65, 0x66, 0x3d, 0x22, 0x23, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x22, 0x3e, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x3c, 0x2f, 0x61, 0x3e, 0x20, 0x20, 0x3c, 0x64, 0x69, 0x76, 0x20, 0x63, 0x6c, 0x61, 0x73, 0x73, 0x3d, 0x22, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x22, 0x3e, 0x20, 0x20, 0x20, 0x20, 0x3c, 0x66, 0x6f, 0x72, 0x6d, 0x20, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x3d, 0x22, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x70, 0x61, 0x67, 0x65, 0x2e, 0x70, 0x68, 0x70, 0x22, 0x3e, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x3c, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x20, 0x74, 0x79, 0x70, 0x65, 0x3d, 0x22, 0x74, 0x65, 0x78, 0x74, 0x22, 0x20, 0x70, 0x6c, 0x61, 0x63, 0x65, 0x68, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x3d, 0x22, 0x55, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x20, 0x6e, 0x61, 0x6d, 0x65, 0x3d, 0x22, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x3e, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x3c, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x20, 0x74, 0x79, 0x70, 0x65, 0x3d, 0x22, 0x74, 0x65, 0x78, 0x74, 0x22, 0x20, 0x70, 0x6c, 0x61, 0x63, 0x65, 0x68, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x3d, 0x22, 0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x22, 0x20, 0x6e, 0x61, 0x6d, 0x65, 0x3d, 0x22, 0x70, 0x73, 0x77, 0x22, 0x3e, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x3c, 0x62, 0x75, 0x74, 0x74, 0x6f, 0x6e, 0x20, 0x74, 0x79, 0x70, 0x65, 0x3d, 0x22, 0x73, 0x75, 0x62, 0x6d, 0x69, 0x74, 0x22, 0x3e, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x3c, 0x2f, 0x62, 0x75, 0x74, 0x74, 0x6f, 0x6e, 0x3e, 0x20, 0x20, 0x20, 0x20, 0x3c, 0x2f, 0x66, 0x6f, 0x72, 0x6d, 0x3e, 0x20, 0x20, 0x3c, 0x2f, 0x64, 0x69, 0x76, 0x3e, 0x3c, 0x2f, 0x64, 0x69, 0x76, 0x3e, 0x3c, 0x64, 0x69, 0x76, 0x20, 0x73, 0x74, 0x79, 0x6c, 0x65, 0x3d, 0x22, 0x70, 0x61, 0x64, 0x64, 0x69, 0x6e, 0x67, 0x2d, 0x6c, 0x65, 0x66, 0x74, 0x3a, 0x31, 0x36, 0x70, 0x78, 0x22, 0x3e, 0x20, 0x20, 0x3c, 0x68, 0x32, 0x3e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x69, 0x76, 0x65, 0x20, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x20, 0x46, 0x6f, 0x72, 0x6d, 0x20, 0x69, 0x6e, 0x20, 0x4e, 0x61, 0x76, 0x62, 0x61, 0x72, 0x3c, 0x2f, 0x68, 0x32, 0x3e, 0x20, 0x20, 0x3c, 0x70, 0x3e, 0x4e, 0x61, 0x76, 0x69, 0x67, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x20, 0x6d, 0x65, 0x6e, 0x75, 0x20, 0x77, 0x69, 0x74, 0x68, 0x20, 0x61, 0x20, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x20, 0x66, 0x6f, 0x72, 0x6d, 0x20, 0x61, 0x6e, 0x64, 0x20, 0x61, 0x20, 0x73, 0x75, 0x62, 0x6d, 0x69, 0x74, 0x20, 0x62, 0x75, 0x74, 0x74, 0x6f, 0x6e, 0x20, 0x69, 0x6e, 0x73, 0x69, 0x64, 0x65, 0x20, 0x6f, 0x66, 0x20, 0x69, 0x74, 0x2e, 0x3c, 0x2f, 0x70, 0x3e, 0x20, 0x20, 0x3c, 0x70, 0x3e, 0x52, 0x65, 0x73, 0x69, 0x7a, 0x65, 0x20, 0x74, 0x68, 0x65, 0x20, 0x62, 0x72, 0x6f, 0x77, 0x73, 0x65, 0x72, 0x20, 0x77, 0x69, 0x6e, 0x64, 0x6f, 0x77, 0x20, 0x74, 0x6f, 0x20, 0x73, 0x65, 0x65, 0x20, 0x74, 0x68, 0x65, 0x20, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x69, 0x76, 0x65, 0x20, 0x65, 0x66, 0x66, 0x65, 0x63, 0x74, 0x2e, 0x3c, 0x2f, 0x70, 0x3e, 0x3c, 0x2f, 0x64, 0x69, 0x76, 0x3e, 0x3c, 0x2f, 0x62, 0x6f, 0x64, 0x79, 0x3e, 0x3c, 0x2f, 0x68, 0x74, 0x6d, 0x6c, 0x3e
+};
+#endif 
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -246,31 +260,38 @@ int main(void)
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityHigh, 0, configMINIMAL_STACK_SIZE * 5);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityHigh, 0, configMINIMAL_STACK_SIZE * 4);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of buttonTask */
-  osThreadDef(buttonTask, StartButtonTask, osPriorityIdle, 0, configMINIMAL_STACK_SIZE * 5);
+  osThreadDef(buttonTask, StartButtonTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
   buttonTaskHandle = osThreadCreate(osThread(buttonTask), NULL);
 
   /* definition and creation of ledTask */
-  osThreadDef(ledTask, StartLEDTask, osPriorityIdle, 0, configMINIMAL_STACK_SIZE * 5);
+  osThreadDef(ledTask, StartLEDTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
   ledTaskHandle = osThreadCreate(osThread(ledTask), NULL);
 
   /* definition and creation of sdTask */
-  osThreadDef(sdTask, StartSDTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 10);
+  osThreadDef(sdTask, StartSDTask, osPriorityAboveNormal, 0, configMINIMAL_STACK_SIZE * 8);
   sdTaskHandle = osThreadCreate(osThread(sdTask), NULL);
 
   /* definition and creation of lwipTask */
-  osThreadDef(lwipTask, StartLWIPTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 8);
+  osThreadDef(lwipTask, StartLWIPTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
   lwipTaskHandle = osThreadCreate(osThread(lwipTask), (void*)&gnetif);
 
   /* definition and creation of dhcpTask */
-  osThreadDef(dhcpTask, StartDHCPTask, osPriorityBelowNormal, 0, configMINIMAL_STACK_SIZE * 5);
+  osThreadDef(dhcpTask, StartDHCPTask, osPriorityHigh, 0, configMINIMAL_STACK_SIZE * 2);
   dhcpTaskHandle = osThreadCreate(osThread(dhcpTask), (void*)&gnetif);
 
   /* USER CODE BEGIN RTOS_THREADS */
     /* add threads, ... */
+  /* definition and creation of httpClientTask */
+  osThreadDef(httpClientTask, Start_HTTP_Client_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 8);
+  httpClientTaskHandle = osThreadCreate(osThread(httpClientTask), (void*)&gnetif);
+  
+  /* definition and creation of httpServerTask */
+  osThreadDef(httpServerTask, Start_HTTP_Server_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 8);
+  httpServerTaskHandle = osThreadCreate(osThread(httpServerTask), (void*)&gnetif);
   /* USER CODE END RTOS_THREADS */
 
   /* Create the queue(s) */
@@ -1144,7 +1165,7 @@ void jsmn_parser_example(char* json_string, uint16_t len)
 
   /* Assume the top-level element is an object */
   if (r < 1 || t[0].type != JSMN_OBJECT) {
-          cli_printf("Object expected\r\n");
+    cli_printf("[JSMN] ERROR: Object expected\r\n");
           // return 1;
   }
 
@@ -1152,19 +1173,20 @@ void jsmn_parser_example(char* json_string, uint16_t len)
   for (i = 1; i < r; i++) {
           if (jsoneq(json_string, &t[i], "channel_id") == 0) {
                   /* We may use strndup() to fetch string value */
-                  cli_printf("- Channel ID: %.*s\r\n", t[i+1].end-t[i+1].start,
+                  cli_printf("[JSMN] Channel ID: %.*s\r\n", t[i+1].end-t[i+1].start,
                                   json_string + t[i+1].start);
                   i++;
           } else if (jsoneq(json_string, &t[i], "entry_id") == 0) {
                   /* We may additionally check if the value is either "true" or "false" */
-                  cli_printf("- Entry ID: %.*s\r\n", t[i+1].end-t[i+1].start,
+                  cli_printf("[JSMN] Entry ID: %.*s\r\n", t[i+1].end-t[i+1].start,
                                   json_string + t[i+1].start);
                   i++;
           } else if (jsoneq(json_string, &t[i], "field1") == 0) {
                   /* We may want to do strtol() here to get numeric value */
-                  cli_printf("- Field1: %.*s\r\n", t[i+1].end-t[i+1].start,
+                  cli_printf("[JSMN] Field1: %.*s\r\n", t[i+1].end-t[i+1].start,
                                   json_string + t[i+1].start);
                   i++;
+#if 0
           } else if (jsoneq(json_string, &t[i], "groups") == 0) {
                   int j;
                   cli_printf("- Groups:\r\n");
@@ -1176,9 +1198,9 @@ void jsmn_parser_example(char* json_string, uint16_t len)
                           cli_printf("  * %.*s\r\n", g->end - g->start, json_string + g->start);
                   }
                   i += t[i+1].size + 1;
+#endif
           } else {
-                  cli_printf("Unexpected key: %.*s\r\n", t[i].end-t[i].start,
-                                  json_string + t[i].start);
+                  // cli_printf("Unexpected key: %.*s\r\n", t[i].end-t[i].start, json_string + t[i].start);
           }
   }
 }
@@ -1201,20 +1223,59 @@ FRESULT get_free_clusters(FATFS* fs)
 
     /* Get volume information and free clusters of used drive */
     fr = f_getfree((TCHAR const*)SDPath, &fre_clust, &fs);
-    cli_printf("f_getfree: %d\r\n", fr);
-
-    if (fr == FR_OK)
+    if (fr != FR_OK)
+    {
+      cli_printf("[FatFs] f_getfree: %d\r\n", fr);
+    }
+    else
     {
       /* Get total sectors and free sectors */
-      tot_sect = (fs->n_fatent - 2) * fs->csize;
-      fre_sect = fre_clust * fs->csize;
+      tot_sect = (fs->n_fatent - 2) * fs->csize * _MAX_SS;
+      fre_sect = fre_clust * fs->csize * _MAX_SS;
 
       /* Print the free space (assuming 512 bytes/sector) */
-      cli_printf("%10lu KiB total drive space.\r\n", tot_sect/2);
-      cli_printf("%10lu KiB available space.\r\n", fre_sect/2);
+      cli_printf("[FatFs] Number of Free Clusters:\r\n");
+      cli_printf("\t%8lu KB Used\r\n", (tot_sect - fre_sect)/1024);
+      cli_printf("\t%8lu KB Available\r\n", fre_sect/1024);
+      cli_printf("\t%8lu KB Total\r\n", tot_sect/1024);
     }
     
     return fr;
+}
+
+FRESULT read_file_sector(FIL* file, void* dest, FSIZE_t len, UINT* bytesread, UINT index)
+{
+  FRESULT fr;
+
+  fr = f_open(file, "index.htm", FA_READ);
+  if(fr != FR_OK)
+  {
+    cli_printf("[FatFs] %s --> f_open: %d\r\n", __FUNCTION__, fr);
+  }
+  else
+  {
+    fr = f_lseek(file, (index * len));
+    if(fr != FR_OK)
+    {
+      cli_printf("[FatFs] %s --> f_lseek: %d\r\n", __FUNCTION__, fr);
+    }
+    else
+    {
+      fr = f_read(file, dest, len, bytesread);
+      if(fr != FR_OK)
+      {
+        cli_printf("[FatFs] %s --> f_read: %d\r\n", __FUNCTION__, fr);
+      }
+    }
+    
+    fr = f_close(file);
+    if(fr != FR_OK)
+    {
+        cli_printf("[FatFs] %s --> f_close: %d\r\n", __FUNCTION__, fr);
+    }
+  }
+  
+  return fr;
 }
 
 /* Start node to be scanned (***also used as work area***) */
@@ -1233,7 +1294,7 @@ FRESULT scan_files(char* path)
             if (fno.fattrib & AM_DIR) {                    
                 /* It is a directory */
                 i = strlen(path);
-                sprintf(&path[i], "/%s (%4d bytes)", fno.fname, fno.fsize);
+                sprintf(&path[i], "\t%s (%4d bytes)", fno.fname, fno.fsize);
                 res = scan_files(path);                    /* Enter the directory */
                 if (res != FR_OK) break;
                 path[i] = 0;
@@ -1241,7 +1302,7 @@ FRESULT scan_files(char* path)
             else 
             {                                       
                 /* It is a file. */
-                cli_printf("%s/%s  (%4d bytes)\r\n", path, fno.fname, fno.fsize);
+                cli_printf("\t%s  (%4d bytes)\r\n", fno.fname, fno.fsize);
             }
         }
         f_closedir(&dir);
@@ -1258,6 +1319,380 @@ static int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
 	return -1;
 }
 
+
+void Start_HTTP_Client_Task(void const * argument)
+{
+  /* USER CODE BEGIN Start_HTTP_Client_Task */
+  
+  /* Queue PV */
+  uint8_t queueData = 0;
+  
+  /* LwIP PV */
+  struct netif* netif = (struct netif*)argument;
+  struct netconn *conn;
+  struct netbuf *netbuf = NULL;
+  ip4_addr_t local_ip; 
+  ip4_addr_t remote_ip; 
+  err_t err;
+  
+  /* Temp Buffer PV */
+  char* temp_buf_data = NULL;
+  uint16_t temp_buf_data_len = 0;
+  lwhttp_message_header_t* temp_header_ptr;
+  lwhttp_message_header_t* content_type_header_ptr;
+  
+  /* JSON PV */
+  const char* json_data_fmt = "{\"api_key\": \"%s\", \"delta_t\": %d, \"field1\": %d}";
+  uint8_t json_data[128];
+  uint8_t json_data_len[4];
+  
+  /* Thingspeak server PV */
+  const char* key = "WTN6FH385TCUNDMU";
+  const char* server = "thingspeak.com";
+  const char* url = "/update.json?headers=false";
+  
+  static lwhttp_request_t client_request;
+  static lwhttp_response_t client_response;
+  
+  /* Wait for DHCP */
+  while (DHCP_state != DHCP_ADDRESS_ASSIGNED)
+  {
+    // cli_printf("[LWIP] %s --> Waiting for DHCP (state = %d)\r\n", __FUNCTION__, DHCP_state);
+    osDelay(500);
+  }
+  cli_printf("[FreeRTOS] Task %s --> INIT OK\r\n", __FUNCTION__);
+
+  /* Infinite loop */
+  for(;;)
+  {
+    if(xQueueReceive(tcpQueueHandle, &queueData, 0) == pdTRUE)
+    {
+      cli_printf("\r\n[LwIP] Client Send -> %u\r\n", queueData);     
+
+      /* Parse HTTP Body in JSON format */
+      sprintf((char *)json_data, json_data_fmt, key, 5, queueData);  
+      sprintf((char *)json_data_len, "%d", strlen((char *)json_data));  
+            
+      /* LwHTTP Inits */
+      lwhttp_request_init(&client_request);
+      lwhttp_response_init(&client_response);  
+            
+      /* Build HTTP Request */
+      lwhttp_request_put_request_line(&client_request, LwHHTP_POST, url);
+      lwhttp_request_put_message_header(&client_request, "Content-Type", "application/json");
+      lwhttp_request_put_message_header(&client_request, "Content-Length", (char *)json_data_len);
+      lwhttp_request_put_message_body(&client_request, (char*)json_data, strlen((char *)json_data));  
+            
+      /* Run LwHTTP Response Parser */
+      lwhttp_request_parse(&client_request);
+            
+      /* LwIP Connect TCP */
+      conn = netconn_new(NETCONN_TCP);        
+      if (conn == NULL)
+      {
+        err = ERR_CONN;
+        cli_printf("[LWIP] %s --> netconn_new (ERR = %d)\r\n", __FUNCTION__, err);
+      }
+      else
+      {
+#if 0
+        /* Bind a netconn to a specific local IP address and port (optional) */
+        err = netconn_bind(conn, &netif->ip_addr, 60);
+        if (err != ERR_OK)
+        {
+          cli_printf("[LWIP] %s --> netconn_bind (ERR = %d)\r\n", __FUNCTION__, err);
+        }
+        else
+#endif
+        {
+          err  = netconn_gethostbyname(server, &remote_ip);
+          if (err != ERR_OK)
+          {
+            cli_printf("[LWIP] %s --> netconn_gethostbyname (ERR = %d)\r\n", __FUNCTION__, err);
+          }
+          else
+          {
+            cli_printf("[LwIP] Server: %s (%s)\r\n", server, ip4addr_ntoa((const ip4_addr_t *)&remote_ip));
+            
+            /* Connect to server */
+            err = netconn_connect(conn, &remote_ip, 80); 
+            if (err != ERR_OK)
+            {
+              cli_printf("[LWIP] %s --> netconn_connect (ERR = %d)\r\n", __FUNCTION__, err);
+            }
+            else
+            {
+              cli_printf("[LwIP] Connection: OK\r\n");
+
+              /* Get LwHTTP Request Data */
+              lwhttp_request_get(&client_request, &temp_buf_data, &temp_buf_data_len);
+              
+              /* Write data to server */
+              err = netconn_write(conn, temp_buf_data, temp_buf_data_len, NETCONN_NOFLAG);
+              if (err != ERR_OK)
+              {
+                cli_printf("[LWIP] %s --> netconn_write (ERR = %d)\r\n", __FUNCTION__, err);
+              }
+              else
+              {
+                /* Get pointer to buffer where response data is stored */
+                while (( err = netconn_recv(conn, &netbuf)) == ERR_OK)
+                {
+                    do
+                    {
+                      /* Get pointer to data and length*/
+                      netbuf_data(netbuf, (void**)&temp_buf_data, &temp_buf_data_len);
+                      
+                      /* LwHTTP write response to parser */
+                      lwhttp_response_put(&client_response, (char*)temp_buf_data, temp_buf_data_len);
+                    }
+                    while (netbuf_next(netbuf) >= 0);
+
+                    /* Free data buffer */
+                    netbuf_delete(netbuf);
+                }
+                
+                if ((err != ERR_OK) && (err != ERR_CLSD))
+                {
+                    cli_printf("[LWIP] %s --> netconn_recv (ERR = %d)\r\n", __FUNCTION__, err);
+                }
+                else
+                {
+                  /* Print HTTP Request */
+                  lwhttp_request_get_request_line(&client_request, &temp_buf_data, &temp_buf_data_len);
+                  cli_printf("[LwHTTP] Request-Line: %.*s\r\n", temp_buf_data_len, temp_buf_data);
+
+                  /* Parse & Print LwHTTP Response */
+                  lwhttp_response_parse(&client_response);
+                  lwhttp_response_get_status_line(&client_response, &temp_buf_data, &temp_buf_data_len);
+                  cli_printf("[LwHTTP] Status-Line: %.*s\r\n\r\n", temp_buf_data_len, temp_buf_data);
+
+                  /* Content-Type */
+                  lwhttp_response_get_message_header(&client_response, "Content-Type", &content_type_header_ptr);
+                  
+                  if ((client_response.start_line.status_line.status_code.data != NULL) && (content_type_header_ptr != NULL))
+                  {
+                    /* If HTTP Status Code is OK (200) and Content-Type is JSON */
+                    if ((0 == strncmp(client_response.start_line.status_line.status_code.data, "200", strlen("200"))) 
+                        && (0 == strncmp(content_type_header_ptr->field_value.data, "application/json", strlen("application/json")))
+                        && (1 < client_response.message_body.len))
+                    {
+                      /* Parse LwHTTP Response message body as JSON */        
+                      jsmn_parser_example(client_response.message_body.data, client_response.message_body.len);  
+                    }                  
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        netconn_delete(conn);
+      }
+      
+      /* Free LwHTTP Request & Response */
+      lwhttp_request_free(&client_request);
+      lwhttp_response_free(&client_response);
+    }
+    
+    osDelay(10);
+  }    
+  /* USER CODE END Start_HTTP_Client_Task */
+}
+
+void Start_HTTP_Server_Task(void const * argument)
+{
+  /* USER CODE BEGIN Start_HTTP_Server_Task */
+  static lwhttp_request_t server_request;
+  static lwhttp_response_t server_response;
+  
+  static uint8_t server_response_buffer[64];
+  
+  UINT bytes_read = 0;
+  FRESULT fr;
+  FILINFO fno;
+
+  /* LwIP PV */
+  struct netconn *conn, *newconn;
+  struct netbuf *netbuf = NULL;
+  err_t err, accept_err;
+  
+  /* Temp Buffer PV */
+  char* temp_buf_data = NULL;
+  uint16_t temp_buf_data_len = 0;
+  
+  const char* hello_world = "Hello World!"; 
+  
+  uint8_t content_length[6];
+  
+  /* Wait for DHCP */
+  osDelay(250);
+  while (DHCP_state != DHCP_ADDRESS_ASSIGNED)
+  {
+    // cli_printf("[LWIP] %s --> Waiting for DHCP (state = %d)\r\n", __FUNCTION__, DHCP_state);
+    osDelay(500);
+  }
+  cli_printf("[FreeRTOS] Task %s --> INIT OK\r\n", __FUNCTION__);
+  
+  /* Create a new TCP connection handle */
+  conn = netconn_new(NETCONN_TCP);
+  if (conn!= NULL)
+  {
+    /* Bind to port 80 (HTTP) with default IP address */
+    err = netconn_bind(conn, NULL, 80);
+    
+    if (err == ERR_OK)
+    {
+      /* Put the connection into LISTEN state */
+      netconn_listen(conn);
+  
+      /* Infinite loop */
+      for(;;)
+      {
+        /* accept any icoming connection */
+        accept_err = netconn_accept(conn, &newconn);
+        if(accept_err == ERR_OK)
+        {
+          /* LwHTTP Inits */
+          lwhttp_request_init(&server_request);
+          lwhttp_response_init(&server_response);  
+
+#if 0
+          /* Get pointer to buffer where response data is stored */
+          for (err = ERR_OK; err == ERR_OK;)
+#endif
+          {
+            /* Note: if this is executed 2 times it blocks the execution */
+            err = netconn_recv(newconn, &netbuf);
+            if (err != ERR_OK)
+            {
+              cli_printf("[LWIP] %s --> netconn_recv (ERR = %d)\r\n", __FUNCTION__, err);
+            }
+            else
+            {
+              err = netconn_err(newconn);
+              if (err != ERR_OK) 
+              {
+                cli_printf("[LWIP] %s --> netconn_err (ERR = %d)\r\n", __FUNCTION__, err);
+              }
+              else
+              {
+                do
+                {                  
+                  /* Get pointer to data and length*/
+                  err = netbuf_data(netbuf, (void**)&temp_buf_data, &temp_buf_data_len);
+                  if (err != ERR_OK) 
+                  {
+                    cli_printf("[LWIP] %s --> netconn_err (ERR = %d)\r\n", __FUNCTION__, err);
+                  }
+                  else
+                  {
+                    /* LwHTTP write request to parser */
+                    lwhttp_request_put(&server_request, (char*)temp_buf_data, temp_buf_data_len);
+                  }                  
+                }
+                while (netbuf_next(netbuf) >= 0);
+                
+                /* Free data buffer */
+                netbuf_delete(netbuf);       
+              }
+            }
+          }
+
+          /* Parse HTTP Request */
+          lwhttp_request_parse(&server_request);
+          
+          /* If HTTP Status Code is OK (200) and Content-Type is JSON */
+          if ((0 == strncmp(server_request.start_line.request_line.method.data, "GET", strlen("GET"))) 
+              && (0 == strncmp(server_request.start_line.request_line.request_uri.data, "/", strlen("/")))
+              && (server_request.start_line.request_line.request_uri.len == strlen("/")))
+          {
+            /* Get content length */
+            sprintf((char *)content_length, "%d", strlen((char *)hello_world));  
+
+            /* Build HTTP Response */
+            lwhttp_response_put_status_line(&server_response, "200", "OK");
+            lwhttp_response_put_message_header(&server_response, "Content-Type", "text/html");
+            lwhttp_response_put_message_header(&server_response, "Content-Length", (char*)content_length);
+            lwhttp_response_put_message_body(&server_response, hello_world, strlen(hello_world));     
+            
+            /* Send Response */
+            lwhttp_response_get(&server_response, &temp_buf_data, &temp_buf_data_len);
+            netconn_write(newconn, temp_buf_data, temp_buf_data_len, NETCONN_COPY);   
+          }
+          else if ((0 == strncmp(server_request.start_line.request_line.method.data, "GET", strlen("GET"))) 
+              && (0 == strncmp(server_request.start_line.request_line.request_uri.data, "/index.html", strlen("/index.html")))
+              && (server_request.start_line.request_line.request_uri.len == strlen("/index.html")))
+          {
+            /* Get content length */
+            f_stat("index.htm", &fno);
+            sprintf((char *)content_length, "%d", fno.fsize);  
+
+            /* Build HTTP Response */
+            lwhttp_response_put_status_line(&server_response, "200", "OK");
+            lwhttp_response_put_message_header(&server_response, "Content-Type", "text/html");
+            lwhttp_response_put_message_header(&server_response, "Content-Length", (char*)content_length);
+            lwhttp_response_put_eol(&server_response);     
+            
+            /* Send Response Start-Line + Message-Headers + <CR><LF> */
+            lwhttp_response_get(&server_response, &temp_buf_data, &temp_buf_data_len);
+            netconn_write(newconn, temp_buf_data, temp_buf_data_len, NETCONN_COPY);
+            
+            /* Send Response Body-Message */
+            bytes_read = sizeof(server_response_buffer);
+            for(UINT idx = 0; bytes_read >= sizeof(server_response_buffer);idx++)
+            {
+              fr = read_file_sector(&HTTP_File, (void*)server_response_buffer, sizeof(server_response_buffer), &bytes_read, idx);
+              if (FR_OK != fr)
+              {
+                cli_printf("[FatFs] read_file_sector: %d\r\n", fr);
+                bytes_read = 0;
+              }
+              else
+              {
+                netconn_write(newconn, &server_response_buffer[0], bytes_read, NETCONN_COPY);
+              }
+            }
+          }
+          else
+          {
+            /* Build HTTP Response */
+            lwhttp_response_put_status_line(&server_response, "404", "NOT FOUND");
+            lwhttp_response_put_message_header(&server_response, "Content-Type", "text/html");
+            lwhttp_response_put_message_header(&server_response, "Content-Length", "0");
+            lwhttp_response_put_message_body(&server_response, NULL, 0);             
+            
+            /* Send Response */
+            lwhttp_response_get(&server_response, &temp_buf_data, &temp_buf_data_len);
+            netconn_write(newconn, temp_buf_data, temp_buf_data_len, NETCONN_COPY);   
+          }
+          
+          /* Close & Delete connection */
+          netconn_close(newconn);
+          netconn_delete(newconn);
+        
+          /* Print HTTP Request */
+          lwhttp_request_get_request_line(&server_request, &temp_buf_data, &temp_buf_data_len);
+          cli_printf("[LwHTTP] Request-Line: %.*s\r\n", temp_buf_data_len, temp_buf_data);
+          
+          /* Print HTTP Response */
+          lwhttp_response_parse(&server_response);
+          lwhttp_response_get_status_line(&server_response, &temp_buf_data, &temp_buf_data_len);
+          cli_printf("[LwHTTP] Status-Line: %.*s\r\n\r\n", temp_buf_data_len, temp_buf_data);
+            
+          /* Free LwHTTP Request & Response */
+          lwhttp_request_free(&server_request);
+          lwhttp_response_free(&server_response);
+        }
+        
+        osDelay(10);
+      }
+    }
+  }
+
+  /* USER CODE END Start_HTTP_Server_Task */
+}
+
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -1269,8 +1704,10 @@ static int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void const * argument)
 {
-
-/* Graphic application */  
+  
+  cli_printf("[FreeRTOS] Task %s --> INIT OK\r\n", __FUNCTION__);
+  
+  /* Graphic application */  
   GRAPHICS_MainTask();
         
   /* USER CODE BEGIN 5 */
@@ -1292,6 +1729,9 @@ void StartDefaultTask(void const * argument)
 void StartButtonTask(void const * argument)
 {
   /* USER CODE BEGIN StartButtonTask */
+  
+  cli_printf("[FreeRTOS] Task %s --> INIT OK\r\n", __FUNCTION__);
+
   uint32_t buttonState = 0;
   
   BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
@@ -1323,6 +1763,8 @@ void StartButtonTask(void const * argument)
 void StartLEDTask(void const * argument)
 {
   /* USER CODE BEGIN StartLEDTask */
+  
+  cli_printf("[FreeRTOS] Task %s --> INIT OK\r\n", __FUNCTION__);
   
   uint8_t led_state = 0;
 
@@ -1360,6 +1802,9 @@ void StartLEDTask(void const * argument)
 /* USER CODE END Header_StartSDTask */
 void StartSDTask(void const * argument)
 {
+  
+  cli_printf("[FreeRTOS] Task %s --> INIT OK\r\n", __FUNCTION__);
+
   /* USER CODE BEGIN StartSDTask */
   
 #if 1
@@ -1374,31 +1819,27 @@ void StartSDTask(void const * argument)
   MX_FATFS_Init();  
 
   /* Start filename */
-  strcpy((char*)file_name_buff, "filenn.TXT");
+  strcpy((char*)file_name_buff, "filen.TXT");
     
-  cli_printf("FATFS %s\r\n", "Start");
+  cli_printf("\r\n[FatFs] START\r\n");
   /*##-1- Link the micro SD disk I/O driver ##################################*/
   // if(FATFS_LinkDriver(&SD_Driver, SDPath) == 0)
   {  
     /*##-2- Register the file system object to the FatFs module ##############*/
     fr = f_mount(&SDFatFs, (TCHAR const*)SDPath, 0);
-    cli_printf("f_mount: %d\r\n", fr);
     if(fr != FR_OK)
     {
-      /* FatFs Initialization Error */
-      Error_Handler();
+      cli_printf("[FatFs] f_mount: %d\r\n", fr);
     }
     else
     {
-#ifdef USE_FATFS_MKFS      
+#if 0      
       /*##-3- Create a FAT file system (format) on the logical drive #########*/
       /* WARNING: Formatting the uSD card will delete all content on the device */
       fr = f_mkfs((TCHAR const*)SDPath, FM_ANY, 0, workBuffer, sizeof(workBuffer));
-      cli_printf("f_mkfs: %d\r\n", fr);
       if(fr != FR_OK)
       {
-        /* FatFs Format Error */
-        Error_Handler();
+        cli_printf("[FatFs] f_mkfs: %d\r\n", fr);
       }
       else
 #endif
@@ -1411,100 +1852,138 @@ void StartSDTask(void const * argument)
         file_name_buff[5] = '0' + (uint8_t)(rng_value % 10);
         */
         
-        cli_printf("file_name_buff: %s\r\n", file_name_buff);
+        cli_printf("[FatFs] File name: %s\r\n", file_name_buff);
 
         /*##-4- Create and Open a new text file object with write access #####*/
         fr = f_open(&MyFile, (char*)file_name_buff, FA_OPEN_ALWAYS | FA_WRITE);
-        cli_printf("f_open: %d\r\n", fr);
         if(fr != FR_OK)
         {
-          /* 'STM32.TXT' file Open for write Error */
-          Error_Handler();
+          cli_printf("[FatFs] f_open: %d\r\n", fr);
         }
         else
         {
 #if 1
           /*##-5- Prepare to append data to the text file ################################*/
           fr = f_lseek(&MyFile, f_size(&MyFile));
-          cli_printf("f_lseek: %d\r\n", fr);
-
           if((byteswritten == 0) || (fr != FR_OK))
           {
             /* 'STM32.TXT' file Write or EOF Error */
-            Error_Handler();
+            cli_printf("[FatFs] f_lseek: %d\r\n", fr);
+            cli_printf("[FatFs] byteswritten: %d\r\n", byteswritten);
           }
           else
 #endif
           {
             /*##-5- Write data to the text file ################################*/
             fr = f_write(&MyFile, wtext, sizeof(wtext), (UINT *)&byteswritten);
-            cli_printf("f_write: %d (%d bytes)\r\n", fr, byteswritten);
             if((byteswritten == 0) || (fr != FR_OK))
             {
-              /* 'STM32.TXT' file Write or EOF Error */
-              Error_Handler();
+              cli_printf("[FatFs] f_write: %d\r\n", fr);
+              cli_printf("[FatFs] byteswritten: %d\r\n", byteswritten);
             }
+#if 0
             else
             {
               /*##-6- Close the open text file #################################*/
               fr = f_close(&MyFile);
-              cli_printf("f_close: %d\r\n", fr);
+              if(fr != FR_OK)
+              {
+                cli_printf("[FatFs] f_close: %d\r\n", fr);
+              }
               
               /*##-7- Open the text file object with read access ###############*/
               fr = f_open(&MyFile, (char*)file_name_buff, FA_READ);
-              cli_printf("f_open: %d\r\n", fr);
               if(fr != FR_OK)
               {
-                /* 'STM32.TXT' file Open for read Error */
-                Error_Handler();
+                cli_printf("[FatFs] f_open: %d\r\n", fr);
               }
               else
               {
                 /*##-8- Read data from the text file ###########################*/
                 fr = f_read(&MyFile, rtext, sizeof(rtext), (UINT*)&bytesread);
-                cli_printf("f_read: %d\r\n", fr);
                 if((bytesread == 0) || (fr != FR_OK))
                 {
-                  /* 'STM32.TXT' file Read or EOF Error */
-                  Error_Handler();
+                  cli_printf("[FatFs] f_read: %d\r\n", fr);
                 }
                 else
                 { 
                   /*##-10- Compare read data with the expected data ############*/
                   if ((bytesread != byteswritten))
                   {                
-                    /* Read data is different from the expected data */
-                    Error_Handler();
+                    cli_printf("[FatFs] bytesread: %d\r\n", bytesread);
+                    cli_printf("[FatFs] byteswritten: %d\r\n", byteswritten);
                   }
                   else
                   {
-                      cli_printf("FATFS %s\r\n", "Success");
+                    cli_printf("[FatFs] SUCCESS!\r\n");
                   }
                 }
               }
             }
+#endif
           }
           
           /*##-6- Close the open text file #################################*/
           fr = f_close(&MyFile);
-          cli_printf("f_close: %d\r\n", fr);
+          if(fr != FR_OK)
+          {
+            cli_printf("[FatFs] f_close: %d\r\n", fr);
+          }
         }
+        
+#if 0
+        /*##-4- Create and Open a new text file object with write access #####*/
+        cli_printf("[FatFs] File name: %s\r\n", "index.html");
+        fr = f_open(&MyFile, "index.htm", FA_CREATE_ALWAYS | FA_WRITE);
+        if(fr != FR_OK)
+        {
+          cli_printf("[FatFs] f_open: %d\r\n", fr);
+        }
+        else
+        {
+          /*##-5- Write data to the text file ################################*/
+          fr = f_write(&MyFile, index_html, sizeof(index_html), (UINT *)&byteswritten);
+          if((byteswritten == 0) || (fr != FR_OK))
+          {
+            cli_printf("[FatFs] f_write: %d\r\n", fr);
+            cli_printf("[FatFs] byteswritten: %d\r\n", byteswritten);
+          }
+          else
+          {
+            cli_printf("[FatFs] Bytes written: %d\r\n", byteswritten);
+          }
+          
+          /*##-6- Close the open text file #################################*/
+          fr = f_close(&MyFile);
+          if(fr != FR_OK)
+          {
+            cli_printf("[FatFs] f_close: %d\r\n", fr);
+          }
+        }
+#endif
       }
       
       /*##-11 - Scan files in the device ###############################*/
       strcpy((char*)rtext, "/");
       rtext[2] = 0x00;
+      cli_printf("[FatFs] Files scan:\r\n");
       fr = scan_files((char*)rtext);
-      cli_printf("scan_files: %d\r\n", fr);
+      if(fr != FR_OK)
+      {
+        cli_printf("[FatFs] scan_files: %d\r\n", fr);
+      }
     }
   }
   
   /*##-12 - Scan files in the device ###############################*/
   fr = get_free_clusters(&SDFatFs);
+  if(fr != FR_OK)
+  {
+    cli_printf("[FatFs] get_free_clusters: %d\r\n", fr);
+  }
 
   /*##-13- Unlink the micro SD disk I/O driver ###############################*/
-  cli_printf("FATFS %s\r\n", "End");
-  FATFS_UnLinkDriver(SDPath);
+  cli_printf("[FatFs] FINISHED\r\n\r\n");
   
 #endif
   /* Infinite loop */
@@ -1512,6 +1991,9 @@ void StartSDTask(void const * argument)
   {
     osDelay(1);
   }
+
+  FATFS_UnLinkDriver(SDPath);
+
   /* USER CODE END StartSDTask */
 }
 
@@ -1526,34 +2008,13 @@ portCHAR PAGE_BODY[256];
 /* USER CODE END Header_StartLWIPTask */
 void StartLWIPTask(void const * argument)
 {
-  /* USER CODE BEGIN StartLWIPTask */
+  
+  cli_printf("[FreeRTOS] Task %s --> INIT OK\r\n", __FUNCTION__);
 
-  /* Queue PV */
-  uint8_t queueData = 0;
+  /* USER CODE BEGIN StartLWIPTask */
 
   /* LwIP PV */
   struct netif* netif = (struct netif*)argument;
-  struct netconn *conn;
-  struct netbuf *netbuf = NULL;
-  ip4_addr_t local_ip; 
-  ip4_addr_t remote_ip; 
-  err_t netErr;
-  
-  /* Temp Buffer PV */
-  char* temp_buf_data = NULL;
-  uint16_t temp_buf_data_len = 0;
-  lwhttp_message_header_t* temp_header_ptr;
-  lwhttp_message_header_t* content_type_header_ptr;
-  
-  /* JSON PV */
-  const char* json_data_fmt = "{\"api_key\": \"%s\", \"delta_t\": %d, \"field1\": %d}";
-  uint8_t json_data[128];
-  uint8_t json_data_len[4];
-  
-  /* Thingspeak server PV */
-  const char* key = "WTN6FH385TCUNDMU";
-  const char* server = "thingspeak.com";
-  const char* url = "/update.json?headers=false";
   
   /* init code for LWIP */
   MX_LWIP_Init();
@@ -1572,184 +2033,6 @@ void StartLWIPTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    if(xQueueReceive(tcpQueueHandle, &queueData, 0) == pdTRUE)
-    {
-      cli_printf("[Queue] Model -> %s (queueData = %u)\r\n", __func__, queueData);
-      
-      /* Parse HTTP Body in JSON format */
-      sprintf((char *)json_data, json_data_fmt, key, 5, queueData);  
-      sprintf((char *)json_data_len, "%d", strlen((char *)json_data));  
-      
-      /* LwHTTP Request Builder */
-      lwhttp_request_init(&httpRequest);
-      lwhttp_request_put_request_line(&httpRequest, LwHHTP_POST, url);
-      // lwhttp_request_put_message_header(&httpRequest, "Host", "www.sensait.com"); /* Required for HTTP/1.1 */
-      lwhttp_request_put_message_header(&httpRequest, "Content-Type", "application/json");
-      lwhttp_request_put_message_header(&httpRequest, "Content-Length", (char *)json_data_len);
-      lwhttp_request_put_message_body(&httpRequest, (char*)json_data, strlen((char *)json_data));      
-      
-      /* LwHTTP Response Builder */
-      lwhttp_response_init(&httpResponse);  
-
-      /* Init error as fatal */
-      netErr = ERR_ABRT;
-      
-      /* Send HTTP Request */
-      if (DHCP_state == DHCP_ADDRESS_ASSIGNED)
-      {
-        /* Create a new TCP connection handle */
-        conn = netconn_new(NETCONN_TCP);        
-        if (conn == NULL)
-        {
-          netErr = ERR_CONN;
-          cli_printf("[LWIP] netconn_new : FAILED\r\n");
-        }
-        else
-        {
-#if 0 
-          /* Bind a netconn to a specific local IP address and port (optional) */
-          netErr = netconn_bind(conn, &netif->ip_addr, 0 );
-          if (netErr != ERR_OK)
-          {
-            cli_printf("[LWIP] netconn_bind: ERR (%d)\r\n", netErr);
-          }
-          else
-#endif
-          {
-            netErr = netconn_gethostbyname(server, &remote_ip);
-            if (netErr != ERR_OK)
-            {
-              cli_printf("[LWIP] netconn_gethostbyname: ERR (%d)\r\n", netErr);
-            }
-            else
-            {
-              cli_printf("Remote IP address to server: %s [%s]\r\n", server, ip4addr_ntoa((const ip4_addr_t *)&remote_ip));
-              
-              /* Connect to server */
-              netErr = netconn_connect(conn, &remote_ip, 80); 
-              if (netErr != ERR_OK)
-              {
-                cli_printf("[LWIP] netconn_connect: ERR (%d)\r\n", netErr);
-              }
-              else
-              {
-                cli_printf("Connected to server: %s\r\n", server);
-                
-        /* Print LwHTTP Request */
-        lwhttp_request_get(&httpRequest, &temp_buf_data, &temp_buf_data_len);
-        cli_printf("[LwHTTP] Request: (%d bytes):\r\n[START]\r\n", temp_buf_data_len);
-        cli_write(temp_buf_data, temp_buf_data_len);
-        cli_printf("\r\n[END]\r\n\r\n");
-
-                /* Write data to server */
-                netErr = netconn_write(conn, temp_buf_data, temp_buf_data_len, NETCONN_NOFLAG);
-                if (netErr != ERR_OK)
-                {
-                  cli_printf("[LWIP] netconn_write: ERR (%d)\r\n", netErr);
-                }                
-              }
-            }
-          }
-        }
-        
-        /* Request Sent, get response */
-        if (netErr == ERR_OK)
-        {                     
-          /* Get pointer to buffer where response data is stored */
-          while (( netErr = netconn_recv(conn, &netbuf)) == ERR_OK)
-          {
-              do
-              {
-                /* Get pointer to data and length*/
-                netbuf_data(netbuf, (void**)&temp_buf_data, &temp_buf_data_len);
-                
-                /* LwHTTP write response to parser */
-                lwhttp_response_put(&httpResponse, (char*)temp_buf_data, temp_buf_data_len);
-              }
-              while (netbuf_next(netbuf) >= 0);
-              
-              /* Free data buffer */
-              netbuf_delete(netbuf);
-          }
-          
-          if ((netErr != ERR_OK) && (netErr != ERR_CLSD))
-          {
-            cli_printf("[LWIP] netconn_recv: ERR (%d)\r\n", netErr);
-          }
-        }
-        
-        /* Run LwHTTP Response Parser */
-        lwhttp_request_parse(&httpRequest);
-        lwhttp_response_parse(&httpResponse);
-        
-        /* Print LwHTTP Request */
-        lwhttp_request_get(&httpRequest, &temp_buf_data, &temp_buf_data_len);
-        cli_printf("[LwHTTP] Request: (%d bytes):\r\n[START]\r\n", temp_buf_data_len);
-        cli_write(temp_buf_data, temp_buf_data_len);
-        cli_printf("\r\n[END]\r\n\r\n");
-
-        /* Print LwHTTP Response */
-        lwhttp_response_get(&httpResponse, &temp_buf_data, &temp_buf_data_len);
-        cli_printf("[LwHTTP] Response: (%d bytes):\r\n[START]\r\n", temp_buf_data_len);
-        cli_write(temp_buf_data, temp_buf_data_len);
-        cli_printf("\r\n[END]\r\n\r\n");
-        
-        /* Print LwHTTP Response Status Line */
-        lwhttp_response_get_status_line(&httpResponse, &temp_buf_data, &temp_buf_data_len);
-        cli_printf("[LwHTTP] Response Start-Line: >>>%.*s<<<\r\n", temp_buf_data_len, temp_buf_data);
-        
-        /* Print LwHTTP Response Status Line */
-        lwhttp_request_get_request_line(&httpRequest, &temp_buf_data, &temp_buf_data_len);
-        cli_printf("[LwHTTP] Request Start-Line: >>>%.*s<<<\r\n", temp_buf_data_len, temp_buf_data);
-        
-        /* Print LwHTTP Message Headers count */
-        cli_printf("[LwHTTP] Response Message-Headers count: %d\r\n", httpResponse.message_headers.count);
-        
-        /* Print LwHTTP Date Header */
-        lwhttp_response_get_message_header(&httpResponse, "Date", &temp_header_ptr);
-        cli_printf("[LwHTTP] Response Message-Header \"%s\": >>>%.*s<<<\r\n", "Date", temp_header_ptr->field_value.len, temp_header_ptr->field_value.data);
-        
-        /* Print LwHTTP Content-Type Header */
-        lwhttp_response_get_message_header(&httpResponse, "Content-Type", &content_type_header_ptr);
-        cli_printf("[LwHTTP] Response Message-Header \"%s\": >>>%.*s<<<\r\n", "Content-Type", content_type_header_ptr->field_value.len, content_type_header_ptr->field_value.data);
-        
-        /* Print LwHTTP Request Message Body */
-        lwhttp_request_get_message_body(&httpRequest, &temp_buf_data, &temp_buf_data_len);
-        cli_printf("[LwHTTP] Request message body: (%d bytes):\r\n[START]\r\n", temp_buf_data_len);
-        cli_write(temp_buf_data, temp_buf_data_len);
-        cli_printf("\r\n[END]\r\n\r\n");
-        
-        /* Print LwHTTP Response Message Body */
-        lwhttp_response_get_message_body(&httpResponse, &temp_buf_data, &temp_buf_data_len);
-        cli_printf("[LwHTTP] Response message body: (%d bytes):\r\n[START]\r\n", temp_buf_data_len);
-        cli_write(temp_buf_data, temp_buf_data_len);
-        cli_printf("\r\n[END]\r\n\r\n");
-        
-        /* Print LwHTTP Response Status Code */
-        lwhttp_response_get_status_code(&httpResponse, &temp_buf_data, &temp_buf_data_len);
-        cli_printf("[LwHTTP] Response status code: >>>%.*s<<<\r\n", temp_buf_data_len, temp_buf_data);
-        
-        /* If HTTP Status Code is OK (200) and Content-Type is JSON */
-        if ((0 == strncmp(httpResponse.start_line.status_line.status_code.data, "200", strlen("200"))) 
-            && (0 == strncmp(content_type_header_ptr->field_value.data, "application/json", strlen("application/json"))))
-        {
-          /* Parse LwHTTP Response message body as JSON */        
-          jsmn_parser_example(httpResponse.message_body.data, httpResponse.message_body.len);  
-        }
-        
-        /* Free LwHTTP Request & Response */
-        lwhttp_request_free(&httpRequest);
-        lwhttp_response_free(&httpResponse);
-        
-        /* Delete TCP connection */
-        netErr = netconn_delete(conn);  
-        if (netErr != ERR_OK)
-        {
-          cli_printf("[LWIP] netconn_close: ERR (%d)\r\n", netErr);
-        }
-      }
-    }
-    
     osDelay(10);
   }
   /* USER CODE END StartLWIPTask */
@@ -1764,6 +2047,9 @@ void StartLWIPTask(void const * argument)
 /* USER CODE END Header_StartDHCPTask */
 void StartDHCPTask(void const * argument)
 {
+  
+  cli_printf("[FreeRTOS] Task %s --> INIT OK\r\n", __FUNCTION__);
+
   /* USER CODE BEGIN StartDHCPTask */
 
   struct netif* netif = (struct netif*)argument;
