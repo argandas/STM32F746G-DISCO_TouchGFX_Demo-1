@@ -1353,13 +1353,9 @@ void Start_HTTP_Client_Task(void const * argument)
   
   static lwhttp_request_t client_request;
   static lwhttp_response_t client_response;
-  
-  /* Wait for DHCP */
-  while (DHCP_state != DHCP_ADDRESS_ASSIGNED)
-  {
-    // cli_printf("[LWIP] %s --> Waiting for DHCP (state = %d)\r\n", __FUNCTION__, DHCP_state);
-    osDelay(500);
-  }
+
+  osDelay(10);  
+
   cli_printf("[FreeRTOS] Task %s --> INIT OK\r\n", __FUNCTION__);
 
   /* Infinite loop */
@@ -1367,135 +1363,144 @@ void Start_HTTP_Client_Task(void const * argument)
   {
     if(xQueueReceive(tcpQueueHandle, &queueData, 0) == pdTRUE)
     {
-      cli_printf("\r\n[LwIP] Client Send -> %u\r\n", queueData);     
+      if (DHCP_state == DHCP_ADDRESS_ASSIGNED)
+      {
+        cli_printf("[LwIP] %s --> Send TCP (data = %u)\r\n", __FUNCTION__, queueData);
 
-      /* Parse HTTP Body in JSON format */
-      sprintf((char *)json_data, json_data_fmt, key, 5, queueData);  
-      sprintf((char *)json_data_len, "%d", strlen((char *)json_data));  
-            
-      /* LwHTTP Inits */
-      lwhttp_request_init(&client_request);
-      lwhttp_response_init(&client_response);  
-            
-      /* Build HTTP Request */
-      lwhttp_request_put_request_line(&client_request, LwHHTP_POST, url);
-      lwhttp_request_put_message_header(&client_request, "Content-Type", "application/json");
-      lwhttp_request_put_message_header(&client_request, "Content-Length", (char *)json_data_len);
-      lwhttp_request_put_message_body(&client_request, (char*)json_data, strlen((char *)json_data));  
-            
-      /* Run LwHTTP Response Parser */
-      lwhttp_request_parse(&client_request);
-            
-      /* LwIP Connect TCP */
-      conn = netconn_new(NETCONN_TCP);        
-      if (conn == NULL)
-      {
-        err = ERR_CONN;
-        cli_printf("[LWIP] %s --> netconn_new (ERR = %d)\r\n", __FUNCTION__, err);
-      }
-      else
-      {
-#if 0
-        /* Bind a netconn to a specific local IP address and port (optional) */
-        err = netconn_bind(conn, &netif->ip_addr, 60);
-        if (err != ERR_OK)
+        /* Parse HTTP Body in JSON format */
+        sprintf((char *)json_data, json_data_fmt, key, 5, queueData);  
+        sprintf((char *)json_data_len, "%d", strlen((char *)json_data));  
+              
+        /* LwHTTP Inits */
+        lwhttp_request_init(&client_request);
+        lwhttp_response_init(&client_response);  
+              
+        /* Build HTTP Request */
+        lwhttp_request_put_request_line(&client_request, LwHHTP_POST, url);
+        lwhttp_request_put_message_header(&client_request, "Content-Type", "application/json");
+        lwhttp_request_put_message_header(&client_request, "Content-Length", (char *)json_data_len);
+        lwhttp_request_put_message_body(&client_request, (char*)json_data, strlen((char *)json_data));  
+              
+        /* Run LwHTTP Response Parser */
+        lwhttp_request_parse(&client_request);
+              
+        /* LwIP Connect TCP */
+        conn = netconn_new(NETCONN_TCP);        
+        if (conn == NULL)
         {
-          cli_printf("[LWIP] %s --> netconn_bind (ERR = %d)\r\n", __FUNCTION__, err);
+          err = ERR_CONN;
+          cli_printf("[LwIP] %s --> netconn_new (ERR = %d)\r\n", __FUNCTION__, err);
         }
         else
-#endif
         {
-          err  = netconn_gethostbyname(server, &remote_ip);
+#if 0
+          /* Bind a netconn to a specific local IP address and port (optional) */
+          err = netconn_bind(conn, &netif->ip_addr, 60);
           if (err != ERR_OK)
           {
-            cli_printf("[LWIP] %s --> netconn_gethostbyname (ERR = %d)\r\n", __FUNCTION__, err);
+            cli_printf("[LwIP] %s --> netconn_bind (ERR = %d)\r\n", __FUNCTION__, err);
           }
           else
+#endif
           {
-            cli_printf("[LwIP] Server: %s (%s)\r\n", server, ip4addr_ntoa((const ip4_addr_t *)&remote_ip));
-            
-            /* Connect to server */
-            err = netconn_connect(conn, &remote_ip, 80); 
+            err  = netconn_gethostbyname(server, &remote_ip);
             if (err != ERR_OK)
             {
-              cli_printf("[LWIP] %s --> netconn_connect (ERR = %d)\r\n", __FUNCTION__, err);
+              cli_printf("[LwIP] %s --> netconn_gethostbyname (ERR = %d)\r\n", __FUNCTION__, err);
             }
             else
             {
-              cli_printf("[LwIP] Connection: OK\r\n");
-
-              /* Get LwHTTP Request Data */
-              lwhttp_request_get(&client_request, &temp_buf_data, &temp_buf_data_len);
+              cli_printf("[LwIP] Server: %s (%s)\r\n", server, ip4addr_ntoa((const ip4_addr_t *)&remote_ip));
               
-              /* Write data to server */
-              err = netconn_write(conn, temp_buf_data, temp_buf_data_len, NETCONN_NOFLAG);
+              /* Connect to server */
+              err = netconn_connect(conn, &remote_ip, 80); 
               if (err != ERR_OK)
               {
-                cli_printf("[LWIP] %s --> netconn_write (ERR = %d)\r\n", __FUNCTION__, err);
+                cli_printf("[LwIP] %s --> netconn_connect (ERR = %d)\r\n", __FUNCTION__, err);
               }
               else
               {
-                /* Get pointer to buffer where response data is stored */
-                while (( err = netconn_recv(conn, &netbuf)) == ERR_OK)
-                {
-                    do
-                    {
-                      /* Get pointer to data and length*/
-                      netbuf_data(netbuf, (void**)&temp_buf_data, &temp_buf_data_len);
-                      
-                      /* LwHTTP write response to parser */
-                      lwhttp_response_put(&client_response, (char*)temp_buf_data, temp_buf_data_len);
-                    }
-                    while (netbuf_next(netbuf) >= 0);
+                cli_printf("[LwIP] Connection: OK\r\n");
 
-                    /* Free data buffer */
-                    netbuf_delete(netbuf);
-                }
+                /* Get LwHTTP Request Data */
+                lwhttp_request_get(&client_request, &temp_buf_data, &temp_buf_data_len);
                 
-                if ((err != ERR_OK) && (err != ERR_CLSD))
+                /* Write data to server */
+                err = netconn_write(conn, temp_buf_data, temp_buf_data_len, NETCONN_NOFLAG);
+                if (err != ERR_OK)
                 {
-                    cli_printf("[LWIP] %s --> netconn_recv (ERR = %d)\r\n", __FUNCTION__, err);
+                  cli_printf("[LwIP] %s --> netconn_write (ERR = %d)\r\n", __FUNCTION__, err);
                 }
                 else
                 {
-                  /* Print HTTP Request */
-                  lwhttp_request_get_request_line(&client_request, &temp_buf_data, &temp_buf_data_len);
-                  cli_printf("[LwHTTP] Request-Line: %.*s\r\n", temp_buf_data_len, temp_buf_data);
-
-                  /* Parse & Print LwHTTP Response */
-                  lwhttp_response_parse(&client_response);
-                  lwhttp_response_get_status_line(&client_response, &temp_buf_data, &temp_buf_data_len);
-                  cli_printf("[LwHTTP] Status-Line: %.*s\r\n\r\n", temp_buf_data_len, temp_buf_data);
-
-                  /* Content-Type */
-                  lwhttp_response_get_message_header(&client_response, "Content-Type", &content_type_header_ptr);
-                  
-                  if ((client_response.start_line.status_line.status_code.data != NULL) && (content_type_header_ptr != NULL))
+                  /* Get pointer to buffer where response data is stored */
+                  while (( err = netconn_recv(conn, &netbuf)) == ERR_OK)
                   {
-                    /* If HTTP Status Code is OK (200) and Content-Type is JSON */
-                    if ((0 == strncmp(client_response.start_line.status_line.status_code.data, "200", strlen("200"))) 
-                        && (0 == strncmp(content_type_header_ptr->field_value.data, "application/json", strlen("application/json")))
-                        && (1 < client_response.message_body.len))
+                      do
+                      {
+                        /* Get pointer to data and length*/
+                        netbuf_data(netbuf, (void**)&temp_buf_data, &temp_buf_data_len);
+                        
+                        /* LwHTTP write response to parser */
+                        lwhttp_response_put(&client_response, (char*)temp_buf_data, temp_buf_data_len);
+                      }
+                      while (netbuf_next(netbuf) >= 0);
+
+                      /* Free data buffer */
+                      netbuf_delete(netbuf);
+                  }
+                  
+                  if ((err != ERR_OK) && (err != ERR_CLSD))
+                  {
+                      cli_printf("[LwIP] %s --> netconn_recv (ERR = %d)\r\n", __FUNCTION__, err);
+                  }
+                  else
+                  {
+                    /* Print HTTP Request */
+                    lwhttp_request_get_request_line(&client_request, &temp_buf_data, &temp_buf_data_len);
+                    cli_printf("[LwHTTP] Request-Line: %.*s\r\n", temp_buf_data_len, temp_buf_data);
+
+                    /* Parse & Print LwHTTP Response */
+                    lwhttp_response_parse(&client_response);
+                    lwhttp_response_get_status_line(&client_response, &temp_buf_data, &temp_buf_data_len);
+                    cli_printf("[LwHTTP] Status-Line: %.*s\r\n\r\n", temp_buf_data_len, temp_buf_data);
+
+                    /* Content-Type */
+                    lwhttp_response_get_message_header(&client_response, "Content-Type", &content_type_header_ptr);
+                    
+                    if ((client_response.start_line.status_line.status_code.data != NULL) && (content_type_header_ptr != NULL))
                     {
-                      /* Parse LwHTTP Response message body as JSON */        
-                      jsmn_parser_example(client_response.message_body.data, client_response.message_body.len);  
-                    }                  
+                      /* If HTTP Status Code is OK (200) and Content-Type is JSON */
+                      if ((0 == strncmp(client_response.start_line.status_line.status_code.data, "200", strlen("200"))) 
+                          && (0 == strncmp(content_type_header_ptr->field_value.data, "application/json", strlen("application/json")))
+                          && (1 < client_response.message_body.len))
+                      {
+                        /* Parse LwHTTP Response message body as JSON */        
+                        jsmn_parser_example(client_response.message_body.data, client_response.message_body.len);  
+                      }                  
+                    }
                   }
                 }
               }
             }
           }
+          
+          netconn_delete(conn);
         }
         
-        netconn_delete(conn);
+        /* Free LwHTTP Request & Response */
+        lwhttp_request_free(&client_request);
+        lwhttp_response_free(&client_response);        
       }
-      
-      /* Free LwHTTP Request & Response */
-      lwhttp_request_free(&client_request);
-      lwhttp_response_free(&client_response);
+      else
+      {
+        cli_printf("[LwIP] %s --> Unable to send TCP (state = %d, data = %u)\r\n", __FUNCTION__, DHCP_state, queueData);
+      }
     }
-    
-    osDelay(10);
+    else
+    {
+      osDelay(10);  
+    }
   }    
   /* USER CODE END Start_HTTP_Client_Task */
 }
@@ -1529,7 +1534,7 @@ void Start_HTTP_Server_Task(void const * argument)
   osDelay(250);
   while (DHCP_state != DHCP_ADDRESS_ASSIGNED)
   {
-    // cli_printf("[LWIP] %s --> Waiting for DHCP (state = %d)\r\n", __FUNCTION__, DHCP_state);
+    // cli_printf("[LwIP] %s --> Waiting for DHCP (state = %d)\r\n", __FUNCTION__, DHCP_state);
     osDelay(500);
   }
   cli_printf("[FreeRTOS] Task %s --> INIT OK\r\n", __FUNCTION__);
@@ -1566,14 +1571,14 @@ void Start_HTTP_Server_Task(void const * argument)
             err = netconn_recv(newconn, &netbuf);
             if (err != ERR_OK)
             {
-              cli_printf("[LWIP] %s --> netconn_recv (ERR = %d)\r\n", __FUNCTION__, err);
+              cli_printf("[LwIP] %s --> netconn_recv (ERR = %d)\r\n", __FUNCTION__, err);
             }
             else
             {
               err = netconn_err(newconn);
               if (err != ERR_OK) 
               {
-                cli_printf("[LWIP] %s --> netconn_err (ERR = %d)\r\n", __FUNCTION__, err);
+                cli_printf("[LwIP] %s --> netconn_err (ERR = %d)\r\n", __FUNCTION__, err);
               }
               else
               {
@@ -1583,7 +1588,7 @@ void Start_HTTP_Server_Task(void const * argument)
                   err = netbuf_data(netbuf, (void**)&temp_buf_data, &temp_buf_data_len);
                   if (err != ERR_OK) 
                   {
-                    cli_printf("[LWIP] %s --> netconn_err (ERR = %d)\r\n", __FUNCTION__, err);
+                    cli_printf("[LwIP] %s --> netconn_err (ERR = %d)\r\n", __FUNCTION__, err);
                   }
                   else
                   {
@@ -1821,7 +1826,7 @@ void StartSDTask(void const * argument)
   /* Start filename */
   strcpy((char*)file_name_buff, "filen.TXT");
     
-  cli_printf("\r\n[FatFs] START\r\n");
+  cli_printf("\r\n[FatFs] Thread START\r\n");
   /*##-1- Link the micro SD disk I/O driver ##################################*/
   // if(FATFS_LinkDriver(&SD_Driver, SDPath) == 0)
   {  
@@ -2027,7 +2032,7 @@ void StartLWIPTask(void const * argument)
   else
   {  
     DHCP_state = DHCP_LINK_DOWN;
-    cli_printf("The network cable is not connected \r\n");
+    cli_printf("[LWIP] %s --> DHCP Link down (state = %d)\r\n", __FUNCTION__, DHCP_state);
   }
 
   /* Infinite loop */

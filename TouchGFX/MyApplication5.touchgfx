@@ -85,7 +85,9 @@
           {
             "Alpha": 255,
             "ButtonTrigger": {
-              "Type": "TouchButtonTrigger"
+              "Type": "RepeatButtonTrigger",
+              "Delay": 100,
+              "Interval": 100
             },
             "ButtonStyles": [
               {

@@ -64,7 +64,7 @@ protected:
     touchgfx::Box backgroundBox;
     touchgfx::Image backgroundImage;
     touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ToggleButtonTrigger > > toggleButton;
-    touchgfx::IconButtonStyle< touchgfx::BoxWithBorderButtonStyle< touchgfx::TouchButtonTrigger > > touchButton;
+    touchgfx::IconButtonStyle< touchgfx::BoxWithBorderButtonStyle< touchgfx::RepeatButtonTrigger > > touchButton;
     touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > zeroButton;
     touchgfx::IconButtonStyle< touchgfx::BoxWithBorderButtonStyle< touchgfx::RepeatButtonTrigger > > repeatButton;
     touchgfx::Image counterBackgroundImage;

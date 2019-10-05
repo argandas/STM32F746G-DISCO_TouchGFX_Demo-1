@@ -24,6 +24,8 @@ MainViewBase::MainViewBase() :
     toggleButton.setPosition(348, 34, 100, 56);
     toggleButton.setAction(flexButtonCallback);
 
+    touchButton.setDelay(6);
+    touchButton.setInterval(6);
     touchButton.setBoxWithBorderPosition(0, 0, 100, 45);
     touchButton.setBorderSize(5);
     touchButton.setBoxWithBorderColors(touchgfx::Color::getColorFrom24BitRGB(222, 222, 222), touchgfx::Color::getColorFrom24BitRGB(40, 58, 64), touchgfx::Color::getColorFrom24BitRGB(54, 62, 65), touchgfx::Color::getColorFrom24BitRGB(95, 103, 109));
