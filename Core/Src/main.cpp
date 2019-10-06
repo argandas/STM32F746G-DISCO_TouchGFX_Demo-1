@@ -1356,7 +1356,7 @@ void Start_HTTP_Client_Task(void const * argument)
 
   osDelay(10);  
 
-  cli_printf("[FreeRTOS] Task %s --> INIT OK\r\n", __FUNCTION__);
+  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
 
   /* Infinite loop */
   for(;;)
@@ -1537,7 +1537,7 @@ void Start_HTTP_Server_Task(void const * argument)
     // cli_printf("[LwIP] %s --> Waiting for DHCP (state = %d)\r\n", __FUNCTION__, DHCP_state);
     osDelay(500);
   }
-  cli_printf("[FreeRTOS] Task %s --> INIT OK\r\n", __FUNCTION__);
+  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
   
   /* Create a new TCP connection handle */
   conn = netconn_new(NETCONN_TCP);
@@ -1710,7 +1710,7 @@ void Start_HTTP_Server_Task(void const * argument)
 void StartDefaultTask(void const * argument)
 {
   
-  cli_printf("[FreeRTOS] Task %s --> INIT OK\r\n", __FUNCTION__);
+  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
   
   /* Graphic application */  
   GRAPHICS_MainTask();
@@ -1735,9 +1735,10 @@ void StartButtonTask(void const * argument)
 {
   /* USER CODE BEGIN StartButtonTask */
   
-  cli_printf("[FreeRTOS] Task %s --> INIT OK\r\n", __FUNCTION__);
+  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
 
   uint32_t buttonState = 0;
+  uint8_t buttonCount = 0;
   
   BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
   
@@ -1749,7 +1750,8 @@ void StartButtonTask(void const * argument)
     {
       if(xQueueSend(buttonQueueHandle, (uint8_t*)&buttonState, 0) == pdTRUE)
       {
-        cli_printf("[Queue] HW -> Model (%d)\r\n", buttonState);
+        buttonCount++;
+        cli_printf("[Queue] %s --> Button Pressed (%u)\r\n", __FUNCTION__, buttonCount);
       }
     }
     
@@ -1769,7 +1771,7 @@ void StartLEDTask(void const * argument)
 {
   /* USER CODE BEGIN StartLEDTask */
   
-  cli_printf("[FreeRTOS] Task %s --> INIT OK\r\n", __FUNCTION__);
+  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
   
   uint8_t led_state = 0;
 
@@ -1789,8 +1791,7 @@ void StartLEDTask(void const * argument)
       {
         BSP_LED_Off(LED_GREEN);
       }
-      
-      cli_printf("[Queue] Model -> HW (led = %d)\r\n", led_state);
+      cli_printf("[Queue] %s --> LED Toggle (%d)\r\n", __FUNCTION__, led_state);
     }
     
     osDelay(20);
@@ -1807,10 +1808,8 @@ void StartLEDTask(void const * argument)
 /* USER CODE END Header_StartSDTask */
 void StartSDTask(void const * argument)
 {
-  
-  cli_printf("[FreeRTOS] Task %s --> INIT OK\r\n", __FUNCTION__);
-
   /* USER CODE BEGIN StartSDTask */
+  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
   
 #if 1
   FRESULT fr;                                               /* FatFs function common result code */
@@ -1826,7 +1825,6 @@ void StartSDTask(void const * argument)
   /* Start filename */
   strcpy((char*)file_name_buff, "filen.TXT");
     
-  cli_printf("\r\n[FatFs] Thread START\r\n");
   /*##-1- Link the micro SD disk I/O driver ##################################*/
   // if(FATFS_LinkDriver(&SD_Driver, SDPath) == 0)
   {  
@@ -2013,10 +2011,9 @@ portCHAR PAGE_BODY[256];
 /* USER CODE END Header_StartLWIPTask */
 void StartLWIPTask(void const * argument)
 {
-  
-  cli_printf("[FreeRTOS] Task %s --> INIT OK\r\n", __FUNCTION__);
-
   /* USER CODE BEGIN StartLWIPTask */
+  
+  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
 
   /* LwIP PV */
   struct netif* netif = (struct netif*)argument;
@@ -2052,10 +2049,9 @@ void StartLWIPTask(void const * argument)
 /* USER CODE END Header_StartDHCPTask */
 void StartDHCPTask(void const * argument)
 {
-  
-  cli_printf("[FreeRTOS] Task %s --> INIT OK\r\n", __FUNCTION__);
-
   /* USER CODE BEGIN StartDHCPTask */
+  
+  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
 
   struct netif* netif = (struct netif*)argument;
   ip_addr_t ipaddr;
