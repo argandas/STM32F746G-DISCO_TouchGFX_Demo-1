@@ -53,6 +53,16 @@ public:
         // Override and implement this function in MainView
     }
 
+    virtual void logButtonPressed()
+    {
+        // Override and implement this function in MainView
+    }
+
+    virtual void dumpButtonPressed()
+    {
+        // Override and implement this function in MainView
+    }
+
 protected:
     FrontendApplication& application() {
         return *static_cast<FrontendApplication*>(Application::getInstance());
@@ -71,6 +81,8 @@ protected:
     touchgfx::TextAreaWithOneWildcard countTxt;
     touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > ledButton;
     touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > tcpButton;
+    touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > logButton;
+    touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > dumpButton;
 
     /*
      * Wildcard Buffers

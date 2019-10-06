@@ -19,6 +19,8 @@ public:
     virtual void ledButtonPressed();
     virtual void tcpButtonPressed();
     virtual void hw_ButtonPressed();
+    virtual void logButtonPressed();
+    virtual void dumpButtonPressed();
 
     bool led_state;
 

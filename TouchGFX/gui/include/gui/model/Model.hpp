@@ -39,6 +39,8 @@ public:
     /* to be called from presenter */
     void p2m_SetLEDState(bool led_state);
     void p2m_SendTCPData(int data);
+    void p2m_LogData(int data);
+    void p2m_DumpData(void);
         
 protected:
     /**

@@ -9,6 +9,8 @@
 extern osMessageQId buttonQueueHandle;
 extern osMessageQId ledQueueHandle;
 extern osMessageQId tcpQueueHandle;
+extern osMessageQId logQueueHandle;
+extern osMessageQId dumpQueueHandle;
 #endif
 
 Model::Model() : modelListener(0)
@@ -29,7 +31,7 @@ void Model::tick()
 void Model::p2m_SetLEDState(bool led_state)
 {
 #ifdef SIMULATOR
-  touchgfx_printf("Model::p2m_SetLEDState: %d\r\n", led_state);
+  touchgfx_printf("Model::%s: %d\r\n\r\n", __FUNCTION__, led_state);
 #else
   xQueueSend(ledQueueHandle, &led_state, 0);
 #endif
@@ -40,8 +42,29 @@ void Model::p2m_SendTCPData(int data)
   uint8_t u8Data = 0;
   u8Data = (uint8_t)data;
 #ifdef SIMULATOR
-  touchgfx_printf("Model::p2m_SendTCPData: %u\r\n", u8Data);
+  touchgfx_printf("Model::%s: %u\r\n\r\n", __FUNCTION__, u8Data);
 #else
   xQueueSend(tcpQueueHandle, &u8Data, 0);
+#endif
+}
+
+void Model::p2m_LogData(int data)
+{
+  uint8_t u8Data = 0;
+  u8Data = (uint8_t)data;
+#ifdef SIMULATOR
+  touchgfx_printf("Model::%s: %u\r\n\r\n", __FUNCTION__, u8Data);
+#else
+  xQueueSend(logQueueHandle, &u8Data, 0);
+#endif
+}
+
+void Model::p2m_DumpData(void)
+{
+  uint8_t u8Data = 0;
+#ifdef SIMULATOR
+  touchgfx_printf("Model::%s: %u\r\n\r\n", __FUNCTION__, u8Data);
+#else
+  xQueueSend(dumpQueueHandle, &u8Data, 0);
 #endif
 }

@@ -31,7 +31,7 @@ MainViewBase::MainViewBase() :
     touchButton.setBoxWithBorderColors(touchgfx::Color::getColorFrom24BitRGB(222, 222, 222), touchgfx::Color::getColorFrom24BitRGB(40, 58, 64), touchgfx::Color::getColorFrom24BitRGB(54, 62, 65), touchgfx::Color::getColorFrom24BitRGB(95, 103, 109));
     touchButton.setIconBitmaps(Bitmap(BITMAP_BLACK_ARROW_UP_ID), Bitmap(BITMAP_ORANGE_ARROW_UP_ID));
     touchButton.setIconXY(34, 14);
-    touchButton.setPosition(32, 35, 100, 45);
+    touchButton.setPosition(32, 45, 100, 45);
     touchButton.setAction(flexButtonCallback);
 
     zeroButton.setBitmaps(Bitmap(BITMAP_SMALL_BTN_ID), Bitmap(BITMAP_SMALL_BTN_PRESSED_ID));
@@ -39,7 +39,7 @@ MainViewBase::MainViewBase() :
     zeroButton.setText(TypedText(T_SINGLEUSEID3));
     zeroButton.setTextPosition(-2, 12, 100, 56);
     zeroButton.setTextColors(touchgfx::Color::getColorFrom24BitRGB(70, 70, 70), touchgfx::Color::getColorFrom24BitRGB(231, 154, 9));
-    zeroButton.setPosition(32, 84, 100, 56);
+    zeroButton.setPosition(32, 90, 100, 56);
     zeroButton.setAction(flexButtonCallback);
 
     repeatButton.setDelay(6);
@@ -49,13 +49,13 @@ MainViewBase::MainViewBase() :
     repeatButton.setBoxWithBorderColors(touchgfx::Color::getColorFrom24BitRGB(222, 222, 222), touchgfx::Color::getColorFrom24BitRGB(48, 58, 64), touchgfx::Color::getColorFrom24BitRGB(54, 62, 65), touchgfx::Color::getColorFrom24BitRGB(128, 136, 143));
     repeatButton.setIconBitmaps(Bitmap(BITMAP_BLACK_ARROW_ID), Bitmap(BITMAP_ORANGE_ARROW_ID));
     repeatButton.setIconXY(34, 14);
-    repeatButton.setPosition(32, 140, 100, 45);
+    repeatButton.setPosition(32, 146, 100, 45);
     repeatButton.setAction(flexButtonCallback);
 
-    counterBackgroundImage.setXY(164, 33);
+    counterBackgroundImage.setXY(164, 42);
     counterBackgroundImage.setBitmap(Bitmap(BITMAP_COUNTER_BOX_ID));
 
-    countTxt.setPosition(164, 65, 152, 90);
+    countTxt.setPosition(164, 74, 152, 90);
     countTxt.setColor(touchgfx::Color::getColorFrom24BitRGB(222, 222, 222));
     countTxt.setLinespacing(0);
     Unicode::snprintf(countTxtBuffer, COUNTTXT_SIZE, "%s", TypedText(T_SINGLEUSEID1).getText());
@@ -67,16 +67,32 @@ MainViewBase::MainViewBase() :
     ledButton.setText(TypedText(T_SINGLEUSEID9));
     ledButton.setTextPosition(0, 19, 100, 56);
     ledButton.setTextColors(touchgfx::Color::getColorFrom24BitRGB(70, 70, 70), touchgfx::Color::getColorFrom24BitRGB(231, 154, 9));
-    ledButton.setPosition(348, 130, 100, 56);
+    ledButton.setPosition(348, 90, 100, 56);
     ledButton.setAction(flexButtonCallback);
 
-    tcpButton.setBitmaps(Bitmap(BITMAP_BTN_LONG_ID), Bitmap(BITMAP_BTN_LONG_PRESSED_ID));
+    tcpButton.setBitmaps(Bitmap(BITMAP_SMALL_BTN_ID), Bitmap(BITMAP_SMALL_BTN_PRESSED_ID));
     tcpButton.setBitmapXY(0, 0);
     tcpButton.setText(TypedText(T_SINGLEUSEID10));
-    tcpButton.setTextPosition(0, 19, 200, 56);
+    tcpButton.setTextPosition(0, 19, 100, 56);
     tcpButton.setTextColors(touchgfx::Color::getColorFrom24BitRGB(70, 70, 70), touchgfx::Color::getColorFrom24BitRGB(231, 154, 9));
-    tcpButton.setPosition(140, 200, 200, 56);
+    tcpButton.setPosition(32, 200, 100, 56);
     tcpButton.setAction(flexButtonCallback);
+
+    logButton.setBitmaps(Bitmap(BITMAP_SMALL_BTN_ID), Bitmap(BITMAP_SMALL_BTN_PRESSED_ID));
+    logButton.setBitmapXY(0, 0);
+    logButton.setText(TypedText(T_SINGLEUSEID11));
+    logButton.setTextPosition(0, 19, 100, 56);
+    logButton.setTextColors(touchgfx::Color::getColorFrom24BitRGB(70, 70, 70), touchgfx::Color::getColorFrom24BitRGB(231, 154, 9));
+    logButton.setPosition(348, 146, 100, 56);
+    logButton.setAction(flexButtonCallback);
+
+    dumpButton.setBitmaps(Bitmap(BITMAP_SMALL_BTN_ID), Bitmap(BITMAP_SMALL_BTN_PRESSED_ID));
+    dumpButton.setBitmapXY(0, 0);
+    dumpButton.setText(TypedText(T_SINGLEUSEID12));
+    dumpButton.setTextPosition(0, 19, 100, 56);
+    dumpButton.setTextColors(touchgfx::Color::getColorFrom24BitRGB(70, 70, 70), touchgfx::Color::getColorFrom24BitRGB(231, 154, 9));
+    dumpButton.setPosition(348, 200, 100, 56);
+    dumpButton.setAction(flexButtonCallback);
 
     add(backgroundBox);
     add(backgroundImage);
@@ -88,6 +104,8 @@ MainViewBase::MainViewBase() :
     add(countTxt);
     add(ledButton);
     add(tcpButton);
+    add(logButton);
+    add(dumpButton);
 }
 
 void MainViewBase::setupScreen()
@@ -138,5 +156,19 @@ void MainViewBase::flexButtonCallbackHandler(const touchgfx::AbstractButtonConta
         //When tcpButton clicked call virtual function
         //Call tcpButtonPressed
         tcpButtonPressed();
+    }
+    else if (&src == &logButton)
+    {
+        //logButtonInteraction
+        //When logButton clicked call virtual function
+        //Call logButtonPressed
+        logButtonPressed();
+    }
+    else if (&src == &dumpButton)
+    {
+        //dumpButtonInteraction
+        //When dumpButton clicked call virtual function
+        //Call dumpButtonPressed
+        dumpButtonPressed();
     }
 }

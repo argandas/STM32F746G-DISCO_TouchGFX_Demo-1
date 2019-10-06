@@ -61,6 +61,8 @@
 #include <stm32746g_discovery.h>
 #include <stm32f7xx_hal_rng.h>
     
+#include "bsp_driver_sd.h"
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
@@ -84,6 +86,9 @@
 // #define USE_FATFS_MKFS 0
 
 #define MAX_DHCP_TRIES  4
+
+#define LWIP_ERROR_MSG(fnc_name, msg, err_num) cli_printf("[LwIP] %s --> %s (ERR = %d)\r\n", fnc_name, msg, err_num);
+#define FatFs_ERROR_MSG(fnc_name, msg, err_num) cli_printf("[FatFs] %s --> %s (ERR = %d)\r\n", fnc_name, msg, err_num);
 
 /* USER CODE END PD */
 
@@ -121,26 +126,24 @@ osThreadId dhcpTaskHandle;
 osMessageQId buttonQueueHandle;
 osMessageQId ledQueueHandle;
 osMessageQId tcpQueueHandle;
+osMessageQId logQueueHandle;
+osMessageQId dumpQueueHandle;
 osSemaphoreId dhcpBinarySemHandle;
 /* USER CODE BEGIN PV */
 
 osThreadId httpClientTaskHandle;
 osThreadId httpServerTaskHandle;
+osThreadId SDLoggerTaskHandle;
 
 FATFS SDFatFs;  /* File system object for SD card logical drive */
-FIL MyFile;     /* File object */
-
 
 FIL HTTP_File;     /* File object */
-
-
-#if 0
-uint8_t workBuffer[2*_MAX_SS];
-#endif
 
 char cli_buff[512];
 
 uint8_t DHCP_state = DHCP_OFF;
+
+const char* sd_log_filename = "sdlog.TXT";
 
 /* USER CODE END PV */
 
@@ -170,18 +173,20 @@ void StartDHCPTask(void const * argument);
 /* USER CODE BEGIN PFP */
 void Start_HTTP_Client_Task(void const * argument);
 void Start_HTTP_Server_Task(void const * argument);
+void Start_SD_Logger_Task(void const * argument);
 
 uint16_t cli_printf(const char* fmt, ...);
 uint16_t cli_write(const char* src, uint16_t len);
-FRESULT scan_files(char* path);
-FRESULT get_free_clusters(FATFS* fs);
+
 static int jsoneq(const char *json, jsmntok_t *tok, const char *s);
 
-#if 0
-const uint8_t index_html[] = {
-  0x3c, 0x21, 0x44, 0x4f, 0x43, 0x54, 0x59, 0x50, 0x45, 0x20, 0x68, 0x74, 0x6d, 0x6c, 0x3e, 0x3c, 0x68, 0x74, 0x6d, 0x6c, 0x3e, 0x3c, 0x68, 0x65, 0x61, 0x64, 0x3e, 0x3c, 0x6d, 0x65, 0x74, 0x61, 0x20, 0x68, 0x74, 0x74, 0x70, 0x2d, 0x65, 0x71, 0x75, 0x69, 0x76, 0x3d, 0x22, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x2d, 0x54, 0x79, 0x70, 0x65, 0x22, 0x20, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x3d, 0x22, 0x74, 0x65, 0x78, 0x74, 0x2f, 0x68, 0x74, 0x6d, 0x6c, 0x3b, 0x20, 0x63, 0x68, 0x61, 0x72, 0x73, 0x65, 0x74, 0x3d, 0x77, 0x69, 0x6e, 0x64, 0x6f, 0x77, 0x73, 0x2d, 0x31, 0x32, 0x35, 0x32, 0x22, 0x3e, 0x3c, 0x62, 0x6f, 0x64, 0x79, 0x3e, 0x3c, 0x73, 0x74, 0x79, 0x6c, 0x65, 0x3e, 0x2a, 0x20, 0x7b, 0x62, 0x6f, 0x78, 0x2d, 0x73, 0x69, 0x7a, 0x69, 0x6e, 0x67, 0x3a, 0x20, 0x62, 0x6f, 0x72, 0x64, 0x65, 0x72, 0x2d, 0x62, 0x6f, 0x78, 0x3b, 0x7d, 0x62, 0x6f, 0x64, 0x79, 0x20, 0x7b, 0x20, 0x20, 0x6d, 0x61, 0x72, 0x67, 0x69, 0x6e, 0x3a, 0x20, 0x30, 0x3b, 0x20, 0x20, 0x66, 0x6f, 0x6e, 0x74, 0x2d, 0x66, 0x61, 0x6d, 0x69, 0x6c, 0x79, 0x3a, 0x20, 0x41, 0x72, 0x69, 0x61, 0x6c, 0x2c, 0x20, 0x48, 0x65, 0x6c, 0x76, 0x65, 0x74, 0x69, 0x63, 0x61, 0x2c, 0x20, 0x73, 0x61, 0x6e, 0x73, 0x2d, 0x73, 0x65, 0x72, 0x69, 0x66, 0x3b, 0x7d, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x7b, 0x20, 0x20, 0x6f, 0x76, 0x65, 0x72, 0x66, 0x6c, 0x6f, 0x77, 0x3a, 0x20, 0x68, 0x69, 0x64, 0x64, 0x65, 0x6e, 0x3b, 0x20, 0x20, 0x62, 0x61, 0x63, 0x6b, 0x67, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x2d, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3a, 0x20, 0x23, 0x65, 0x39, 0x65, 0x39, 0x65, 0x39, 0x3b, 0x7d, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x61, 0x20, 0x7b, 0x20, 0x20, 0x66, 0x6c, 0x6f, 0x61, 0x74, 0x3a, 0x20, 0x6c, 0x65, 0x66, 0x74, 0x3b, 0x20, 0x20, 0x64, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x3a, 0x20, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x3b, 0x20, 0x20, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3a, 0x20, 0x62, 0x6c, 0x61, 0x63, 0x6b, 0x3b, 0x20, 0x20, 0x74, 0x65, 0x78, 0x74, 0x2d, 0x61, 0x6c, 0x69, 0x67, 0x6e, 0x3a, 0x20, 0x63, 0x65, 0x6e, 0x74, 0x65, 0x72, 0x3b, 0x20, 0x20, 0x70, 0x61, 0x64, 0x64, 0x69, 0x6e, 0x67, 0x3a, 0x20, 0x31, 0x34, 0x70, 0x78, 0x20, 0x31, 0x36, 0x70, 0x78, 0x3b, 0x20, 0x20, 0x74, 0x65, 0x78, 0x74, 0x2d, 0x64, 0x65, 0x63, 0x6f, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x3a, 0x20, 0x6e, 0x6f, 0x6e, 0x65, 0x3b, 0x20, 0x20, 0x66, 0x6f, 0x6e, 0x74, 0x2d, 0x73, 0x69, 0x7a, 0x65, 0x3a, 0x20, 0x31, 0x37, 0x70, 0x78, 0x3b, 0x7d, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x61, 0x3a, 0x68, 0x6f, 0x76, 0x65, 0x72, 0x20, 0x7b, 0x20, 0x20, 0x62, 0x61, 0x63, 0x6b, 0x67, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x2d, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3a, 0x20, 0x23, 0x64, 0x64, 0x64, 0x3b, 0x20, 0x20, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3a, 0x20, 0x62, 0x6c, 0x61, 0x63, 0x6b, 0x3b, 0x7d, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x61, 0x2e, 0x61, 0x63, 0x74, 0x69, 0x76, 0x65, 0x20, 0x7b, 0x20, 0x20, 0x62, 0x61, 0x63, 0x6b, 0x67, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x2d, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3a, 0x20, 0x23, 0x32, 0x31, 0x39, 0x36, 0x46, 0x33, 0x3b, 0x20, 0x20, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3a, 0x20, 0x77, 0x68, 0x69, 0x74, 0x65, 0x3b, 0x7d, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x2e, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x20, 0x7b, 0x20, 0x20, 0x66, 0x6c, 0x6f, 0x61, 0x74, 0x3a, 0x20, 0x72, 0x69, 0x67, 0x68, 0x74, 0x3b, 0x7d, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x5b, 0x74, 0x79, 0x70, 0x65, 0x3d, 0x74, 0x65, 0x78, 0x74, 0x5d, 0x20, 0x7b, 0x20, 0x20, 0x70, 0x61, 0x64, 0x64, 0x69, 0x6e, 0x67, 0x3a, 0x20, 0x36, 0x70, 0x78, 0x3b, 0x20, 0x20, 0x6d, 0x61, 0x72, 0x67, 0x69, 0x6e, 0x2d, 0x74, 0x6f, 0x70, 0x3a, 0x20, 0x38, 0x70, 0x78, 0x3b, 0x20, 0x20, 0x66, 0x6f, 0x6e, 0x74, 0x2d, 0x73, 0x69, 0x7a, 0x65, 0x3a, 0x20, 0x31, 0x37, 0x70, 0x78, 0x3b, 0x20, 0x20, 0x62, 0x6f, 0x72, 0x64, 0x65, 0x72, 0x3a, 0x20, 0x6e, 0x6f, 0x6e, 0x65, 0x3b, 0x20, 0x20, 0x77, 0x69, 0x64, 0x74, 0x68, 0x3a, 0x31, 0x32, 0x30, 0x70, 0x78, 0x3b, 0x7d, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x2e, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x20, 0x62, 0x75, 0x74, 0x74, 0x6f, 0x6e, 0x20, 0x7b, 0x20, 0x20, 0x66, 0x6c, 0x6f, 0x61, 0x74, 0x3a, 0x20, 0x72, 0x69, 0x67, 0x68, 0x74, 0x3b, 0x20, 0x20, 0x70, 0x61, 0x64, 0x64, 0x69, 0x6e, 0x67, 0x3a, 0x20, 0x36, 0x70, 0x78, 0x20, 0x31, 0x30, 0x70, 0x78, 0x3b, 0x20, 0x20, 0x6d, 0x61, 0x72, 0x67, 0x69, 0x6e, 0x2d, 0x74, 0x6f, 0x70, 0x3a, 0x20, 0x38, 0x70, 0x78, 0x3b, 0x20, 0x20, 0x6d, 0x61, 0x72, 0x67, 0x69, 0x6e, 0x2d, 0x72, 0x69, 0x67, 0x68, 0x74, 0x3a, 0x20, 0x31, 0x36, 0x70, 0x78, 0x3b, 0x20, 0x20, 0x62, 0x61, 0x63, 0x6b, 0x67, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x2d, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3a, 0x20, 0x23, 0x35, 0x35, 0x35, 0x3b, 0x20, 0x20, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3a, 0x20, 0x77, 0x68, 0x69, 0x74, 0x65, 0x3b, 0x20, 0x20, 0x66, 0x6f, 0x6e, 0x74, 0x2d, 0x73, 0x69, 0x7a, 0x65, 0x3a, 0x20, 0x31, 0x37, 0x70, 0x78, 0x3b, 0x20, 0x20, 0x62, 0x6f, 0x72, 0x64, 0x65, 0x72, 0x3a, 0x20, 0x6e, 0x6f, 0x6e, 0x65, 0x3b, 0x20, 0x20, 0x63, 0x75, 0x72, 0x73, 0x6f, 0x72, 0x3a, 0x20, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x3b, 0x7d, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x2e, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x20, 0x62, 0x75, 0x74, 0x74, 0x6f, 0x6e, 0x3a, 0x68, 0x6f, 0x76, 0x65, 0x72, 0x20, 0x7b, 0x20, 0x20, 0x62, 0x61, 0x63, 0x6b, 0x67, 0x72, 0x6f, 0x75, 0x6e, 0x64, 0x2d, 0x63, 0x6f, 0x6c, 0x6f, 0x72, 0x3a, 0x20, 0x67, 0x72, 0x65, 0x65, 0x6e, 0x3b, 0x7d, 0x40, 0x6d, 0x65, 0x64, 0x69, 0x61, 0x20, 0x73, 0x63, 0x72, 0x65, 0x65, 0x6e, 0x20, 0x61, 0x6e, 0x64, 0x20, 0x28, 0x6d, 0x61, 0x78, 0x2d, 0x77, 0x69, 0x64, 0x74, 0x68, 0x3a, 0x20, 0x36, 0x30, 0x30, 0x70, 0x78, 0x29, 0x20, 0x7b, 0x20, 0x20, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x2e, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x20, 0x7b, 0x20, 0x20, 0x20, 0x20, 0x66, 0x6c, 0x6f, 0x61, 0x74, 0x3a, 0x20, 0x6e, 0x6f, 0x6e, 0x65, 0x3b, 0x20, 0x20, 0x7d, 0x20, 0x20, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x61, 0x2c, 0x20, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x5b, 0x74, 0x79, 0x70, 0x65, 0x3d, 0x74, 0x65, 0x78, 0x74, 0x5d, 0x2c, 0x20, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x2e, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x20, 0x62, 0x75, 0x74, 0x74, 0x6f, 0x6e, 0x20, 0x7b, 0x20, 0x20, 0x20, 0x20, 0x66, 0x6c, 0x6f, 0x61, 0x74, 0x3a, 0x20, 0x6e, 0x6f, 0x6e, 0x65, 0x3b, 0x20, 0x20, 0x20, 0x20, 0x64, 0x69, 0x73, 0x70, 0x6c, 0x61, 0x79, 0x3a, 0x20, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x3b, 0x20, 0x20, 0x20, 0x20, 0x74, 0x65, 0x78, 0x74, 0x2d, 0x61, 0x6c, 0x69, 0x67, 0x6e, 0x3a, 0x20, 0x6c, 0x65, 0x66, 0x74, 0x3b, 0x20, 0x20, 0x20, 0x20, 0x77, 0x69, 0x64, 0x74, 0x68, 0x3a, 0x20, 0x31, 0x30, 0x30, 0x25, 0x3b, 0x20, 0x20, 0x20, 0x20, 0x6d, 0x61, 0x72, 0x67, 0x69, 0x6e, 0x3a, 0x20, 0x30, 0x3b, 0x20, 0x20, 0x20, 0x20, 0x70, 0x61, 0x64, 0x64, 0x69, 0x6e, 0x67, 0x3a, 0x20, 0x31, 0x34, 0x70, 0x78, 0x3b, 0x20, 0x20, 0x7d, 0x20, 0x20, 0x2e, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x20, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x5b, 0x74, 0x79, 0x70, 0x65, 0x3d, 0x74, 0x65, 0x78, 0x74, 0x5d, 0x20, 0x7b, 0x20, 0x20, 0x20, 0x20, 0x62, 0x6f, 0x72, 0x64, 0x65, 0x72, 0x3a, 0x20, 0x31, 0x70, 0x78, 0x20, 0x73, 0x6f, 0x6c, 0x69, 0x64, 0x20, 0x23, 0x63, 0x63, 0x63, 0x3b, 0x20, 0x20, 0x20, 0x20, 0x7d, 0x7d, 0x3c, 0x2f, 0x73, 0x74, 0x79, 0x6c, 0x65, 0x3e, 0x3c, 0x2f, 0x68, 0x65, 0x61, 0x64, 0x3e, 0x3c, 0x64, 0x69, 0x76, 0x20, 0x63, 0x6c, 0x61, 0x73, 0x73, 0x3d, 0x22, 0x74, 0x6f, 0x70, 0x6e, 0x61, 0x76, 0x22, 0x3e, 0x20, 0x20, 0x3c, 0x61, 0x20, 0x63, 0x6c, 0x61, 0x73, 0x73, 0x3d, 0x22, 0x61, 0x63, 0x74, 0x69, 0x76, 0x65, 0x22, 0x20, 0x68, 0x72, 0x65, 0x66, 0x3d, 0x22, 0x23, 0x68, 0x6f, 0x6d, 0x65, 0x22, 0x3e, 0x48, 0x6f, 0x6d, 0x65, 0x3c, 0x2f, 0x61, 0x3e, 0x20, 0x20, 0x3c, 0x61, 0x20, 0x68, 0x72, 0x65, 0x66, 0x3d, 0x22, 0x23, 0x61, 0x62, 0x6f, 0x75, 0x74, 0x22, 0x3e, 0x41, 0x62, 0x6f, 0x75, 0x74, 0x3c, 0x2f, 0x61, 0x3e, 0x20, 0x20, 0x3c, 0x61, 0x20, 0x68, 0x72, 0x65, 0x66, 0x3d, 0x22, 0x23, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x22, 0x3e, 0x43, 0x6f, 0x6e, 0x74, 0x61, 0x63, 0x74, 0x3c, 0x2f, 0x61, 0x3e, 0x20, 0x20, 0x3c, 0x64, 0x69, 0x76, 0x20, 0x63, 0x6c, 0x61, 0x73, 0x73, 0x3d, 0x22, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x2d, 0x63, 0x6f, 0x6e, 0x74, 0x61, 0x69, 0x6e, 0x65, 0x72, 0x22, 0x3e, 0x20, 0x20, 0x20, 0x20, 0x3c, 0x66, 0x6f, 0x72, 0x6d, 0x20, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x3d, 0x22, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x70, 0x61, 0x67, 0x65, 0x2e, 0x70, 0x68, 0x70, 0x22, 0x3e, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x3c, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x20, 0x74, 0x79, 0x70, 0x65, 0x3d, 0x22, 0x74, 0x65, 0x78, 0x74, 0x22, 0x20, 0x70, 0x6c, 0x61, 0x63, 0x65, 0x68, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x3d, 0x22, 0x55, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x20, 0x6e, 0x61, 0x6d, 0x65, 0x3d, 0x22, 0x75, 0x73, 0x65, 0x72, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x3e, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x3c, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x20, 0x74, 0x79, 0x70, 0x65, 0x3d, 0x22, 0x74, 0x65, 0x78, 0x74, 0x22, 0x20, 0x70, 0x6c, 0x61, 0x63, 0x65, 0x68, 0x6f, 0x6c, 0x64, 0x65, 0x72, 0x3d, 0x22, 0x50, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x22, 0x20, 0x6e, 0x61, 0x6d, 0x65, 0x3d, 0x22, 0x70, 0x73, 0x77, 0x22, 0x3e, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x3c, 0x62, 0x75, 0x74, 0x74, 0x6f, 0x6e, 0x20, 0x74, 0x79, 0x70, 0x65, 0x3d, 0x22, 0x73, 0x75, 0x62, 0x6d, 0x69, 0x74, 0x22, 0x3e, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x3c, 0x2f, 0x62, 0x75, 0x74, 0x74, 0x6f, 0x6e, 0x3e, 0x20, 0x20, 0x20, 0x20, 0x3c, 0x2f, 0x66, 0x6f, 0x72, 0x6d, 0x3e, 0x20, 0x20, 0x3c, 0x2f, 0x64, 0x69, 0x76, 0x3e, 0x3c, 0x2f, 0x64, 0x69, 0x76, 0x3e, 0x3c, 0x64, 0x69, 0x76, 0x20, 0x73, 0x74, 0x79, 0x6c, 0x65, 0x3d, 0x22, 0x70, 0x61, 0x64, 0x64, 0x69, 0x6e, 0x67, 0x2d, 0x6c, 0x65, 0x66, 0x74, 0x3a, 0x31, 0x36, 0x70, 0x78, 0x22, 0x3e, 0x20, 0x20, 0x3c, 0x68, 0x32, 0x3e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x69, 0x76, 0x65, 0x20, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x20, 0x46, 0x6f, 0x72, 0x6d, 0x20, 0x69, 0x6e, 0x20, 0x4e, 0x61, 0x76, 0x62, 0x61, 0x72, 0x3c, 0x2f, 0x68, 0x32, 0x3e, 0x20, 0x20, 0x3c, 0x70, 0x3e, 0x4e, 0x61, 0x76, 0x69, 0x67, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x20, 0x6d, 0x65, 0x6e, 0x75, 0x20, 0x77, 0x69, 0x74, 0x68, 0x20, 0x61, 0x20, 0x6c, 0x6f, 0x67, 0x69, 0x6e, 0x20, 0x66, 0x6f, 0x72, 0x6d, 0x20, 0x61, 0x6e, 0x64, 0x20, 0x61, 0x20, 0x73, 0x75, 0x62, 0x6d, 0x69, 0x74, 0x20, 0x62, 0x75, 0x74, 0x74, 0x6f, 0x6e, 0x20, 0x69, 0x6e, 0x73, 0x69, 0x64, 0x65, 0x20, 0x6f, 0x66, 0x20, 0x69, 0x74, 0x2e, 0x3c, 0x2f, 0x70, 0x3e, 0x20, 0x20, 0x3c, 0x70, 0x3e, 0x52, 0x65, 0x73, 0x69, 0x7a, 0x65, 0x20, 0x74, 0x68, 0x65, 0x20, 0x62, 0x72, 0x6f, 0x77, 0x73, 0x65, 0x72, 0x20, 0x77, 0x69, 0x6e, 0x64, 0x6f, 0x77, 0x20, 0x74, 0x6f, 0x20, 0x73, 0x65, 0x65, 0x20, 0x74, 0x68, 0x65, 0x20, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x69, 0x76, 0x65, 0x20, 0x65, 0x66, 0x66, 0x65, 0x63, 0x74, 0x2e, 0x3c, 0x2f, 0x70, 0x3e, 0x3c, 0x2f, 0x64, 0x69, 0x76, 0x3e, 0x3c, 0x2f, 0x62, 0x6f, 0x64, 0x79, 0x3e, 0x3c, 0x2f, 0x68, 0x74, 0x6d, 0x6c, 0x3e
-};
-#endif 
+void post_thingspeak(void);
+
+FRESULT sd_scan_files(char* path);
+FRESULT sd_get_free_clusters(FATFS* fs);
+FRESULT sd_append(char* fn, char* wtext);
+FRESULT sd_log(uint8_t data);
+FRESULT sd_dump(void);
 
 /* USER CODE END PFP */
 
@@ -285,6 +290,7 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_THREADS */
     /* add threads, ... */
+
   /* definition and creation of httpClientTask */
   osThreadDef(httpClientTask, Start_HTTP_Client_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 8);
   httpClientTaskHandle = osThreadCreate(osThread(httpClientTask), (void*)&gnetif);
@@ -292,6 +298,11 @@ int main(void)
   /* definition and creation of httpServerTask */
   osThreadDef(httpServerTask, Start_HTTP_Server_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 8);
   httpServerTaskHandle = osThreadCreate(osThread(httpServerTask), (void*)&gnetif);
+
+    /* definition and creation of SDLoggerTask */
+  osThreadDef(SDLoggerTask, Start_SD_Logger_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 8);
+  SDLoggerTaskHandle = osThreadCreate(osThread(SDLoggerTask), NULL);
+
   /* USER CODE END RTOS_THREADS */
 
   /* Create the queue(s) */
@@ -306,6 +317,14 @@ int main(void)
   /* definition and creation of tcpQueue */
   osMessageQDef(tcpQueue, 8, uint16_t);
   tcpQueueHandle = osMessageCreate(osMessageQ(tcpQueue), NULL);
+
+  /* definition and creation of logQueue */
+  osMessageQDef(logQueue, 8, uint16_t);
+  logQueueHandle = osMessageCreate(osMessageQ(logQueue), NULL);
+
+  /* definition and creation of dumpQueue */
+  osMessageQDef(dumpQueue, 8, uint16_t);
+  dumpQueueHandle = osMessageCreate(osMessageQ(dumpQueue), NULL);
 
   /* USER CODE BEGIN RTOS_QUEUES */
     /* add queues, ... */
@@ -1216,7 +1235,7 @@ uint16_t cli_write(const char* src, uint16_t len)
   return len;
 }
 
-FRESULT get_free_clusters(FATFS* fs)
+FRESULT sd_get_free_clusters(FATFS* fs)
 {
     FRESULT fr;
     DWORD fre_clust, fre_sect, tot_sect;
@@ -1279,7 +1298,7 @@ FRESULT read_file_sector(FIL* file, void* dest, FSIZE_t len, UINT* bytesread, UI
 }
 
 /* Start node to be scanned (***also used as work area***) */
-FRESULT scan_files(char* path)
+FRESULT sd_scan_files(char* path)
 {
     FRESULT res;
     DIR dir;
@@ -1295,7 +1314,7 @@ FRESULT scan_files(char* path)
                 /* It is a directory */
                 i = strlen(path);
                 sprintf(&path[i], "\t%s (%4d bytes)", fno.fname, fno.fsize);
-                res = scan_files(path);                    /* Enter the directory */
+                res = sd_scan_files(path);                    /* Enter the directory */
                 if (res != FR_OK) break;
                 path[i] = 0;
             }
@@ -1319,27 +1338,18 @@ static int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
 	return -1;
 }
 
-
-void Start_HTTP_Client_Task(void const * argument)
+err_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uint8_t data)
 {
-  /* USER CODE BEGIN Start_HTTP_Client_Task */
-  
-  /* Queue PV */
-  uint8_t queueData = 0;
-  
   /* LwIP PV */
-  struct netif* netif = (struct netif*)argument;
+  // struct netif* netif = (struct netif*)argument;
   struct netconn *conn;
   struct netbuf *netbuf = NULL;
-  ip4_addr_t local_ip; 
   ip4_addr_t remote_ip; 
   err_t err;
   
   /* Temp Buffer PV */
   char* temp_buf_data = NULL;
   uint16_t temp_buf_data_len = 0;
-  lwhttp_message_header_t* temp_header_ptr;
-  lwhttp_message_header_t* content_type_header_ptr;
   
   /* JSON PV */
   const char* json_data_fmt = "{\"api_key\": \"%s\", \"delta_t\": %d, \"field1\": %d}";
@@ -1350,7 +1360,171 @@ void Start_HTTP_Client_Task(void const * argument)
   const char* key = "WTN6FH385TCUNDMU";
   const char* server = "thingspeak.com";
   const char* url = "/update.json?headers=false";
+
+  cli_printf("[LwIP] %s --> Send TCP (data = %u)\r\n", __FUNCTION__, data);
+
+  if (DHCP_state == DHCP_ADDRESS_ASSIGNED)
+  {
+    /* Parse HTTP Body in JSON format */
+    sprintf((char *)json_data, json_data_fmt, key, 5, data);  
+    sprintf((char *)json_data_len, "%d", strlen((char *)json_data));  
+          
+    /* Build HTTP Request */
+    lwhttp_request_put_request_line(req_ptr, LwHHTP_POST, url);
+    lwhttp_request_put_message_header(req_ptr, "Content-Type", "application/json");
+    lwhttp_request_put_message_header(req_ptr, "Content-Length", (char *)json_data_len);
+    lwhttp_request_put_message_body(req_ptr, (char*)json_data, strlen((char *)json_data));  
+          
+    /* Run LwHTTP Response Parser */
+    lwhttp_request_parse(req_ptr);
+          
+    /* LwIP Connect TCP */
+    conn = netconn_new(NETCONN_TCP);        
+    if (conn == NULL)
+    {
+#if 0
+      /* Bind a netconn to a specific local IP address and port (optional) */
+      err = netconn_bind(conn, &netif->ip_addr, 60);
+      if (err != ERR_OK)
+      {
+        cli_printf("[LwIP] %s --> netconn_bind (ERR = %d)\r\n", __FUNCTION__, err);
+      }
+      else
+#endif
+      {
+        err  = netconn_gethostbyname(server, &remote_ip);
+        if (err == ERR_OK)
+        {
+          cli_printf("[LwIP] Server: %s (%s)\r\n", server, ip4addr_ntoa((const ip4_addr_t *)&remote_ip));
+          
+          /* Connect to server */
+          err = netconn_connect(conn, &remote_ip, 80); 
+          if (err == ERR_OK)
+          {
+            cli_printf("[LwIP] Connection: OK\r\n");
+
+            /* Get LwHTTP Request Data */
+            lwhttp_request_get(req_ptr, &temp_buf_data, &temp_buf_data_len);
+            
+            /* Write data to server */
+            err = netconn_write(conn, temp_buf_data, temp_buf_data_len, NETCONN_NOFLAG);
+            if (err == ERR_OK)
+            {
+              /* Get pointer to buffer where response data is stored */
+              while (( err = netconn_recv(conn, &netbuf)) == ERR_OK)
+              {
+                  do
+                  {
+                    /* Get pointer to data and length*/
+                    netbuf_data(netbuf, (void**)&temp_buf_data, &temp_buf_data_len);
+                    
+                    /* LwHTTP write response to parser */
+                    lwhttp_response_put(rsp_ptr, (char*)temp_buf_data, temp_buf_data_len);
+                  }
+                  while (netbuf_next(netbuf) >= 0);
+
+                  /* Free data buffer */
+                  netbuf_delete(netbuf);
+              }
+              
+              if ((err == ERR_OK) || (err == ERR_CLSD))
+              {
+                if (rsp_ptr->start_line.status_line.status_code.data != NULL)
+                {
+                  /* Print HTTP Request */
+                  lwhttp_request_get_request_line(req_ptr, &temp_buf_data, &temp_buf_data_len);
+                  cli_printf("[LwHTTP] Request-Line: %.*s\r\n", temp_buf_data_len, temp_buf_data);
+
+                  /* Parse & Print LwHTTP Response */
+                  lwhttp_response_parse(rsp_ptr);
+                  lwhttp_response_get_status_line(rsp_ptr, &temp_buf_data, &temp_buf_data_len);
+                  cli_printf("[LwHTTP] Status-Line: %.*s\r\n\r\n", temp_buf_data_len, temp_buf_data);
+                  
+                  err = ERR_OK;               
+                }
+                else
+                {
+                  /* TODO: Assign correct error code*/
+                  err = ERR_CONN;
+                }
+              }
+              else
+              {
+                LWIP_ERROR_MSG(__FUNCTION__, "netconn_recv", err);
+              }
+            }
+            else
+            {
+              LWIP_ERROR_MSG(__FUNCTION__, "netconn_write", err);
+            }
+          }
+          else
+          {
+            LWIP_ERROR_MSG(__FUNCTION__, "netconn_connect", err);
+          }
+        }
+        else
+        {
+          LWIP_ERROR_MSG(__FUNCTION__, "netconn_gethostbyname", err);
+        }
+      }
+      
+      netconn_delete(conn);
+    }
+    else
+    {
+      err = ERR_CONN;
+      LWIP_ERROR_MSG(__FUNCTION__, "netconn_new", err);
+    }    
+  }
+  else
+  {
+    cli_printf("[LwIP] %s --> Unable to send TCP (DHCP State = %d)\r\n", __FUNCTION__, DHCP_state);
+  }
+}
+
+void Start_SD_Logger_Task(void const * argument)
+{
+  /* USER CODE BEGIN Start_HTTP_Client_Task */
   
+  /* Queue PV */
+  uint8_t queueData = 0;
+
+  osDelay(100);  
+
+  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
+
+  /* Infinite loop */
+  for(;;)
+  {
+    if(xQueueReceive(logQueueHandle, &queueData, 0) == pdTRUE)
+    {
+      cli_printf("[RTOS] %s --> New log: %d\r\n", __FUNCTION__, queueData);
+      sd_log(queueData);
+    }
+    else if(xQueueReceive(dumpQueueHandle, &queueData, 0) == pdTRUE)
+    {
+      cli_printf("[RTOS] %s --> Dump log\r\n", __FUNCTION__);
+      sd_dump();
+    }
+    else
+    {
+      osDelay(10);  
+    }
+  }    
+  /* USER CODE END Start_HTTP_Client_Task */
+}
+
+
+void Start_HTTP_Client_Task(void const * argument)
+{
+  /* USER CODE BEGIN Start_HTTP_Client_Task */
+  
+  /* Queue PV */
+  uint8_t queueData = 0;
+  err_t err = ERR_OK;
+  lwhttp_message_header_t* content_type_header_ptr;
+
   static lwhttp_request_t client_request;
   static lwhttp_response_t client_response;
 
@@ -1363,139 +1537,31 @@ void Start_HTTP_Client_Task(void const * argument)
   {
     if(xQueueReceive(tcpQueueHandle, &queueData, 0) == pdTRUE)
     {
-      if (DHCP_state == DHCP_ADDRESS_ASSIGNED)
+      /* LwHTTP Inits */
+      lwhttp_request_init(&client_request);
+      lwhttp_response_init(&client_response);  
+
+      /* Sen POST request */
+      err = post_thingspeak(&client_request, &client_response, queueData);
+      if (ERR_OK == err)
       {
-        cli_printf("[LwIP] %s --> Send TCP (data = %u)\r\n", __FUNCTION__, queueData);
 
-        /* Parse HTTP Body in JSON format */
-        sprintf((char *)json_data, json_data_fmt, key, 5, queueData);  
-        sprintf((char *)json_data_len, "%d", strlen((char *)json_data));  
-              
-        /* LwHTTP Inits */
-        lwhttp_request_init(&client_request);
-        lwhttp_response_init(&client_response);  
-              
-        /* Build HTTP Request */
-        lwhttp_request_put_request_line(&client_request, LwHHTP_POST, url);
-        lwhttp_request_put_message_header(&client_request, "Content-Type", "application/json");
-        lwhttp_request_put_message_header(&client_request, "Content-Length", (char *)json_data_len);
-        lwhttp_request_put_message_body(&client_request, (char*)json_data, strlen((char *)json_data));  
-              
-        /* Run LwHTTP Response Parser */
-        lwhttp_request_parse(&client_request);
-              
-        /* LwIP Connect TCP */
-        conn = netconn_new(NETCONN_TCP);        
-        if (conn == NULL)
+        /* Content-Type */
+        lwhttp_response_get_message_header(&client_response, "Content-Type", &content_type_header_ptr);
+
+        /* If HTTP Status Code is OK (200) and Content-Type is JSON */
+        if ((0 == strncmp(client_response.start_line.status_line.status_code.data, "200", strlen("200"))) 
+            && (0 == strncmp(content_type_header_ptr->field_value.data, "application/json", strlen("application/json")))
+            && (1 < client_response.message_body.len))
         {
-          err = ERR_CONN;
-          cli_printf("[LwIP] %s --> netconn_new (ERR = %d)\r\n", __FUNCTION__, err);
-        }
-        else
-        {
-#if 0
-          /* Bind a netconn to a specific local IP address and port (optional) */
-          err = netconn_bind(conn, &netif->ip_addr, 60);
-          if (err != ERR_OK)
-          {
-            cli_printf("[LwIP] %s --> netconn_bind (ERR = %d)\r\n", __FUNCTION__, err);
-          }
-          else
-#endif
-          {
-            err  = netconn_gethostbyname(server, &remote_ip);
-            if (err != ERR_OK)
-            {
-              cli_printf("[LwIP] %s --> netconn_gethostbyname (ERR = %d)\r\n", __FUNCTION__, err);
-            }
-            else
-            {
-              cli_printf("[LwIP] Server: %s (%s)\r\n", server, ip4addr_ntoa((const ip4_addr_t *)&remote_ip));
-              
-              /* Connect to server */
-              err = netconn_connect(conn, &remote_ip, 80); 
-              if (err != ERR_OK)
-              {
-                cli_printf("[LwIP] %s --> netconn_connect (ERR = %d)\r\n", __FUNCTION__, err);
-              }
-              else
-              {
-                cli_printf("[LwIP] Connection: OK\r\n");
-
-                /* Get LwHTTP Request Data */
-                lwhttp_request_get(&client_request, &temp_buf_data, &temp_buf_data_len);
-                
-                /* Write data to server */
-                err = netconn_write(conn, temp_buf_data, temp_buf_data_len, NETCONN_NOFLAG);
-                if (err != ERR_OK)
-                {
-                  cli_printf("[LwIP] %s --> netconn_write (ERR = %d)\r\n", __FUNCTION__, err);
-                }
-                else
-                {
-                  /* Get pointer to buffer where response data is stored */
-                  while (( err = netconn_recv(conn, &netbuf)) == ERR_OK)
-                  {
-                      do
-                      {
-                        /* Get pointer to data and length*/
-                        netbuf_data(netbuf, (void**)&temp_buf_data, &temp_buf_data_len);
-                        
-                        /* LwHTTP write response to parser */
-                        lwhttp_response_put(&client_response, (char*)temp_buf_data, temp_buf_data_len);
-                      }
-                      while (netbuf_next(netbuf) >= 0);
-
-                      /* Free data buffer */
-                      netbuf_delete(netbuf);
-                  }
-                  
-                  if ((err != ERR_OK) && (err != ERR_CLSD))
-                  {
-                      cli_printf("[LwIP] %s --> netconn_recv (ERR = %d)\r\n", __FUNCTION__, err);
-                  }
-                  else
-                  {
-                    /* Print HTTP Request */
-                    lwhttp_request_get_request_line(&client_request, &temp_buf_data, &temp_buf_data_len);
-                    cli_printf("[LwHTTP] Request-Line: %.*s\r\n", temp_buf_data_len, temp_buf_data);
-
-                    /* Parse & Print LwHTTP Response */
-                    lwhttp_response_parse(&client_response);
-                    lwhttp_response_get_status_line(&client_response, &temp_buf_data, &temp_buf_data_len);
-                    cli_printf("[LwHTTP] Status-Line: %.*s\r\n\r\n", temp_buf_data_len, temp_buf_data);
-
-                    /* Content-Type */
-                    lwhttp_response_get_message_header(&client_response, "Content-Type", &content_type_header_ptr);
-                    
-                    if ((client_response.start_line.status_line.status_code.data != NULL) && (content_type_header_ptr != NULL))
-                    {
-                      /* If HTTP Status Code is OK (200) and Content-Type is JSON */
-                      if ((0 == strncmp(client_response.start_line.status_line.status_code.data, "200", strlen("200"))) 
-                          && (0 == strncmp(content_type_header_ptr->field_value.data, "application/json", strlen("application/json")))
-                          && (1 < client_response.message_body.len))
-                      {
-                        /* Parse LwHTTP Response message body as JSON */        
-                        jsmn_parser_example(client_response.message_body.data, client_response.message_body.len);  
-                      }                  
-                    }
-                  }
-                }
-              }
-            }
-          }
-          
-          netconn_delete(conn);
-        }
-        
-        /* Free LwHTTP Request & Response */
-        lwhttp_request_free(&client_request);
-        lwhttp_response_free(&client_response);        
+          /* Parse LwHTTP Response message body as JSON */        
+          jsmn_parser_example(client_response.message_body.data, client_response.message_body.len);  
+        }   
       }
-      else
-      {
-        cli_printf("[LwIP] %s --> Unable to send TCP (state = %d, data = %u)\r\n", __FUNCTION__, DHCP_state, queueData);
-      }
+
+      /* Free LwHTTP Request & Response */
+      lwhttp_request_free(&client_request);
+      lwhttp_response_free(&client_response);    
     }
     else
     {
@@ -1799,6 +1865,107 @@ void StartLEDTask(void const * argument)
   /* USER CODE END StartLEDTask */
 }
 
+FRESULT sd_append(char* fn, char* wtext)
+{
+  FRESULT fr;                                    /* FatFs function common result code */
+  FIL fil;                                       /* File object */
+
+  uint32_t byteswritten = 0;                     /* File write/read counts */
+    
+  cli_printf("[FatFs] %s --> File name: %s\r\n", __FUNCTION__, fn);
+  cli_printf("[FatFs] %s --> Text: %s", __FUNCTION__, wtext);
+
+  /*##-3- Create and Open a new text file object with write access #####*/
+  fr = f_open(&fil, (char*)fn, FA_OPEN_ALWAYS | FA_WRITE);
+  if(fr == FR_OK)
+  {    
+    /*##-4- Prepare to append data to the text file ################################*/
+    fr = f_lseek(&fil, f_size(&fil));
+    if(fr == FR_OK)
+    {
+      /*##-5- Write data to the text file ################################*/
+      fr = f_write(&fil, wtext, strlen(wtext), (UINT *)&byteswritten);
+      if(fr == FR_OK)
+      {
+        cli_printf("[FatFs] %s --> byteswritten: %d\r\n\r\n", __FUNCTION__, byteswritten);
+      }
+      else
+      {
+        FatFs_ERROR_MSG(__FUNCTION__, "f_write", fr);
+      }
+    }
+    else
+    {
+      FatFs_ERROR_MSG(__FUNCTION__, "f_lseek", fr);
+    }
+    
+    /*##-6- Close the open text file #################################*/
+    fr = f_close(&fil);
+    if(fr != FR_OK)
+    {
+      FatFs_ERROR_MSG(__FUNCTION__, "f_close", fr);
+    }
+  }
+  else
+  {
+    FatFs_ERROR_MSG(__FUNCTION__, "f_open", fr);
+  }
+  
+  return fr;
+}
+
+FRESULT sd_log(uint8_t data)
+{
+  uint8_t buffer[32];
+  snprintf((char*)buffer, sizeof(buffer), "Log entry = %u\r\n", data);
+  return sd_append((char*)sd_log_filename, (char*)buffer);
+}
+
+FRESULT sd_dump(void)
+{
+  FRESULT fr;                                 /* FatFs function common result code */
+  FIL fil;                                    /* File object */
+  uint32_t bytesread = 0;                     /* File write/read counts */
+  uint8_t rtext[256];                         /* File read buffer */
+
+  cli_printf("[FatFs] %s --> File name: %s\r\n", __FUNCTION__, (char*)sd_log_filename);
+
+  /*##-7- Open the text file object with read access ###############*/
+  fr = f_open(&fil, (char*)sd_log_filename, FA_READ);
+  if(fr == FR_OK)
+  {
+    do
+    {
+      /*##-8- Read data from the text file ###########################*/
+      fr = f_read(&fil, rtext, sizeof(rtext), (UINT*)&bytesread);
+      if(fr == FR_OK)
+      {
+        if(bytesread > 0)
+        {
+          cli_write((char*)&rtext[0], bytesread);
+        }
+      }
+      else 
+      {
+        FatFs_ERROR_MSG(__FUNCTION__, "f_read", fr);
+      }
+    } while((bytesread > 0) && (fr == FR_OK));
+
+    /*##-6- Close the open text file #################################*/
+    fr = f_close(&fil);
+    if(fr != FR_OK)
+    {
+      FatFs_ERROR_MSG(__FUNCTION__, "f_close", fr);
+    }
+  }
+  else
+  {
+    FatFs_ERROR_MSG(__FUNCTION__, "f_open", fr);
+  }
+  
+  return fr;
+}
+
 /* USER CODE BEGIN Header_StartSDTask */
 /**
 * @brief Function implementing the sdTask thread.
@@ -1809,186 +1976,46 @@ void StartLEDTask(void const * argument)
 void StartSDTask(void const * argument)
 {
   /* USER CODE BEGIN StartSDTask */
-  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
-  
-#if 1
-  FRESULT fr;                                               /* FatFs function common result code */
-  uint32_t byteswritten, bytesread = 0;                     /* File write/read counts */
-  uint8_t wtext[] = "This is STM32 working with FatFs\r\n"; /* File write buffer */
-  uint8_t rtext[100];                                       /* File read buffer */
+  FRESULT fr;                                 /* FatFs function common result code */
+  FATFS* fs = &SDFatFs;                       /* File system object for SD card logical drive */
+  uint8_t ret = 0;
   uint32_t rng_value = 0;
-  uint8_t file_name_buff[16];
-  
-  /* init code for FATFS */
-  MX_FATFS_Init();  
+  uint8_t file_name[16];
 
-  /* Start filename */
-  strcpy((char*)file_name_buff, "filen.TXT");
-    
+  /* init code for FATFS */
+  MX_FATFS_Init();
+
+  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
+
   /*##-1- Link the micro SD disk I/O driver ##################################*/
-  // if(FATFS_LinkDriver(&SD_Driver, SDPath) == 0)
-  {  
+  ret = BSP_SD_Init();
+  if(ret == MSD_OK)
+  {
     /*##-2- Register the file system object to the FatFs module ##############*/
-    fr = f_mount(&SDFatFs, (TCHAR const*)SDPath, 0);
-    if(fr != FR_OK)
+    fr = f_mount(fs, (TCHAR const*)SDPath, 0);
+    if(fr == FR_OK)
     {
-      cli_printf("[FatFs] f_mount: %d\r\n", fr);
+      cli_printf("[FatFs] %s --> f_mount OK!\r\n", __FUNCTION__);
     }
     else
     {
-#if 0      
-      /*##-3- Create a FAT file system (format) on the logical drive #########*/
-      /* WARNING: Formatting the uSD card will delete all content on the device */
-      fr = f_mkfs((TCHAR const*)SDPath, FM_ANY, 0, workBuffer, sizeof(workBuffer));
-      if(fr != FR_OK)
-      {
-        cli_printf("[FatFs] f_mkfs: %d\r\n", fr);
-      }
-      else
-#endif
-      {
-        HAL_RNG_GenerateRandomNumber(&hrng, &rng_value);
-        file_name_buff[4] = '0' + (uint8_t)(rng_value % 10);
-        
-        /* 10 - 99 files
-        HAL_RNG_GenerateRandomNumber(&hrng, &rng_value);
-        file_name_buff[5] = '0' + (uint8_t)(rng_value % 10);
-        */
-        
-        cli_printf("[FatFs] File name: %s\r\n", file_name_buff);
-
-        /*##-4- Create and Open a new text file object with write access #####*/
-        fr = f_open(&MyFile, (char*)file_name_buff, FA_OPEN_ALWAYS | FA_WRITE);
-        if(fr != FR_OK)
-        {
-          cli_printf("[FatFs] f_open: %d\r\n", fr);
-        }
-        else
-        {
-#if 1
-          /*##-5- Prepare to append data to the text file ################################*/
-          fr = f_lseek(&MyFile, f_size(&MyFile));
-          if((byteswritten == 0) || (fr != FR_OK))
-          {
-            /* 'STM32.TXT' file Write or EOF Error */
-            cli_printf("[FatFs] f_lseek: %d\r\n", fr);
-            cli_printf("[FatFs] byteswritten: %d\r\n", byteswritten);
-          }
-          else
-#endif
-          {
-            /*##-5- Write data to the text file ################################*/
-            fr = f_write(&MyFile, wtext, sizeof(wtext), (UINT *)&byteswritten);
-            if((byteswritten == 0) || (fr != FR_OK))
-            {
-              cli_printf("[FatFs] f_write: %d\r\n", fr);
-              cli_printf("[FatFs] byteswritten: %d\r\n", byteswritten);
-            }
-#if 0
-            else
-            {
-              /*##-6- Close the open text file #################################*/
-              fr = f_close(&MyFile);
-              if(fr != FR_OK)
-              {
-                cli_printf("[FatFs] f_close: %d\r\n", fr);
-              }
-              
-              /*##-7- Open the text file object with read access ###############*/
-              fr = f_open(&MyFile, (char*)file_name_buff, FA_READ);
-              if(fr != FR_OK)
-              {
-                cli_printf("[FatFs] f_open: %d\r\n", fr);
-              }
-              else
-              {
-                /*##-8- Read data from the text file ###########################*/
-                fr = f_read(&MyFile, rtext, sizeof(rtext), (UINT*)&bytesread);
-                if((bytesread == 0) || (fr != FR_OK))
-                {
-                  cli_printf("[FatFs] f_read: %d\r\n", fr);
-                }
-                else
-                { 
-                  /*##-10- Compare read data with the expected data ############*/
-                  if ((bytesread != byteswritten))
-                  {                
-                    cli_printf("[FatFs] bytesread: %d\r\n", bytesread);
-                    cli_printf("[FatFs] byteswritten: %d\r\n", byteswritten);
-                  }
-                  else
-                  {
-                    cli_printf("[FatFs] SUCCESS!\r\n");
-                  }
-                }
-              }
-            }
-#endif
-          }
-          
-          /*##-6- Close the open text file #################################*/
-          fr = f_close(&MyFile);
-          if(fr != FR_OK)
-          {
-            cli_printf("[FatFs] f_close: %d\r\n", fr);
-          }
-        }
-        
-#if 0
-        /*##-4- Create and Open a new text file object with write access #####*/
-        cli_printf("[FatFs] File name: %s\r\n", "index.html");
-        fr = f_open(&MyFile, "index.htm", FA_CREATE_ALWAYS | FA_WRITE);
-        if(fr != FR_OK)
-        {
-          cli_printf("[FatFs] f_open: %d\r\n", fr);
-        }
-        else
-        {
-          /*##-5- Write data to the text file ################################*/
-          fr = f_write(&MyFile, index_html, sizeof(index_html), (UINT *)&byteswritten);
-          if((byteswritten == 0) || (fr != FR_OK))
-          {
-            cli_printf("[FatFs] f_write: %d\r\n", fr);
-            cli_printf("[FatFs] byteswritten: %d\r\n", byteswritten);
-          }
-          else
-          {
-            cli_printf("[FatFs] Bytes written: %d\r\n", byteswritten);
-          }
-          
-          /*##-6- Close the open text file #################################*/
-          fr = f_close(&MyFile);
-          if(fr != FR_OK)
-          {
-            cli_printf("[FatFs] f_close: %d\r\n", fr);
-          }
-        }
-#endif
-      }
-      
-      /*##-11 - Scan files in the device ###############################*/
-      strcpy((char*)rtext, "/");
-      rtext[2] = 0x00;
-      cli_printf("[FatFs] Files scan:\r\n");
-      fr = scan_files((char*)rtext);
-      if(fr != FR_OK)
-      {
-        cli_printf("[FatFs] scan_files: %d\r\n", fr);
-      }
+      FatFs_ERROR_MSG(__FUNCTION__, "f_mount", fr);
     }
   }
-  
-  /*##-12 - Scan files in the device ###############################*/
-  fr = get_free_clusters(&SDFatFs);
-  if(fr != FR_OK)
+  else
   {
-    cli_printf("[FatFs] get_free_clusters: %d\r\n", fr);
+    FatFs_ERROR_MSG(__FUNCTION__, "BSP_SD_Init", ret);
   }
 
-  /*##-13- Unlink the micro SD disk I/O driver ###############################*/
-  cli_printf("[FatFs] FINISHED\r\n\r\n");
+  /* Get random number */
+  HAL_RNG_GenerateRandomNumber(&hrng, &rng_value);
+
+  /* Parse filename */
+  snprintf((char*)file_name, 16, "file%u.TXT", (uint8_t)(rng_value % 10));
+
+  /* Add to file */
+  sd_append((char*)file_name, (char*)"STM32 FatFs Demo\r\n");
   
-#endif
   /* Infinite loop */
   for(;;)
   {
