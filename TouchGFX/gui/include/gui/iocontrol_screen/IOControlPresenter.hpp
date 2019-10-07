@@ -1,17 +1,17 @@
-#ifndef MAIN_PRESENTER_HPP
-#define MAIN_PRESENTER_HPP
+#ifndef IOCONTROL_PRESENTER_HPP
+#define IOCONTROL_PRESENTER_HPP
 
 #include <gui/model/ModelListener.hpp>
 #include <mvp/Presenter.hpp>
 
 using namespace touchgfx;
 
-class MainView;
+class IOControlView;
 
-class MainPresenter : public Presenter, public ModelListener
+class IOControlPresenter : public Presenter, public ModelListener
 {
 public:
-    MainPresenter(MainView& v);
+    IOControlPresenter(IOControlView& v);
 
     /**
      * The activate function is called automatically when this screen is "switched in"
@@ -24,21 +24,16 @@ public:
      * (ie. made inactive). Teardown functionality can be placed here.
      */
     virtual void deactivate();
-    
-    /* redefine call on MainListener, to be calle from Model*/
-    void m2p_ButtonPressed();
-    
-    /* to be called from view */
-    void v2p_SendTCPData(int data);
-    void v2p_LogData(int data);
-    void v2p_DumpData(void);
 
-    virtual ~MainPresenter() {};
+    virtual ~IOControlPresenter() {};
+    
+    void v2p_SetLEDState(bool state);
 
 private:
-    MainPresenter();
+    IOControlPresenter();
 
-    MainView& view;
+    IOControlView& view;
 };
 
-#endif // MAIN_PRESENTER_HPP
+
+#endif // IOCONTROL_PRESENTER_HPP

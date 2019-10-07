@@ -87,8 +87,26 @@
 
 #define MAX_DHCP_TRIES  4
 
-#define LWIP_ERROR_MSG(fnc_name, msg, err_num) cli_printf("[LwIP] %s --> %s (ERR = %d)\r\n", fnc_name, msg, err_num);
-#define FatFs_ERROR_MSG(fnc_name, msg, err_num) cli_printf("[FatFs] %s --> %s (ERR = %d)\r\n", fnc_name, msg, err_num);
+#define DBG_LWIP_ENABLED  1
+#define DBG_RTOS_ENABLED  2
+#define DBG_FATFS_ENABLED 4
+#define DBG_QUEUE_ENABLED 8
+#define DBG_JSMN_ENABLED  16
+#define DBG_DHCP_ENABLED  32
+
+const uint8_t bg_enabled = 0xFF;
+
+#define DBG_PRINT_MSG(label, fnc, msg, err, txt) 
+#define DBG_PRINT_ERR(label, fnc, msg, err, txt) //cli_printf("$$$ [%s] %s --> %s (ERR = %d)\r\n", label, fnc, msg, *err)
+#define DBG_PRINT_TXT(label, fnc, msg, err, txt) //cli_printf("$$$ [%s] %s --> %s: %s\r\n", label, fnc, msg, txt)
+#define DBG_PRINT_ALL(label, fnc, msg, err, txt) //cli_printf("$$$ [%s] %s --> %s: %s (ERR = %d)\r\n", label, fnc, msg, txt, *err)
+
+#define  DBG_LWIP(msg, val, txt) debug_print(DBG_LWIP_ENABLED,  (char*)"LWIP",  __FUNCTION__, (char*)msg, (int8_t*)val, (char*)txt);
+#define DBG_FATFS(msg, val, txt) debug_print(DBG_FATFS_ENABLED, (char*)"FatFs", __FUNCTION__, (char*)msg, (int8_t*)val, (char*)txt);
+#define  DBG_RTOS(msg, val, txt) debug_print(DBG_RTOS_ENABLED,  (char*)"RTOS",  __FUNCTION__, (char*)msg, (int8_t*)val, (char*)txt);
+#define DBG_QUEUE(msg, val, txt) debug_print(DBG_QUEUE_ENABLED, (char*)"QUEUE", __FUNCTION__, (char*)msg, (int8_t*)val, (char*)txt);
+#define  DBG_JSMN(msg, val, txt) debug_print(DBG_JSMN_ENABLED,  (char*)"JSMN",  __FUNCTION__, (char*)msg, (int8_t*)val, (char*)txt);
+#define  DBG_DHCP(msg, val, txt) debug_print(DBG_DHCP_ENABLED,  (char*)"DHCP",  __FUNCTION__, (char*)msg, (int8_t*)val, (char*)txt);
 
 /* USER CODE END PD */
 
@@ -178,9 +196,11 @@ void Start_SD_Logger_Task(void const * argument);
 uint16_t cli_printf(const char* fmt, ...);
 uint16_t cli_write(const char* src, uint16_t len);
 
+void debug_print(uint8_t dbg_mask, char* label, const char* fnc, char* msg, int8_t* val, char* txt);
+
 static int jsoneq(const char *json, jsmntok_t *tok, const char *s);
 
-void post_thingspeak(void);
+err_t post_thingspeak(void);
 
 FRESULT sd_scan_files(char* path);
 FRESULT sd_get_free_clusters(FATFS* fs);
@@ -296,7 +316,7 @@ int main(void)
   httpClientTaskHandle = osThreadCreate(osThread(httpClientTask), (void*)&gnetif);
   
   /* definition and creation of httpServerTask */
-  osThreadDef(httpServerTask, Start_HTTP_Server_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
+  osThreadDef(httpServerTask, Start_HTTP_Server_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 6);
   httpServerTaskHandle = osThreadCreate(osThread(httpServerTask), (void*)&gnetif);
 
     /* definition and creation of SDLoggerTask */
@@ -307,11 +327,11 @@ int main(void)
 
   /* Create the queue(s) */
   /* definition and creation of buttonQueue */
-  osMessageQDef(buttonQueue, 16, uint8_t);
+  osMessageQDef(buttonQueue, 4, uint8_t);
   buttonQueueHandle = osMessageCreate(osMessageQ(buttonQueue), NULL);
 
   /* definition and creation of ledQueue */
-  osMessageQDef(ledQueue, 16, uint8_t);
+  osMessageQDef(ledQueue, 4, uint8_t);
   ledQueueHandle = osMessageCreate(osMessageQ(ledQueue), NULL);
 
   /* definition and creation of tcpQueue */
@@ -323,7 +343,7 @@ int main(void)
   logQueueHandle = osMessageCreate(osMessageQ(logQueue), NULL);
 
   /* definition and creation of dumpQueue */
-  osMessageQDef(dumpQueue, 8, uint16_t);
+  osMessageQDef(dumpQueue, 1, uint16_t);
   dumpQueueHandle = osMessageCreate(osMessageQ(dumpQueue), NULL);
 
   /* USER CODE BEGIN RTOS_QUEUES */
@@ -1154,6 +1174,22 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void debug_print(uint8_t dbg_mask, char* label, const char* fnc, char* msg, int8_t* val, char* txt)
+{
+  if (0 < (dbg_mask & bg_enabled)) {
+    if (NULL != msg) {
+      if ((NULL != val) && (NULL != txt)) {
+        cli_printf("[%s] %s --> %s: %s (val = %d)\r\n", label, fnc, msg, txt, *val);
+      } else if (NULL != val) {
+        cli_printf("[%s] %s --> %s (val = %d)\r\n", label, fnc, msg, *val);
+      } else if (NULL != txt) {
+        cli_printf("[%s] %s --> %s: %s\r\n", label, fnc, msg, txt);
+      } else {
+        cli_printf("[%s] %s --> %s\r\n", label, fnc, msg);
+      }
+    }
+  }
+}
 
 uint16_t cli_printf(const char* fmt, ...)
 {
@@ -1177,15 +1213,16 @@ void jsmn_parser_example(char* json_string, uint16_t len)
 
   jsmn_init(&p);
   r = jsmn_parse(&p, json_string, len, t, sizeof(t)/sizeof(t[0]));
-  if (r < 0) {
-          cli_printf("Failed to parse JSON: %d\r\n", r);
-          //return 1;
+  if (r < 0) 
+  {
+    DBG_JSMN("Failed to parse JSON", &r, NULL)
+    //return 1;
   }
 
   /* Assume the top-level element is an object */
   if (r < 1 || t[0].type != JSMN_OBJECT) {
-    cli_printf("[JSMN] ERROR: Object expected\r\n");
-          // return 1;
+    DBG_JSMN("Object expected", &r, NULL)
+    // return 1;
   }
 
   /* Loop over all keys of the root object */
@@ -1242,11 +1279,7 @@ FRESULT sd_get_free_clusters(FATFS* fs)
 
     /* Get volume information and free clusters of used drive */
     fr = f_getfree((TCHAR const*)SDPath, &fre_clust, &fs);
-    if (fr != FR_OK)
-    {
-      cli_printf("[FatFs] f_getfree: %d\r\n", fr);
-    }
-    else
+    if (fr == FR_OK)
     {
       /* Get total sectors and free sectors */
       tot_sect = (fs->n_fatent - 2) * fs->csize * _MAX_SS;
@@ -1257,6 +1290,10 @@ FRESULT sd_get_free_clusters(FATFS* fs)
       cli_printf("\t%8lu KB Used\r\n", (tot_sect - fre_sect)/1024);
       cli_printf("\t%8lu KB Available\r\n", fre_sect/1024);
       cli_printf("\t%8lu KB Total\r\n", tot_sect/1024);
+    }
+    else
+    {
+      DBG_FATFS("f_getfree",  &fr, NULL);
     }
     
     return fr;
@@ -1269,28 +1306,28 @@ FRESULT read_file_sector(FIL* file, void* dest, FSIZE_t len, UINT* bytesread, UI
   fr = f_open(file, "index.htm", FA_READ);
   if(fr != FR_OK)
   {
-    cli_printf("[FatFs] %s --> f_open: %d\r\n", __FUNCTION__, fr);
+    DBG_FATFS("f_open",  &fr, NULL);
   }
   else
   {
     fr = f_lseek(file, (index * len));
     if(fr != FR_OK)
     {
-      cli_printf("[FatFs] %s --> f_lseek: %d\r\n", __FUNCTION__, fr);
+      DBG_FATFS("f_lseek",  &fr, NULL);
     }
     else
     {
       fr = f_read(file, dest, len, bytesread);
       if(fr != FR_OK)
       {
-        cli_printf("[FatFs] %s --> f_read: %d\r\n", __FUNCTION__, fr);
+        DBG_FATFS("f_read",  &fr, NULL);
       }
     }
     
     fr = f_close(file);
     if(fr != FR_OK)
     {
-        cli_printf("[FatFs] %s --> f_close: %d\r\n", __FUNCTION__, fr);
+      DBG_FATFS("f_close",  &fr, NULL);
     }
   }
   
@@ -1300,22 +1337,22 @@ FRESULT read_file_sector(FIL* file, void* dest, FSIZE_t len, UINT* bytesread, UI
 /* Start node to be scanned (***also used as work area***) */
 FRESULT sd_scan_files(char* path)
 {
-    FRESULT res;
+    FRESULT fr;
     DIR dir;
     UINT i;
     static FILINFO fno;
 
-    res = f_opendir(&dir, path);                       /* Open the directory */
-    if (res == FR_OK) {
+    fr = f_opendir(&dir, path);                       /* Open the directory */
+    if (fr == FR_OK) {
         for (;;) {
-            res = f_readdir(&dir, &fno);                   /* Read a directory item */
-            if (res != FR_OK || fno.fname[0] == 0) break;  /* Break on error or end of dir */
+            fr = f_readdir(&dir, &fno);                   /* Read a directory item */
+            if (fr != FR_OK || fno.fname[0] == 0) break;  /* Break on error or end of dir */
             if (fno.fattrib & AM_DIR) {                    
                 /* It is a directory */
                 i = strlen(path);
                 sprintf(&path[i], "\t%s (%4d bytes)", fno.fname, fno.fsize);
-                res = sd_scan_files(path);                    /* Enter the directory */
-                if (res != FR_OK) break;
+                fr = sd_scan_files(path);                    /* Enter the directory */
+                if (fr != FR_OK) break;
                 path[i] = 0;
             }
             else 
@@ -1327,7 +1364,7 @@ FRESULT sd_scan_files(char* path)
         f_closedir(&dir);
     }
 
-    return res;
+    return fr;
 }
 
 static int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
@@ -1361,7 +1398,7 @@ err_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uin
   const char* server = "api.thingspeak.com";
   const char* url = "/update.json?headers=false";
 
-  cli_printf("[LwIP] %s --> Send TCP (data = %u)\r\n", __FUNCTION__, data);
+  DBG_LWIP("Send TCP",  &data, NULL);
 
   if (DHCP_state == DHCP_ADDRESS_ASSIGNED)
   {
@@ -1380,28 +1417,28 @@ err_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uin
           
     /* LwIP Connect TCP */
     conn = netconn_new(NETCONN_TCP);        
-    if (conn != NULL)
+    if (NULL != conn)
     {
 #if 0
       /* Bind a netconn to a specific local IP address and port (optional) */
       err = netconn_bind(conn, &netif->ip_addr, 60);
       if (err != ERR_OK)
       {
-        cli_printf("[LwIP] %s --> netconn_bind (ERR = %d)\r\n", __FUNCTION__, err);
+        cli_printf("[LwIP] %s --> netconn_bind (ERR = %d)\r\n", err);
       }
       else
 #endif
       {
         err  = netconn_gethostbyname(server, &remote_ip);
-        if (err == ERR_OK)
+        if (ERR_OK == err)
         {
-          cli_printf("[LwIP] Server: %s (%s)\r\n", server, ip4addr_ntoa((const ip4_addr_t *)&remote_ip));
+          DBG_LWIP(server,  NULL, ip4addr_ntoa((const ip4_addr_t *)&remote_ip));
           
           /* Connect to server */
           err = netconn_connect(conn, &remote_ip, 80); 
-          if (err == ERR_OK)
+          if (ERR_OK == err)
           {
-            cli_printf("[LwIP] Connection: OK\r\n");
+            DBG_LWIP("Connection",  NULL, "OK!");
 
             /* Get LwHTTP Request Data */
             lwhttp_request_get(req_ptr, &temp_buf_data, &temp_buf_data_len);
@@ -1414,9 +1451,9 @@ err_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uin
 
             /* Write data to server */
             err = netconn_write(conn, temp_buf_data, temp_buf_data_len, NETCONN_NOFLAG);
-            if (err == ERR_OK)
+            if (ERR_OK == err)
             {
-              cli_printf("[LwIP] netconn_write: %d bytes\r\n", temp_buf_data_len);
+              DBG_LWIP("netconn_write",  &temp_buf_data_len, NULL);
 
               /* Get pointer to buffer where response data is stored */
               while (( err = netconn_recv(conn, &netbuf)) == ERR_OK)
@@ -1435,11 +1472,12 @@ err_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uin
                   netbuf_delete(netbuf);
               }
               
-              if ((err == ERR_OK) || (err == ERR_CLSD))
+              if ((ERR_OK == err) || (err == ERR_CLSD))
               {
                 /* Run LwHTTP Request Parser */
                 lwhttp_response_parse(rsp_ptr);
-                cli_printf("[LwIP] netconn_recv: %d bytes\r\n", rsp_ptr->buffer.len);
+
+                DBG_LWIP("netconn_recv",  &rsp_ptr->buffer.len, NULL);
 
                 if (rsp_ptr->start_line.status_line.status_code.data != NULL)
                 {
@@ -1461,22 +1499,22 @@ err_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uin
               }
               else
               {
-                LWIP_ERROR_MSG(__FUNCTION__, "netconn_recv", err);
+                DBG_LWIP("netconn_recv", &err, NULL);
               }
             }
             else
             {
-              LWIP_ERROR_MSG(__FUNCTION__, "netconn_write", err);
+              DBG_LWIP("netconn_write", &err, NULL);
             }
           }
           else
           {
-            LWIP_ERROR_MSG(__FUNCTION__, "netconn_connect", err);
+            DBG_LWIP("netconn_connect", &err, NULL);
           }
         }
         else
         {
-          LWIP_ERROR_MSG(__FUNCTION__, "netconn_gethostbyname", err);
+          DBG_LWIP("netconn_gethostbyname", &err, NULL);
         }
       }
       
@@ -1485,13 +1523,15 @@ err_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uin
     else
     {
       err = ERR_CONN;
-      LWIP_ERROR_MSG(__FUNCTION__, "netconn_new", err);
+      DBG_LWIP("netconn_new",  &err, NULL);
     }    
   }
   else
   {
-    cli_printf("[LwIP] %s --> Unable to send TCP (DHCP State = %d)\r\n", __FUNCTION__, DHCP_state);
+    DBG_DHCP("Unable to send TCP", &DHCP_state, "DHCP State");
   }
+
+  return err;
 }
 
 void Start_SD_Logger_Task(void const * argument)
@@ -1503,19 +1543,19 @@ void Start_SD_Logger_Task(void const * argument)
 
   osDelay(100);  
 
-  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
+  DBG_RTOS("Start Task",  NULL, NULL);
 
   /* Infinite loop */
   for(;;)
   {
     if(xQueueReceive(logQueueHandle, &queueData, 0) == pdTRUE)
     {
-      cli_printf("[RTOS] %s --> New log: %d\r\n", __FUNCTION__, queueData);
+      DBG_QUEUE("logQueueHandle",  &queueData, NULL);
       sd_log(queueData);
     }
     else if(xQueueReceive(dumpQueueHandle, &queueData, 0) == pdTRUE)
     {
-      cli_printf("[RTOS] %s --> Dump log\r\n", __FUNCTION__);
+      DBG_QUEUE("dumpQueueHandle",  NULL, NULL);
       sd_dump();
     }
     else
@@ -1542,17 +1582,19 @@ void Start_HTTP_Client_Task(void const * argument)
   /* Wait for DHCP */
   while (DHCP_state != DHCP_ADDRESS_ASSIGNED)
   {
-    cli_printf("[LwIP] %s --> Waiting for DHCP (state = %d)\r\n", __FUNCTION__, DHCP_state);
+    DBG_LWIP("Waiting for DHCP",  &DHCP_state, NULL);
     osDelay(500);
   }
 
-  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
+  DBG_RTOS("Start Task",  NULL, NULL);
 
   /* Infinite loop */
   for(;;)
   {
     if(xQueueReceive(tcpQueueHandle, &queueData, 0) == pdTRUE)
     {
+      DBG_QUEUE("tcpQueueHandle", &queueData, NULL);
+
       /* LwHTTP Inits */
       lwhttp_request_init(&client_request);
       lwhttp_response_init(&client_response);  
@@ -1574,17 +1616,17 @@ void Start_HTTP_Client_Task(void const * argument)
           client_response.start_line.status_line.status_code.data
         );
 
-        cli_printf("[LwIP] %s --> Content-Type:\r\n%.*s\r\n", 
-          __FUNCTION__, 
-          content_type_header_ptr->field_value.len, 
-          content_type_header_ptr->field_value.data
-        );
-
         cli_printf("[LwIP] %s --> message_body:\r\n%d\r\n", 
           __FUNCTION__, 
           client_response.message_body.len
         );
 #endif
+
+        cli_printf("[LwIP] %s --> Content-Type:\r\n%.*s\r\n", 
+          __FUNCTION__, 
+          content_type_header_ptr->field_value.len, 
+          content_type_header_ptr->field_value.data
+        );
 
         /* If HTTP Status Code is OK (200) and Content-Type is JSON */
         if ((0 == strncmp(client_response.start_line.status_line.status_code.data, "200", strlen("200"))) 
@@ -1596,12 +1638,12 @@ void Start_HTTP_Client_Task(void const * argument)
         }   
         else
         {
-          LWIP_ERROR_MSG(__FUNCTION__, "JSON", err);
+          DBG_LWIP("JSON parse",  &err, NULL);
         }
       }
       else
       {
-        LWIP_ERROR_MSG(__FUNCTION__, "post_thingspeak", err);
+        DBG_LWIP("post_thingspeak", &err, NULL);
       }
 
       /* Free LwHTTP Request & Response */
@@ -1644,10 +1686,10 @@ void Start_HTTP_Server_Task(void const * argument)
   /* Wait for DHCP */
   while (DHCP_state != DHCP_ADDRESS_ASSIGNED)
   {
-    cli_printf("[LwIP] %s --> Waiting for DHCP (state = %d)\r\n", __FUNCTION__, DHCP_state);
+    DBG_LWIP("Waiting for DHCP",  &DHCP_state, NULL);
     osDelay(500);
   }
-  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
+  DBG_RTOS("Start Task",  NULL, NULL);
   
   /* Create a new TCP connection handle */
   conn = netconn_new(NETCONN_TCP);
@@ -1681,14 +1723,14 @@ void Start_HTTP_Server_Task(void const * argument)
             err = netconn_recv(newconn, &netbuf);
             if (err != ERR_OK)
             {
-              cli_printf("[LwIP] %s --> netconn_recv (ERR = %d)\r\n", __FUNCTION__, err);
+              DBG_LWIP("netconn_recv",  &err, NULL);
             }
             else
             {
               err = netconn_err(newconn);
               if (err != ERR_OK) 
               {
-                cli_printf("[LwIP] %s --> netconn_err (ERR = %d)\r\n", __FUNCTION__, err);
+                DBG_LWIP("netconn_err",  &err, NULL);
               }
               else
               {
@@ -1698,7 +1740,7 @@ void Start_HTTP_Server_Task(void const * argument)
                   err = netbuf_data(netbuf, (void**)&temp_buf_data, &temp_buf_data_len);
                   if (err != ERR_OK) 
                   {
-                    cli_printf("[LwIP] %s --> netconn_err (ERR = %d)\r\n", __FUNCTION__, err);
+                    DBG_LWIP("netbuf_data",  &err, NULL);
                   }
                   else
                   {
@@ -1760,7 +1802,7 @@ void Start_HTTP_Server_Task(void const * argument)
               fr = read_file_sector(&HTTP_File, (void*)server_response_buffer, sizeof(server_response_buffer), &bytes_read, idx);
               if (FR_OK != fr)
               {
-                cli_printf("[FatFs] read_file_sector: %d\r\n", fr);
+                DBG_FATFS("read_file_sector",  &fr, NULL);
                 bytes_read = 0;
               }
               else
@@ -1819,18 +1861,18 @@ void Start_HTTP_Server_Task(void const * argument)
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void const * argument)
 {
-  
-  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
-  
+
   /* Graphic application */  
   GRAPHICS_MainTask();
-        
+      
   /* USER CODE BEGIN 5 */
-    /* Infinite loop */
-    for (;;)
-    {
-        osDelay(1);
-    }
+  DBG_RTOS("Start Task",  NULL, NULL);
+
+  /* Infinite loop */
+  for (;;)
+  {
+      osDelay(1);
+  }
   /* USER CODE END 5 */ 
 }
 
@@ -1844,14 +1886,13 @@ void StartDefaultTask(void const * argument)
 void StartButtonTask(void const * argument)
 {
   /* USER CODE BEGIN StartButtonTask */
-  
-  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
-
   uint32_t buttonState = 0;
   uint8_t buttonCount = 0;
   
   BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
   
+  DBG_RTOS("Start Task",  NULL, NULL);
+
   /* Infinite loop */
   for(;;)
   {
@@ -1861,7 +1902,7 @@ void StartButtonTask(void const * argument)
       if(xQueueSend(buttonQueueHandle, (uint8_t*)&buttonState, 0) == pdTRUE)
       {
         buttonCount++;
-        cli_printf("[Queue] %s --> Button Pressed (%u)\r\n", __FUNCTION__, buttonCount);
+        DBG_QUEUE("buttonQueueHandle",  &buttonCount, NULL);
       }
     }
     
@@ -1880,19 +1921,19 @@ void StartButtonTask(void const * argument)
 void StartLEDTask(void const * argument)
 {
   /* USER CODE BEGIN StartLEDTask */
-  
-  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
-  
   uint8_t led_state = 0;
 
   BSP_LED_Init(LED_GREEN);
   BSP_LED_Off(LED_GREEN);
+  
+  DBG_RTOS("Start Task",  NULL, NULL);
       
   /* Infinite loop */
   for(;;)
   {
     if(xQueueReceive(ledQueueHandle, &led_state, 0) == pdTRUE)
     {
+      DBG_QUEUE("ledQueueHandle", &led_state, NULL);
       if (led_state == 1)
       {
         BSP_LED_On(LED_GREEN);
@@ -1901,7 +1942,6 @@ void StartLEDTask(void const * argument)
       {
         BSP_LED_Off(LED_GREEN);
       }
-      cli_printf("[Queue] %s --> LED Toggle (%d)\r\n", __FUNCTION__, led_state);
     }
     
     osDelay(20);
@@ -1915,9 +1955,9 @@ FRESULT sd_append(char* fn, char* wtext)
   FIL fil;                                       /* File object */
 
   uint32_t byteswritten = 0;                     /* File write/read counts */
-    
-  cli_printf("[FatFs] %s --> File name: %s\r\n", __FUNCTION__, fn);
-  cli_printf("[FatFs] %s --> Text: %s", __FUNCTION__, wtext);
+
+  DBG_FATFS("File name",  NULL, fn);
+  DBG_FATFS("Text",  NULL, wtext);
 
   /*##-3- Create and Open a new text file object with write access #####*/
   fr = f_open(&fil, (char*)fn, FA_OPEN_ALWAYS | FA_WRITE);
@@ -1931,28 +1971,28 @@ FRESULT sd_append(char* fn, char* wtext)
       fr = f_write(&fil, wtext, strlen(wtext), (UINT *)&byteswritten);
       if(fr == FR_OK)
       {
-        cli_printf("[FatFs] %s --> byteswritten: %d\r\n\r\n", __FUNCTION__, byteswritten);
+        DBG_FATFS("byteswritten",  &byteswritten, NULL);
       }
       else
       {
-        FatFs_ERROR_MSG(__FUNCTION__, "f_write", fr);
+        DBG_FATFS("f_write", &fr, NULL);
       }
     }
     else
     {
-      FatFs_ERROR_MSG(__FUNCTION__, "f_lseek", fr);
+      DBG_FATFS("f_lseek", &fr, NULL);
     }
     
     /*##-6- Close the open text file #################################*/
     fr = f_close(&fil);
     if(fr != FR_OK)
     {
-      FatFs_ERROR_MSG(__FUNCTION__, "f_close", fr);
+      DBG_FATFS("f_close", &fr, NULL);
     }
   }
   else
   {
-    FatFs_ERROR_MSG(__FUNCTION__, "f_open", fr);
+    DBG_FATFS("f_open", &fr, NULL);
   }
   
   return fr;
@@ -1972,7 +2012,7 @@ FRESULT sd_dump(void)
   uint32_t bytesread = 0;                     /* File write/read counts */
   uint8_t rtext[256];                         /* File read buffer */
 
-  cli_printf("[FatFs] %s --> File name: %s\r\n", __FUNCTION__, (char*)sd_log_filename);
+  DBG_FATFS("File name",  NULL, (char*)sd_log_filename);
 
   /*##-7- Open the text file object with read access ###############*/
   fr = f_open(&fil, (char*)sd_log_filename, FA_READ);
@@ -1991,7 +2031,7 @@ FRESULT sd_dump(void)
       }
       else 
       {
-        FatFs_ERROR_MSG(__FUNCTION__, "f_read", fr);
+        DBG_FATFS("f_read", &fr, NULL);
       }
     } while((bytesread > 0) && (fr == FR_OK));
 
@@ -1999,12 +2039,12 @@ FRESULT sd_dump(void)
     fr = f_close(&fil);
     if(fr != FR_OK)
     {
-      FatFs_ERROR_MSG(__FUNCTION__, "f_close", fr);
+      DBG_FATFS("f_close", &fr, NULL);
     }
   }
   else
   {
-    FatFs_ERROR_MSG(__FUNCTION__, "f_open", fr);
+    DBG_FATFS("f_open", &fr, NULL);
   }
   
   return fr;
@@ -2029,7 +2069,7 @@ void StartSDTask(void const * argument)
   /* init code for FATFS */
   MX_FATFS_Init();
 
-  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
+  DBG_RTOS("Start Task",  NULL, NULL);
 
   /*##-1- Link the micro SD disk I/O driver ##################################*/
   ret = BSP_SD_Init();
@@ -2039,16 +2079,16 @@ void StartSDTask(void const * argument)
     fr = f_mount(fs, (TCHAR const*)SDPath, 0);
     if(fr == FR_OK)
     {
-      cli_printf("[FatFs] %s --> f_mount OK!\r\n", __FUNCTION__);
+      DBG_FATFS("f_mount", NULL, "OK!");
     }
     else
     {
-      FatFs_ERROR_MSG(__FUNCTION__, "f_mount", fr);
+      DBG_FATFS("f_mount", &fr, NULL);
     }
   }
   else
   {
-    FatFs_ERROR_MSG(__FUNCTION__, "BSP_SD_Init", ret);
+    DBG_FATFS("BSP_SD_Init", &ret, NULL);
   }
 
   /* Get random number */
@@ -2080,21 +2120,20 @@ void StartSDTask(void const * argument)
 
 void setDHCP_State(uint8_t state)
 {
-  cli_printf("[DHCP] State change %d --> %d\r\n", DHCP_state, state);
+  DBG_DHCP("DHCP State change", &state, NULL);
   DHCP_state = state;
 }
 
 void StartLWIPTask(void const * argument)
 {
   /* USER CODE BEGIN StartLWIPTask */
-  
-  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
-
   /* LwIP PV */
   struct netif* netif = (struct netif*)argument;
   
   /* init code for LWIP */
   MX_LWIP_Init();
+
+  DBG_RTOS("Start Task",  NULL, NULL);
   
   /* Check interface status */
   if (netif_is_up(netif))
@@ -2104,7 +2143,6 @@ void StartLWIPTask(void const * argument)
   else
   {  
     setDHCP_State(DHCP_LINK_DOWN);
-    cli_printf("[LWIP] %s --> DHCP Link down (state = %d)\r\n", __FUNCTION__, DHCP_state);
   }
 
   /* Infinite loop */
@@ -2126,9 +2164,6 @@ void StartLWIPTask(void const * argument)
 void StartDHCPTask(void const * argument)
 {
   /* USER CODE BEGIN StartDHCPTask */
-  
-  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
-
   struct netif* netif = (struct netif*)argument;
   ip_addr_t ipaddr;
   ip_addr_t netmask;
@@ -2138,6 +2173,8 @@ void StartDHCPTask(void const * argument)
   
   /* Get DHCP instance */
   dhcp = (struct dhcp *)netif_get_client_data(netif, LWIP_NETIF_CLIENT_DATA_INDEX_DHCP);
+
+  DBG_RTOS("Start Task",  NULL, NULL);
   
   for (;;)
   {
@@ -2150,7 +2187,7 @@ void StartDHCPTask(void const * argument)
         ip_addr_set_zero_ip4(&netif->gw);       
         dhcp_start(netif);
         setDHCP_State(DHCP_WAIT_ADDRESS);
-        cli_printf("[DHCP] Looking for server ...\r\n");
+        DBG_DHCP("Looking for server", NULL, NULL);
       }
       break;
       
@@ -2159,7 +2196,7 @@ void StartDHCPTask(void const * argument)
         if (dhcp_supplied_address(netif)) 
         {
           setDHCP_State(DHCP_ADDRESS_ASSIGNED); 
-          cli_printf("[DHCP] Supplied address: %s\r\n", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
+          DBG_DHCP("Supplied address", NULL, ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
         }
         else
         {
@@ -2179,8 +2216,8 @@ void StartDHCPTask(void const * argument)
             IP_ADDR4(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
             netif_set_addr(netif, ip_2_ip4(&ipaddr), ip_2_ip4(&netmask), ip_2_ip4(&gw));
             
-            cli_printf("[DHCP] Timeout\r\n");
-            cli_printf("[DHCP] Static IP address: %s\r\n", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
+            DBG_DHCP("Timeout", NULL, NULL);
+            DBG_DHCP("Static IP address", NULL, ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
           }
         }
       }

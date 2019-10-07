@@ -22,6 +22,15 @@
     <ClCompile Include="..\..\gui\src\main_screen\MainPresenter.cpp"/>
     <ClCompile Include="..\..\gui\src\main_screen\MainView.cpp"/>
     <ClCompile Include="..\..\generated\gui_generated\src\main_screen\MainViewBase.cpp"/>
+    <ClCompile Include="..\..\gui\src\logger_screen\LoggerPresenter.cpp"/>
+    <ClCompile Include="..\..\gui\src\logger_screen\LoggerView.cpp"/>
+    <ClCompile Include="..\..\generated\gui_generated\src\logger_screen\LoggerViewBase.cpp"/>
+    <ClCompile Include="..\..\gui\src\network_screen\NetworkPresenter.cpp"/>
+    <ClCompile Include="..\..\gui\src\network_screen\NetworkView.cpp"/>
+    <ClCompile Include="..\..\generated\gui_generated\src\network_screen\NetworkViewBase.cpp"/>
+    <ClCompile Include="..\..\gui\src\iocontrol_screen\IOControlPresenter.cpp"/>
+    <ClCompile Include="..\..\gui\src\iocontrol_screen\IOControlView.cpp"/>
+    <ClCompile Include="..\..\generated\gui_generated\src\iocontrol_screen\IOControlViewBase.cpp"/>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\assets\texts\texts.xlsx"/>
@@ -171,6 +180,15 @@
     <ClInclude Include="..\..\gui\include\gui\main_screen\MainPresenter.hpp"/>
     <ClInclude Include="..\..\gui\include\gui\main_screen\MainView.hpp"/>
     <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\main_screen\MainViewBase.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\logger_screen\LoggerPresenter.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\logger_screen\LoggerView.hpp"/>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\logger_screen\LoggerViewBase.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\network_screen\NetworkPresenter.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\network_screen\NetworkView.hpp"/>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\network_screen\NetworkViewBase.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\iocontrol_screen\IOControlPresenter.hpp"/>
+    <ClInclude Include="..\..\gui\include\gui\iocontrol_screen\IOControlView.hpp"/>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\iocontrol_screen\IOControlViewBase.hpp"/>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\touchgfx.rc"/>

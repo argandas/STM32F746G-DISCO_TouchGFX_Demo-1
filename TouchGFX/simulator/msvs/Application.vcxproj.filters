@@ -163,6 +163,42 @@
     <Filter Include="Source Files\generated\gui_generated\main_screen">
       <UniqueIdentifier>2317A4E9-624F-4947-A52D-B85444F7D776</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\gui\logger_screen">
+      <UniqueIdentifier>BE4FF6F2-9059-4680-9EBC-1CFD35AC7838</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gui\logger_screen">
+      <UniqueIdentifier>3521D18A-0E6E-49C4-A326-8BEADFE0B567</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\generated\gui_generated\logger_screen">
+      <UniqueIdentifier>60729A11-44EC-478A-B4FF-13E1A1D211C4</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generated\gui_generated\logger_screen">
+      <UniqueIdentifier>5910B9FC-19A3-4525-8AAE-D8EE7FDBED34</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui\network_screen">
+      <UniqueIdentifier>8EEE3B19-7640-45E7-8A67-7BB27054AEC0</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gui\network_screen">
+      <UniqueIdentifier>24548096-8493-43D2-B34C-9ED326F20271</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\generated\gui_generated\network_screen">
+      <UniqueIdentifier>84553003-165F-4C2D-AB16-24580C9C27EF</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generated\gui_generated\network_screen">
+      <UniqueIdentifier>5D354B69-BD2B-482B-A81B-F85BC3B805A4</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\gui\iocontrol_screen">
+      <UniqueIdentifier>4929671B-3D14-44AF-B5CB-4D7DA8BF6F3D</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\gui\iocontrol_screen">
+      <UniqueIdentifier>46A653E6-9455-4F5E-9C31-07A6E5C5A95E</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generated\gui_generated\iocontrol_screen">
+      <UniqueIdentifier>58F68DCA-119C-4B5E-9C33-2D5CC99700AC</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\generated\gui_generated\iocontrol_screen">
+      <UniqueIdentifier>F0A6B754-56F9-4593-AB83-499BD45D91FC</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(TouchGFXReleasePath)\framework\source\platform\driver\touch\SDL2TouchController.cpp">
@@ -197,6 +233,33 @@
     </ClCompile>
     <ClCompile Include="..\..\generated\gui_generated\src\main_screen\MainViewBase.cpp">
       <Filter>Source Files\generated\gui_generated\main_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\logger_screen\LoggerPresenter.cpp">
+      <Filter>Source Files\gui\logger_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\logger_screen\LoggerView.cpp">
+      <Filter>Source Files\gui\logger_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\generated\gui_generated\src\logger_screen\LoggerViewBase.cpp">
+      <Filter>Source Files\generated\gui_generated\logger_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\network_screen\NetworkPresenter.cpp">
+      <Filter>Source Files\gui\network_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\network_screen\NetworkView.cpp">
+      <Filter>Source Files\gui\network_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\generated\gui_generated\src\network_screen\NetworkViewBase.cpp">
+      <Filter>Source Files\generated\gui_generated\network_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\iocontrol_screen\IOControlPresenter.cpp">
+      <Filter>Source Files\gui\iocontrol_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\gui\src\iocontrol_screen\IOControlView.cpp">
+      <Filter>Source Files\gui\iocontrol_screen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\generated\gui_generated\src\iocontrol_screen\IOControlViewBase.cpp">
+      <Filter>Source Files\generated\gui_generated\iocontrol_screen</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -636,6 +699,33 @@
     </ClInclude>
     <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\main_screen\MainViewBase.hpp">
       <Filter>Header Files\generated\gui_generated\main_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\logger_screen\LoggerPresenter.hpp">
+      <Filter>Header Files\gui\logger_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\logger_screen\LoggerView.hpp">
+      <Filter>Header Files\gui\logger_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\logger_screen\LoggerViewBase.hpp">
+      <Filter>Header Files\generated\gui_generated\logger_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\network_screen\NetworkPresenter.hpp">
+      <Filter>Header Files\gui\network_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\network_screen\NetworkView.hpp">
+      <Filter>Header Files\gui\network_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\network_screen\NetworkViewBase.hpp">
+      <Filter>Header Files\generated\gui_generated\network_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\iocontrol_screen\IOControlPresenter.hpp">
+      <Filter>Header Files\gui\iocontrol_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\gui\include\gui\iocontrol_screen\IOControlView.hpp">
+      <Filter>Header Files\gui\iocontrol_screen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\generated\gui_generated\include\gui_generated\iocontrol_screen\IOControlViewBase.hpp">
+      <Filter>Header Files\generated\gui_generated\iocontrol_screen</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

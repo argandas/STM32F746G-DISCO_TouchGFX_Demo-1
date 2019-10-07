@@ -137,13 +137,6 @@ void MainView::toggleButtonPressed()
     toggleButton.invalidate();
 }
 
-void MainView::ledButtonPressed()
-{
-  led_state = !led_state;
-  touchgfx_printf("MainView::%s = %d\r\n", __FUNCTION__, led_state);
-  presenter->v2p_SetLEDState(led_state);
-}
-
 void MainView::tcpButtonPressed()
 {
   int tmpVal = Unicode::atoi(countTxt.getWildcard());

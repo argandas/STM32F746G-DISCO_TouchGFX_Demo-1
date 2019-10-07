@@ -1268,14 +1268,53 @@
         </file>
       </group>
       <group>
+        <name>iocontrol_screen</name>
+        <file>
+          <name>$PROJ_DIR$\..\TouchGFX\generated\gui_generated\src\iocontrol_screen\IOControlViewBase.cpp</name>
+        </file>
+      </group>
+      <group>
+        <name>logger_screen</name>
+        <file>
+          <name>$PROJ_DIR$\..\TouchGFX\generated\gui_generated\src\logger_screen\LoggerViewBase.cpp</name>
+        </file>
+      </group>
+      <group>
         <name>main_screen</name>
         <file>
           <name>$PROJ_DIR$\..\TouchGFX\generated\gui_generated\src\main_screen\MainViewBase.cpp</name>
         </file>
       </group>
+      <group>
+        <name>network_screen</name>
+        <file>
+          <name>$PROJ_DIR$\..\TouchGFX\generated\gui_generated\src\network_screen\NetworkViewBase.cpp</name>
+        </file>
+      </group>
     </group>
     <group>
       <name>images</name>
+      <group>
+        <name>__designer</name>
+        <file>
+          <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\__designer\blue_buttons_round_edge_icon_button.cpp</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\__designer\blue_buttons_round_edge_icon_button_pressed.cpp</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\__designer\blue_icons_document_32.cpp</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\__designer\blue_icons_home_32.cpp</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\__designer\blue_icons_settings_32.cpp</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\__designer\blue_icons_tools_32.cpp</name>
+        </file>
+      </group>
       <file>
         <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\bg.cpp</name>
       </file>
@@ -1335,6 +1374,24 @@
       </file>
     </group>
     <group>
+      <name>iocontrol_screen</name>
+      <file>
+        <name>$PROJ_DIR$\..\TouchGFX\gui\src\iocontrol_screen\IOControlPresenter.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\TouchGFX\gui\src\iocontrol_screen\IOControlView.cpp</name>
+      </file>
+    </group>
+    <group>
+      <name>logger_screen</name>
+      <file>
+        <name>$PROJ_DIR$\..\TouchGFX\gui\src\logger_screen\LoggerPresenter.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\TouchGFX\gui\src\logger_screen\LoggerView.cpp</name>
+      </file>
+    </group>
+    <group>
       <name>main_screen</name>
       <file>
         <name>$PROJ_DIR$\..\TouchGFX\gui\src\main_screen\MainPresenter.cpp</name>
@@ -1347,6 +1404,15 @@
       <name>model</name>
       <file>
         <name>$PROJ_DIR$\..\TouchGFX\gui\src\model\Model.cpp</name>
+      </file>
+    </group>
+    <group>
+      <name>network_screen</name>
+      <file>
+        <name>$PROJ_DIR$\..\TouchGFX\gui\src\network_screen\NetworkPresenter.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\TouchGFX\gui\src\network_screen\NetworkView.cpp</name>
       </file>
     </group>
   </group>

@@ -18,6 +18,22 @@ public:
     // Main
     void gotoMainScreenNoTransition();
 
+    void gotoMainScreenSlideTransitionNorth();
+
+    void gotoMainScreenCoverTransitionSouth();
+
+
+    // Logger
+    void gotoLoggerScreenNoTransition();
+
+
+    // Network
+    void gotoNetworkScreenNoTransition();
+
+
+    // IOControl
+    void gotoIOControlScreenNoTransition();
+
 protected:
     touchgfx::Callback<FrontendApplicationBase> transitionCallback;
     FrontendHeap& frontendHeap;
@@ -25,6 +41,22 @@ protected:
 
     // Main
     void gotoMainScreenNoTransitionImpl();
+
+    void gotoMainScreenSlideTransitionNorthImpl();
+
+    void gotoMainScreenCoverTransitionSouthImpl();
+
+
+    // Logger
+    void gotoLoggerScreenNoTransitionImpl();
+
+
+    // Network
+    void gotoNetworkScreenNoTransitionImpl();
+
+
+    // IOControl
+    void gotoIOControlScreenNoTransitionImpl();
 };
 
 #endif // FRONTENDAPPLICATIONBASE_HPP

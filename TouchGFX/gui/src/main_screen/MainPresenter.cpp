@@ -20,12 +20,6 @@ void MainPresenter::m2p_ButtonPressed()
   view.hw_ButtonPressed();
 }
 
-void MainPresenter::v2p_SetLEDState(bool state)
-{
-  touchgfx_printf("MainPresenter::%s: %d\r\n", __FUNCTION__, state);
-  model->p2m_SetLEDState(state);
-}
-
 void MainPresenter::v2p_SendTCPData(int data)
 {
   touchgfx_printf("MainPresenter::%s: %d\r\n", __FUNCTION__, data);

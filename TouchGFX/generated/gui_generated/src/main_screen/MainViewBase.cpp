@@ -62,14 +62,6 @@ MainViewBase::MainViewBase() :
     countTxt.setWildcard(countTxtBuffer);
     countTxt.setTypedText(TypedText(T_NUMBERTEXT));
 
-    ledButton.setBitmaps(Bitmap(BITMAP_SMALL_BTN_ID), Bitmap(BITMAP_SMALL_BTN_PRESSED_ID));
-    ledButton.setBitmapXY(0, 0);
-    ledButton.setText(TypedText(T_SINGLEUSEID9));
-    ledButton.setTextPosition(0, 19, 100, 56);
-    ledButton.setTextColors(touchgfx::Color::getColorFrom24BitRGB(70, 70, 70), touchgfx::Color::getColorFrom24BitRGB(231, 154, 9));
-    ledButton.setPosition(348, 90, 100, 56);
-    ledButton.setAction(flexButtonCallback);
-
     tcpButton.setBitmaps(Bitmap(BITMAP_SMALL_BTN_ID), Bitmap(BITMAP_SMALL_BTN_PRESSED_ID));
     tcpButton.setBitmapXY(0, 0);
     tcpButton.setText(TypedText(T_SINGLEUSEID10));
@@ -94,6 +86,27 @@ MainViewBase::MainViewBase() :
     dumpButton.setPosition(348, 200, 100, 56);
     dumpButton.setAction(flexButtonCallback);
 
+    screenBtnLogger.setBitmaps(Bitmap(BITMAP_BLUE_BUTTONS_ROUND_EDGE_ICON_BUTTON_ID), Bitmap(BITMAP_BLUE_BUTTONS_ROUND_EDGE_ICON_BUTTON_PRESSED_ID));
+    screenBtnLogger.setBitmapXY(0, 0);
+    screenBtnLogger.setIconBitmaps(Bitmap(BITMAP_BLUE_ICONS_SETTINGS_32_ID), Bitmap(BITMAP_BLUE_ICONS_SETTINGS_32_ID));
+    screenBtnLogger.setIconXY(15, 15);
+    screenBtnLogger.setPosition(150, 198, 60, 60);
+    screenBtnLogger.setAction(flexButtonCallback);
+
+    screenBtnNetwork.setBitmaps(Bitmap(BITMAP_BLUE_BUTTONS_ROUND_EDGE_ICON_BUTTON_ID), Bitmap(BITMAP_BLUE_BUTTONS_ROUND_EDGE_ICON_BUTTON_PRESSED_ID));
+    screenBtnNetwork.setBitmapXY(0, 0);
+    screenBtnNetwork.setIconBitmaps(Bitmap(BITMAP_BLUE_ICONS_TOOLS_32_ID), Bitmap(BITMAP_BLUE_ICONS_TOOLS_32_ID));
+    screenBtnNetwork.setIconXY(15, 16);
+    screenBtnNetwork.setPosition(210, 198, 60, 60);
+    screenBtnNetwork.setAction(flexButtonCallback);
+
+    screenBtnIOCont.setBitmaps(Bitmap(BITMAP_BLUE_BUTTONS_ROUND_EDGE_ICON_BUTTON_ID), Bitmap(BITMAP_BLUE_BUTTONS_ROUND_EDGE_ICON_BUTTON_PRESSED_ID));
+    screenBtnIOCont.setBitmapXY(0, 0);
+    screenBtnIOCont.setIconBitmaps(Bitmap(BITMAP_BLUE_ICONS_DOCUMENT_32_ID), Bitmap(BITMAP_BLUE_ICONS_DOCUMENT_32_ID));
+    screenBtnIOCont.setIconXY(17, 15);
+    screenBtnIOCont.setPosition(270, 198, 60, 60);
+    screenBtnIOCont.setAction(flexButtonCallback);
+
     add(backgroundBox);
     add(backgroundImage);
     add(toggleButton);
@@ -102,10 +115,12 @@ MainViewBase::MainViewBase() :
     add(repeatButton);
     add(counterBackgroundImage);
     add(countTxt);
-    add(ledButton);
     add(tcpButton);
     add(logButton);
     add(dumpButton);
+    add(screenBtnLogger);
+    add(screenBtnNetwork);
+    add(screenBtnIOCont);
 }
 
 void MainViewBase::setupScreen()
@@ -143,13 +158,6 @@ void MainViewBase::flexButtonCallbackHandler(const touchgfx::AbstractButtonConta
         //Call repeatButtonPressed
         repeatButtonPressed();
     }
-    else if (&src == &ledButton)
-    {
-        //ledButtonInteraction
-        //When ledButton clicked call virtual function
-        //Call ledButtonPressed
-        ledButtonPressed();
-    }
     else if (&src == &tcpButton)
     {
         //tcpButtonInteraction
@@ -170,5 +178,26 @@ void MainViewBase::flexButtonCallbackHandler(const touchgfx::AbstractButtonConta
         //When dumpButton clicked call virtual function
         //Call dumpButtonPressed
         dumpButtonPressed();
+    }
+    else if (&src == &screenBtnLogger)
+    {
+        //screenLoggerInteraction
+        //When screenBtnLogger clicked change screen to Logger
+        //Go to Logger with no screen transition
+        application().gotoLoggerScreenNoTransition();
+    }
+    else if (&src == &screenBtnNetwork)
+    {
+        //screenNetworkInteraction
+        //When screenBtnNetwork clicked change screen to Network
+        //Go to Network with no screen transition
+        application().gotoNetworkScreenNoTransition();
+    }
+    else if (&src == &screenBtnIOCont)
+    {
+        //screenIOControlInteraction
+        //When screenBtnIOCont clicked change screen to IOControl
+        //Go to IOControl with no screen transition
+        application().gotoIOControlScreenNoTransition();
     }
 }

@@ -8,11 +8,24 @@
 #include <common/Partition.hpp>
 #include <mvp/MVPHeap.hpp>
 #include <touchgfx/transitions/NoTransition.hpp>
+
+
+
+#include <touchgfx/transitions/SlideTransition.hpp>
+
+#include <touchgfx/transitions/CoverTransition.hpp>
+
 #include <gui/common/FrontendApplication.hpp>
 #include <gui/model/Model.hpp>
 
 #include <gui/main_screen/MainView.hpp>
 #include <gui/main_screen/MainPresenter.hpp>
+#include <gui/logger_screen/LoggerView.hpp>
+#include <gui/logger_screen/LoggerPresenter.hpp>
+#include <gui/network_screen/NetworkView.hpp>
+#include <gui/network_screen/NetworkPresenter.hpp>
+#include <gui/iocontrol_screen/IOControlView.hpp>
+#include <gui/iocontrol_screen/IOControlPresenter.hpp>
 
 
 /**
@@ -36,7 +49,10 @@ public:
      * @note All view types used in the application MUST be added to this list!
      */
     typedef meta::TypeList< MainView,
-            meta::Nil
+            meta::TypeList< LoggerView,
+            meta::TypeList< NetworkView,
+            meta::TypeList< IOControlView,
+            meta::Nil > > >
             > GeneratedViewTypes;
 
     /**
@@ -49,7 +65,10 @@ public:
      * @note All presenter types used in the application MUST be added to this list!
      */
     typedef meta::TypeList< MainPresenter,
-            meta::Nil
+            meta::TypeList< LoggerPresenter,
+            meta::TypeList< NetworkPresenter,
+            meta::TypeList< IOControlPresenter,
+            meta::Nil > > >
             > GeneratedPresenterTypes;
 
     /**
@@ -62,7 +81,9 @@ public:
      * @note All transition types used in the application MUST be added to this list!
      */
     typedef meta::TypeList< NoTransition,
-            meta::Nil
+            meta::TypeList< SlideTransition<NORTH>,
+            meta::TypeList< CoverTransition<SOUTH>,
+            meta::Nil > >
             > GeneratedTransitionTypes;
 
     /**

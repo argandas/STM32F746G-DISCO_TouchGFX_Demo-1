@@ -16,14 +16,11 @@ public:
     virtual void zeroButtonPressed();
     virtual void touchButtonPressed();
     virtual void toggleButtonPressed();
-    virtual void ledButtonPressed();
     virtual void tcpButtonPressed();
     virtual void hw_ButtonPressed();
     virtual void logButtonPressed();
     virtual void dumpButtonPressed();
-
-    bool led_state;
-
+    
 private:
   void inc_count();
   void dec_count();
