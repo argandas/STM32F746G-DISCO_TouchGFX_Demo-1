@@ -277,26 +277,26 @@ int main(void)
   ledTaskHandle = osThreadCreate(osThread(ledTask), NULL);
 
   /* definition and creation of sdTask */
-  osThreadDef(sdTask, StartSDTask, osPriorityAboveNormal, 0, configMINIMAL_STACK_SIZE * 8);
+  osThreadDef(sdTask, StartSDTask, osPriorityAboveNormal, 0, configMINIMAL_STACK_SIZE * 4);
   sdTaskHandle = osThreadCreate(osThread(sdTask), NULL);
 
   /* definition and creation of lwipTask */
-  osThreadDef(lwipTask, StartLWIPTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 6);
+  osThreadDef(lwipTask, StartLWIPTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
   lwipTaskHandle = osThreadCreate(osThread(lwipTask), (void*)&gnetif);
 
   /* definition and creation of dhcpTask */
-  osThreadDef(dhcpTask, StartDHCPTask, osPriorityBelowNormal, 0, configMINIMAL_STACK_SIZE * 5);
+  osThreadDef(dhcpTask, StartDHCPTask, osPriorityAboveNormal, 0, configMINIMAL_STACK_SIZE * 4);
   dhcpTaskHandle = osThreadCreate(osThread(dhcpTask), (void*)&gnetif);
 
   /* USER CODE BEGIN RTOS_THREADS */
     /* add threads, ... */
 
   /* definition and creation of httpClientTask */
-  osThreadDef(httpClientTask, Start_HTTP_Client_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 8);
+  osThreadDef(httpClientTask, Start_HTTP_Client_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
   httpClientTaskHandle = osThreadCreate(osThread(httpClientTask), (void*)&gnetif);
   
   /* definition and creation of httpServerTask */
-  osThreadDef(httpServerTask, Start_HTTP_Server_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 8);
+  osThreadDef(httpServerTask, Start_HTTP_Server_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
   httpServerTaskHandle = osThreadCreate(osThread(httpServerTask), (void*)&gnetif);
 
     /* definition and creation of SDLoggerTask */
@@ -1358,7 +1358,7 @@ err_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uin
   
   /* Thingspeak server PV */
   const char* key = "WTN6FH385TCUNDMU";
-  const char* server = "thingspeak.com";
+  const char* server = "api.thingspeak.com";
   const char* url = "/update.json?headers=false";
 
   cli_printf("[LwIP] %s --> Send TCP (data = %u)\r\n", __FUNCTION__, data);
@@ -1375,12 +1375,12 @@ err_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uin
     lwhttp_request_put_message_header(req_ptr, "Content-Length", (char *)json_data_len);
     lwhttp_request_put_message_body(req_ptr, (char*)json_data, strlen((char *)json_data));  
           
-    /* Run LwHTTP Response Parser */
+    /* Run LwHTTP Request Parser */
     lwhttp_request_parse(req_ptr);
           
     /* LwIP Connect TCP */
     conn = netconn_new(NETCONN_TCP);        
-    if (conn == NULL)
+    if (conn != NULL)
     {
 #if 0
       /* Bind a netconn to a specific local IP address and port (optional) */
@@ -1405,11 +1405,19 @@ err_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uin
 
             /* Get LwHTTP Request Data */
             lwhttp_request_get(req_ptr, &temp_buf_data, &temp_buf_data_len);
-            
+
+#if 0
+            cli_printf("[LwIP] %s --> Request:\r\n", __FUNCTION__); 
+            cli_write(req_ptr->buffer.data, req_ptr->buffer.len);
+            cli_printf("\r\n");
+#endif     
+
             /* Write data to server */
             err = netconn_write(conn, temp_buf_data, temp_buf_data_len, NETCONN_NOFLAG);
             if (err == ERR_OK)
             {
+              cli_printf("[LwIP] netconn_write: %d bytes\r\n", temp_buf_data_len);
+
               /* Get pointer to buffer where response data is stored */
               while (( err = netconn_recv(conn, &netbuf)) == ERR_OK)
               {
@@ -1429,6 +1437,10 @@ err_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uin
               
               if ((err == ERR_OK) || (err == ERR_CLSD))
               {
+                /* Run LwHTTP Request Parser */
+                lwhttp_response_parse(rsp_ptr);
+                cli_printf("[LwIP] netconn_recv: %d bytes\r\n", rsp_ptr->buffer.len);
+
                 if (rsp_ptr->start_line.status_line.status_code.data != NULL)
                 {
                   /* Print HTTP Request */
@@ -1444,8 +1456,7 @@ err_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uin
                 }
                 else
                 {
-                  /* TODO: Assign correct error code*/
-                  err = ERR_CONN;
+                  err = ERR_MEM;
                 }
               }
               else
@@ -1528,7 +1539,12 @@ void Start_HTTP_Client_Task(void const * argument)
   static lwhttp_request_t client_request;
   static lwhttp_response_t client_response;
 
-  osDelay(10);  
+  /* Wait for DHCP */
+  while (DHCP_state != DHCP_ADDRESS_ASSIGNED)
+  {
+    cli_printf("[LwIP] %s --> Waiting for DHCP (state = %d)\r\n", __FUNCTION__, DHCP_state);
+    osDelay(500);
+  }
 
   cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
 
@@ -1545,9 +1561,30 @@ void Start_HTTP_Client_Task(void const * argument)
       err = post_thingspeak(&client_request, &client_response, queueData);
       if (ERR_OK == err)
       {
-
         /* Content-Type */
         lwhttp_response_get_message_header(&client_response, "Content-Type", &content_type_header_ptr);
+#if 0
+        cli_printf("[LwIP] %s --> Response:\r\n", __FUNCTION__); 
+      
+        cli_write(client_response.buffer.data, client_response.buffer.len);
+
+        cli_printf("[LwIP] %s --> status_code:\r\n%.*s\r\n", 
+          __FUNCTION__, 
+          client_response.start_line.status_line.status_code.len, 
+          client_response.start_line.status_line.status_code.data
+        );
+
+        cli_printf("[LwIP] %s --> Content-Type:\r\n%.*s\r\n", 
+          __FUNCTION__, 
+          content_type_header_ptr->field_value.len, 
+          content_type_header_ptr->field_value.data
+        );
+
+        cli_printf("[LwIP] %s --> message_body:\r\n%d\r\n", 
+          __FUNCTION__, 
+          client_response.message_body.len
+        );
+#endif
 
         /* If HTTP Status Code is OK (200) and Content-Type is JSON */
         if ((0 == strncmp(client_response.start_line.status_line.status_code.data, "200", strlen("200"))) 
@@ -1557,6 +1594,14 @@ void Start_HTTP_Client_Task(void const * argument)
           /* Parse LwHTTP Response message body as JSON */        
           jsmn_parser_example(client_response.message_body.data, client_response.message_body.len);  
         }   
+        else
+        {
+          LWIP_ERROR_MSG(__FUNCTION__, "JSON", err);
+        }
+      }
+      else
+      {
+        LWIP_ERROR_MSG(__FUNCTION__, "post_thingspeak", err);
       }
 
       /* Free LwHTTP Request & Response */
@@ -1597,10 +1642,9 @@ void Start_HTTP_Server_Task(void const * argument)
   uint8_t content_length[6];
   
   /* Wait for DHCP */
-  osDelay(250);
   while (DHCP_state != DHCP_ADDRESS_ASSIGNED)
   {
-    // cli_printf("[LwIP] %s --> Waiting for DHCP (state = %d)\r\n", __FUNCTION__, DHCP_state);
+    cli_printf("[LwIP] %s --> Waiting for DHCP (state = %d)\r\n", __FUNCTION__, DHCP_state);
     osDelay(500);
   }
   cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
@@ -2043,26 +2087,37 @@ void setDHCP_State(uint8_t state)
 void StartLWIPTask(void const * argument)
 {
   /* USER CODE BEGIN StartLWIPTask */
-  struct netif* netif = (struct netif*)argument;
+  
+  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
 
+  /* LwIP PV */
+  struct netif* netif = (struct netif*)argument;
+  
   /* init code for LWIP */
   MX_LWIP_Init();
   
   /* Check interface status */
   if (netif_is_up(netif))
   {
-    DHCP_state = DHCP_START;
+    setDHCP_State(DHCP_START);
   }
   else
   {  
-    DHCP_state = DHCP_LINK_DOWN;
-    cli_printf("The network cable is not connected \r\n");
+    setDHCP_State(DHCP_LINK_DOWN);
+    cli_printf("[LWIP] %s --> DHCP Link down (state = %d)\r\n", __FUNCTION__, DHCP_state);
   }
 
   /* Infinite loop */
   for(;;)
   {    
-    osDelay(10);
+    if (netif_is_up(netif) && (DHCP_state == DHCP_OFF))
+    {
+      setDHCP_State(DHCP_START);
+    }
+    else
+    {
+      osDelay(10);
+    }
   }
   /* USER CODE END StartLWIPTask */
 }
@@ -2071,6 +2126,8 @@ void StartLWIPTask(void const * argument)
 void StartDHCPTask(void const * argument)
 {
   /* USER CODE BEGIN StartDHCPTask */
+  
+  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
 
   struct netif* netif = (struct netif*)argument;
   ip_addr_t ipaddr;
@@ -2092,7 +2149,7 @@ void StartDHCPTask(void const * argument)
         ip_addr_set_zero_ip4(&netif->netmask);
         ip_addr_set_zero_ip4(&netif->gw);       
         dhcp_start(netif);
-        DHCP_state = DHCP_WAIT_ADDRESS;
+        setDHCP_State(DHCP_WAIT_ADDRESS);
         cli_printf("[DHCP] Looking for server ...\r\n");
       }
       break;
@@ -2101,9 +2158,8 @@ void StartDHCPTask(void const * argument)
       {                
         if (dhcp_supplied_address(netif)) 
         {
-          DHCP_state = DHCP_ADDRESS_ASSIGNED; 
-          sprintf((char *)iptxt, "%s", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));   
-          cli_printf("[DHCP] Supplied address: %s\r\n", iptxt);
+          setDHCP_State(DHCP_ADDRESS_ASSIGNED); 
+          cli_printf("[DHCP] Supplied address: %s\r\n", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
         }
         else
         {
@@ -2112,7 +2168,7 @@ void StartDHCPTask(void const * argument)
           /* DHCP timeout */
           if (dhcp->tries > MAX_DHCP_TRIES)
           {
-            DHCP_state = DHCP_TIMEOUT;
+            setDHCP_State(DHCP_TIMEOUT);
             
             /* Stop DHCP */
             dhcp_stop(netif);
@@ -2123,9 +2179,8 @@ void StartDHCPTask(void const * argument)
             IP_ADDR4(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
             netif_set_addr(netif, ip_2_ip4(&ipaddr), ip_2_ip4(&netmask), ip_2_ip4(&gw));
             
-            sprintf((char *)iptxt, "%s", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
             cli_printf("[DHCP] Timeout\r\n");
-            cli_printf("[DHCP] Static IP address: %s\r\n", iptxt);
+            cli_printf("[DHCP] Static IP address: %s\r\n", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
           }
         }
       }
@@ -2134,7 +2189,7 @@ void StartDHCPTask(void const * argument)
       {
         /* Stop DHCP */
         dhcp_stop(netif);
-        DHCP_state = DHCP_OFF; 
+        setDHCP_State(DHCP_OFF); 
       }
       break;
     default: 

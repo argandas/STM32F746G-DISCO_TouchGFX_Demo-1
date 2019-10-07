@@ -10,81 +10,81 @@ extern "C" {
 #endif
 
 typedef enum {
-	LwHHTP_MESSAGE_TYPE_INVALID = 0,
-	LwHHTP_MESSAGE_TYPE_REQUEST = 1,
-	LwHHTP_MESSAGE_TYPE_RESPONSE = 2,
-	LwHHTP_MESSAGE_TYPE_MAX,
+    LwHHTP_MESSAGE_TYPE_INVALID = 0,
+    LwHHTP_MESSAGE_TYPE_REQUEST = 1,
+    LwHHTP_MESSAGE_TYPE_RESPONSE = 2,
+    LwHHTP_MESSAGE_TYPE_MAX,
 } lwhttp_message_type_t;
 
 typedef enum {
-	LwHHTP_POST = 0,
-	LwHHTP_GET = 1,
-	LwHHTP_MAX,
+    LwHHTP_POST = 0,
+    LwHHTP_GET = 1,
+    LwHHTP_MAX,
 } lwhttp_method_t;
 
 typedef enum {
-	LwHHTP_BUILDER_INIT = 0,
-	LwHHTP_BUILDER_READY = 1,
-	LwHHTP_BUILDER_ADDED_START_LINE = 2,
-	LwHHTP_BUILDER_ADDED_MESSAGE_HEADER = 3,
-	LwHHTP_BUILDER_ADDED_MESSAGE_BODY = 4,
-	LwHHTP_BUILDER_FINISHED = LwHHTP_BUILDER_ADDED_MESSAGE_BODY,
-	LwHHTP_BUILDER_ERROR = 6,
+    LwHHTP_BUILDER_INIT = 0,
+    LwHHTP_BUILDER_READY = 1,
+    LwHHTP_BUILDER_ADDED_START_LINE = 2,
+    LwHHTP_BUILDER_ADDED_MESSAGE_HEADER = 3,
+    LwHHTP_BUILDER_ADDED_MESSAGE_BODY = 4,
+    LwHHTP_BUILDER_FINISHED = LwHHTP_BUILDER_ADDED_MESSAGE_BODY,
+    LwHHTP_BUILDER_ERROR = 6,
 } lwhttp_message_builder_state_t;
 
 typedef enum {
-	LwHHTP_PARSER_INIT = 0,
-	LwHHTP_PARSER_READY = 1,
-	LwHHTP_PARSER_START_LINE = 2,
-	LwHHTP_PARSER_MESSAGE_HEADER = 3,
-	LwHHTP_PARSER_MESSAGE_BODY = 4,
-	LwHHTP_PARSER_END = 5,
-	LwHHTP_PARSER_ERROR = 6,
+    LwHHTP_PARSER_INIT = 0,
+    LwHHTP_PARSER_READY = 1,
+    LwHHTP_PARSER_START_LINE = 2,
+    LwHHTP_PARSER_MESSAGE_HEADER = 3,
+    LwHHTP_PARSER_MESSAGE_BODY = 4,
+    LwHHTP_PARSER_END = 5,
+    LwHHTP_PARSER_ERROR = 6,
 } lwhttp_message_parser_state_t;
 
 typedef struct {
-	char* data;
-	uint16_t len;
+    char* data;
+    uint16_t len;
 } lwhttp_token_t;
 
 typedef struct {
-	lwhttp_token_t buffer;        /* Buffer */
-	lwhttp_token_t field_name;
-	lwhttp_token_t field_value;
+    lwhttp_token_t buffer;        /* Buffer */
+    lwhttp_token_t field_name;
+    lwhttp_token_t field_value;
 } lwhttp_message_header_t;
 
 typedef struct {
-	lwhttp_message_header_t* headers;
-	uint16_t count;
+    lwhttp_message_header_t* headers;
+    uint16_t count;
 } lwhttp_message_headers_t;
 
 typedef struct {
-	lwhttp_token_t buffer;        /* Buffer */
-        lwhttp_token_t method;        /* HTTP/1.1 Sec5.1.1 Request - Method */
-        lwhttp_token_t request_uri;   /* HTTP/1.1 Sec5.1.2 Request - Request-URI */
-        lwhttp_token_t http_version;  /* HTTP/1.1 Sec3.1 Protocol parameters - HTTP Version */
+    lwhttp_token_t buffer;        /* Buffer */
+    lwhttp_token_t method;        /* HTTP/1.1 Sec5.1.1 Request - Method */
+    lwhttp_token_t request_uri;   /* HTTP/1.1 Sec5.1.2 Request - Request-URI */
+    lwhttp_token_t http_version;  /* HTTP/1.1 Sec3.1 Protocol parameters - HTTP Version */
 } lwhttp_request_line_t;
 
 typedef struct {
-	lwhttp_token_t buffer;        /* Buffer */
-        lwhttp_token_t http_version;  /* HTTP/1.1 Sec3.1 Protocol parameters - HTTP Version */
-        lwhttp_token_t status_code;   /* HTTP/1.1 Sec6.1.1 Response - Status Code and Reason Phrase */
-        lwhttp_token_t reason_phrase; /* HTTP/1.1 Sec6.1.1 Response - Status Code and Reason Phrase */
+    lwhttp_token_t buffer;        /* Buffer */
+    lwhttp_token_t http_version;  /* HTTP/1.1 Sec3.1 Protocol parameters - HTTP Version */
+    lwhttp_token_t status_code;   /* HTTP/1.1 Sec6.1.1 Response - Status Code and Reason Phrase */
+    lwhttp_token_t reason_phrase; /* HTTP/1.1 Sec6.1.1 Response - Status Code and Reason Phrase */
 } lwhttp_status_line_t;
 
 typedef union {
-	lwhttp_request_line_t request_line; /* HTTP/1.1 Sec5.1 Request - Request line */
-	lwhttp_status_line_t status_line;   /* HTTP/1.1 Sec6.1 Response - Status line */
+    lwhttp_request_line_t request_line; /* HTTP/1.1 Sec5.1 Request - Request line */
+    lwhttp_status_line_t status_line;   /* HTTP/1.1 Sec6.1 Response - Status line */
 } lwhttp_start_line_t;
 
 typedef struct {
-        lwhttp_message_parser_state_t parser_state;   /* Parser internals */
-        lwhttp_message_builder_state_t builder_state; /* Builder internals */
-	lwhttp_token_t buffer;                        /* Buffer */
-        lwhttp_message_type_t message_type;           /* HTTP/1.1 Sec4.1 Message Types */
-        lwhttp_start_line_t start_line;               /* HTTP/1.1 Sec4.1 Message Types - Start-Line */
-        lwhttp_message_headers_t message_headers;     /* HTTP/1.1 Sec4.2 HTTP Message - Message-Headers */
-        lwhttp_token_t message_body;                  /* HTTP/1.1 Sec4.3 HTTP Message - Message-Body */
+    lwhttp_message_parser_state_t parser_state;   /* Parser internals */
+    lwhttp_message_builder_state_t builder_state; /* Builder internals */
+    lwhttp_token_t buffer;                        /* Buffer */
+    lwhttp_message_type_t message_type;           /* HTTP/1.1 Sec4.1 Message Types */
+    lwhttp_start_line_t start_line;               /* HTTP/1.1 Sec4.1 Message Types - Start-Line */
+    lwhttp_message_headers_t message_headers;     /* HTTP/1.1 Sec4.2 HTTP Message - Message-Headers */
+    lwhttp_token_t message_body;                  /* HTTP/1.1 Sec4.3 HTTP Message - Message-Body */
 } lwhttp_message_t;
 
 typedef lwhttp_message_t lwhttp_response_t;
