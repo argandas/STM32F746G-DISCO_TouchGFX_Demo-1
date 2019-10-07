@@ -16,7 +16,7 @@ IOControlViewBase::IOControlViewBase() :
     home_button.setBitmapXY(0, 0);
     home_button.setIconBitmaps(Bitmap(BITMAP_BLUE_ICONS_HOME_32_ID), Bitmap(BITMAP_BLUE_ICONS_HOME_32_ID));
     home_button.setIconXY(15, 15);
-    home_button.setPosition(0, 0, 60, 60);
+    home_button.setPosition(10, 10, 60, 60);
     home_button.setAction(flexButtonCallback);
 
     ledButton.setBitmaps(Bitmap(BITMAP_SMALL_BTN_ID), Bitmap(BITMAP_SMALL_BTN_PRESSED_ID));
@@ -24,12 +24,52 @@ IOControlViewBase::IOControlViewBase() :
     ledButton.setText(TypedText(T_SINGLEUSEID13));
     ledButton.setTextPosition(0, 19, 100, 56);
     ledButton.setTextColors(touchgfx::Color::getColorFrom24BitRGB(70, 70, 70), touchgfx::Color::getColorFrom24BitRGB(231, 154, 9));
-    ledButton.setPosition(359, 60, 100, 56);
+    ledButton.setPosition(331, 108, 100, 56);
     ledButton.setAction(flexButtonCallback);
+
+    touchButton.setDelay(6);
+    touchButton.setInterval(6);
+    touchButton.setBoxWithBorderPosition(0, 0, 100, 45);
+    touchButton.setBorderSize(5);
+    touchButton.setBoxWithBorderColors(touchgfx::Color::getColorFrom24BitRGB(222, 222, 222), touchgfx::Color::getColorFrom24BitRGB(40, 58, 64), touchgfx::Color::getColorFrom24BitRGB(54, 62, 65), touchgfx::Color::getColorFrom24BitRGB(95, 103, 109));
+    touchButton.setIconBitmaps(Bitmap(BITMAP_BLACK_ARROW_UP_ID), Bitmap(BITMAP_ORANGE_ARROW_UP_ID));
+    touchButton.setIconXY(34, 14);
+    touchButton.setPosition(190, 10, 100, 45);
+
+    zeroButton.setBitmaps(Bitmap(BITMAP_SMALL_BTN_ID), Bitmap(BITMAP_SMALL_BTN_PRESSED_ID));
+    zeroButton.setBitmapXY(0, 0);
+    zeroButton.setText(TypedText(T_SINGLEUSEID22));
+    zeroButton.setTextPosition(0, 19, 100, 56);
+    zeroButton.setTextColors(touchgfx::Color::getColorFrom24BitRGB(70, 70, 70), touchgfx::Color::getColorFrom24BitRGB(231, 154, 9));
+    zeroButton.setPosition(50, 108, 100, 56);
+
+    repeatButton.setDelay(6);
+    repeatButton.setInterval(6);
+    repeatButton.setBoxWithBorderPosition(0, 0, 100, 45);
+    repeatButton.setBorderSize(5);
+    repeatButton.setBoxWithBorderColors(touchgfx::Color::getColorFrom24BitRGB(222, 222, 222), touchgfx::Color::getColorFrom24BitRGB(48, 58, 64), touchgfx::Color::getColorFrom24BitRGB(54, 62, 65), touchgfx::Color::getColorFrom24BitRGB(128, 136, 143));
+    repeatButton.setIconBitmaps(Bitmap(BITMAP_BLACK_ARROW_ID), Bitmap(BITMAP_ORANGE_ARROW_ID));
+    repeatButton.setIconXY(34, 14);
+    repeatButton.setPosition(190, 219, 100, 45);
+
+    counterBackgroundImage.setXY(164, 59);
+    counterBackgroundImage.setBitmap(Bitmap(BITMAP_COUNTER_BOX_ID));
+
+    countTxt.setPosition(164, 91, 152, 90);
+    countTxt.setColor(touchgfx::Color::getColorFrom24BitRGB(222, 222, 222));
+    countTxt.setLinespacing(0);
+    Unicode::snprintf(countTxtBuffer, COUNTTXT_SIZE, "%s", TypedText(T_SINGLEUSEID23).getText());
+    countTxt.setWildcard(countTxtBuffer);
+    countTxt.setTypedText(TypedText(T_NUMBERTEXT));
 
     add(backgroundImage);
     add(home_button);
     add(ledButton);
+    add(touchButton);
+    add(zeroButton);
+    add(repeatButton);
+    add(counterBackgroundImage);
+    add(countTxt);
 }
 
 void IOControlViewBase::setupScreen()
@@ -52,5 +92,17 @@ void IOControlViewBase::flexButtonCallbackHandler(const touchgfx::AbstractButton
         //When ledButton clicked call virtual function
         //Call ledButtonPressed
         ledButtonPressed();
+    }
+    else if (&src == &touchButton)
+    {
+
+    }
+    else if (&src == &zeroButton)
+    {
+
+    }
+    else if (&src == &repeatButton)
+    {
+
     }
 }

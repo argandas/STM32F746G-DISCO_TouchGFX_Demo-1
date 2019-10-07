@@ -30,8 +30,6 @@ public:
     
     /* to be called from view */
     void v2p_SendTCPData(int data);
-    void v2p_LogData(int data);
-    void v2p_DumpData(void);
 
     virtual ~MainPresenter() {};
 

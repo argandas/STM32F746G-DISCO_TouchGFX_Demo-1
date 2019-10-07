@@ -9,6 +9,7 @@
 #include <gui/logger_screen/LoggerPresenter.hpp>
 #include <touchgfx/widgets/Image.hpp>
 #include <touchgfx/containers/buttons/Buttons.hpp>
+#include <touchgfx/widgets/TextAreaWithWildcard.hpp>
 
 class LoggerViewBase : public touchgfx::View<LoggerPresenter>
 {
@@ -17,6 +18,19 @@ public:
     virtual ~LoggerViewBase() {}
 
     virtual void setupScreen();
+
+    /*
+     * Custom Action Handlers
+     */
+    virtual void logButtonPressed()
+    {
+        // Override and implement this function in LoggerView
+    }
+
+    virtual void dumpButtonPressed()
+    {
+        // Override and implement this function in LoggerView
+    }
 
 protected:
     FrontendApplication& application() {
@@ -28,6 +42,18 @@ protected:
      */
     touchgfx::Image backgroundImage;
     touchgfx::IconButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > flexButton1_1;
+    touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > logButton;
+    touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > dumpButton;
+    touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > clearLogButton;
+    touchgfx::Image counterBackgroundImage;
+    touchgfx::TextAreaWithOneWildcard countTxt;
+    touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > rngButton;
+
+    /*
+     * Wildcard Buffers
+     */
+    static const uint16_t COUNTTXT_SIZE = 3;
+    touchgfx::Unicode::UnicodeChar countTxtBuffer[COUNTTXT_SIZE];
 
 private:
 

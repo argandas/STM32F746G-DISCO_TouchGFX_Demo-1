@@ -70,22 +70,6 @@ MainViewBase::MainViewBase() :
     tcpButton.setPosition(32, 200, 100, 56);
     tcpButton.setAction(flexButtonCallback);
 
-    logButton.setBitmaps(Bitmap(BITMAP_SMALL_BTN_ID), Bitmap(BITMAP_SMALL_BTN_PRESSED_ID));
-    logButton.setBitmapXY(0, 0);
-    logButton.setText(TypedText(T_SINGLEUSEID11));
-    logButton.setTextPosition(0, 19, 100, 56);
-    logButton.setTextColors(touchgfx::Color::getColorFrom24BitRGB(70, 70, 70), touchgfx::Color::getColorFrom24BitRGB(231, 154, 9));
-    logButton.setPosition(348, 146, 100, 56);
-    logButton.setAction(flexButtonCallback);
-
-    dumpButton.setBitmaps(Bitmap(BITMAP_SMALL_BTN_ID), Bitmap(BITMAP_SMALL_BTN_PRESSED_ID));
-    dumpButton.setBitmapXY(0, 0);
-    dumpButton.setText(TypedText(T_SINGLEUSEID12));
-    dumpButton.setTextPosition(0, 19, 100, 56);
-    dumpButton.setTextColors(touchgfx::Color::getColorFrom24BitRGB(70, 70, 70), touchgfx::Color::getColorFrom24BitRGB(231, 154, 9));
-    dumpButton.setPosition(348, 200, 100, 56);
-    dumpButton.setAction(flexButtonCallback);
-
     screenBtnLogger.setBitmaps(Bitmap(BITMAP_BLUE_BUTTONS_ROUND_EDGE_ICON_BUTTON_ID), Bitmap(BITMAP_BLUE_BUTTONS_ROUND_EDGE_ICON_BUTTON_PRESSED_ID));
     screenBtnLogger.setBitmapXY(0, 0);
     screenBtnLogger.setIconBitmaps(Bitmap(BITMAP_BLUE_ICONS_SETTINGS_32_ID), Bitmap(BITMAP_BLUE_ICONS_SETTINGS_32_ID));
@@ -116,8 +100,6 @@ MainViewBase::MainViewBase() :
     add(counterBackgroundImage);
     add(countTxt);
     add(tcpButton);
-    add(logButton);
-    add(dumpButton);
     add(screenBtnLogger);
     add(screenBtnNetwork);
     add(screenBtnIOCont);
@@ -164,20 +146,6 @@ void MainViewBase::flexButtonCallbackHandler(const touchgfx::AbstractButtonConta
         //When tcpButton clicked call virtual function
         //Call tcpButtonPressed
         tcpButtonPressed();
-    }
-    else if (&src == &logButton)
-    {
-        //logButtonInteraction
-        //When logButton clicked call virtual function
-        //Call logButtonPressed
-        logButtonPressed();
-    }
-    else if (&src == &dumpButton)
-    {
-        //dumpButtonInteraction
-        //When dumpButton clicked call virtual function
-        //Call dumpButtonPressed
-        dumpButtonPressed();
     }
     else if (&src == &screenBtnLogger)
     {

@@ -24,6 +24,9 @@ public:
      * (ie. made inactive). Teardown functionality can be placed here.
      */
     virtual void deactivate();
+    
+    void v2p_LogData(int data);
+    void v2p_DumpData(void);
 
     virtual ~LoggerPresenter() {};
 

@@ -9,6 +9,7 @@
 #include <gui/iocontrol_screen/IOControlPresenter.hpp>
 #include <touchgfx/widgets/Image.hpp>
 #include <touchgfx/containers/buttons/Buttons.hpp>
+#include <touchgfx/widgets/TextAreaWithWildcard.hpp>
 
 class IOControlViewBase : public touchgfx::View<IOControlPresenter>
 {
@@ -37,6 +38,17 @@ protected:
     touchgfx::Image backgroundImage;
     touchgfx::IconButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > home_button;
     touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > ledButton;
+    touchgfx::IconButtonStyle< touchgfx::BoxWithBorderButtonStyle< touchgfx::RepeatButtonTrigger > > touchButton;
+    touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > zeroButton;
+    touchgfx::IconButtonStyle< touchgfx::BoxWithBorderButtonStyle< touchgfx::RepeatButtonTrigger > > repeatButton;
+    touchgfx::Image counterBackgroundImage;
+    touchgfx::TextAreaWithOneWildcard countTxt;
+
+    /*
+     * Wildcard Buffers
+     */
+    static const uint16_t COUNTTXT_SIZE = 3;
+    touchgfx::Unicode::UnicodeChar countTxtBuffer[COUNTTXT_SIZE];
 
 private:
 

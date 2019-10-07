@@ -48,16 +48,6 @@ public:
         // Override and implement this function in MainView
     }
 
-    virtual void logButtonPressed()
-    {
-        // Override and implement this function in MainView
-    }
-
-    virtual void dumpButtonPressed()
-    {
-        // Override and implement this function in MainView
-    }
-
 protected:
     FrontendApplication& application() {
         return *static_cast<FrontendApplication*>(Application::getInstance());
@@ -75,8 +65,6 @@ protected:
     touchgfx::Image counterBackgroundImage;
     touchgfx::TextAreaWithOneWildcard countTxt;
     touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > tcpButton;
-    touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > logButton;
-    touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > dumpButton;
     touchgfx::IconButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > screenBtnLogger;
     touchgfx::IconButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > screenBtnNetwork;
     touchgfx::IconButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > screenBtnIOCont;

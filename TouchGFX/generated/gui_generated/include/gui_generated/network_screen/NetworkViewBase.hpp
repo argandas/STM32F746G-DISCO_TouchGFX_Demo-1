@@ -9,6 +9,7 @@
 #include <gui/network_screen/NetworkPresenter.hpp>
 #include <touchgfx/widgets/Image.hpp>
 #include <touchgfx/containers/buttons/Buttons.hpp>
+#include <touchgfx/widgets/TextArea.hpp>
 
 class NetworkViewBase : public touchgfx::View<NetworkPresenter>
 {
@@ -28,6 +29,10 @@ protected:
      */
     touchgfx::Image backgroundImage;
     touchgfx::IconButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > flexButton1;
+    touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > tcpButton;
+    touchgfx::Image image1;
+    touchgfx::TextArea textArea1;
+    touchgfx::TextArea textArea1_1;
 
 private:
 

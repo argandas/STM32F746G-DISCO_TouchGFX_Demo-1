@@ -26,16 +26,4 @@ void MainPresenter::v2p_SendTCPData(int data)
   model->p2m_SendTCPData(data);
 }
 
-void MainPresenter::v2p_LogData(int data)
-{
-  touchgfx_printf("MainPresenter::%s: %d\r\n", __FUNCTION__, data);
-  model->p2m_LogData(data);
-}
-
-void MainPresenter::v2p_DumpData(void)
-{
-  touchgfx_printf("MainPresenter::%s: %d\r\n", __FUNCTION__, 0);
-  model->p2m_DumpData();
-}
-
 

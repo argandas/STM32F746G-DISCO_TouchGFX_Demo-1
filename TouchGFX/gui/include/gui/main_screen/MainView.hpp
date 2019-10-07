@@ -18,8 +18,6 @@ public:
     virtual void toggleButtonPressed();
     virtual void tcpButtonPressed();
     virtual void hw_ButtonPressed();
-    virtual void logButtonPressed();
-    virtual void dumpButtonPressed();
     
 private:
   void inc_count();

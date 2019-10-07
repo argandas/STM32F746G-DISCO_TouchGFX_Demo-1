@@ -3,6 +3,8 @@
 /*********************************************************************************/
 #include <gui_generated/network_screen/NetworkViewBase.hpp>
 #include "BitmapDatabase.hpp"
+#include <texts/TextKeysAndLanguages.hpp>
+#include <touchgfx/Color.hpp>
 
 NetworkViewBase::NetworkViewBase() :
     flexButtonCallback(this, &NetworkViewBase::flexButtonCallbackHandler)
@@ -14,11 +16,35 @@ NetworkViewBase::NetworkViewBase() :
     flexButton1.setBitmapXY(0, 0);
     flexButton1.setIconBitmaps(Bitmap(BITMAP_BLUE_ICONS_HOME_32_ID), Bitmap(BITMAP_BLUE_ICONS_HOME_32_ID));
     flexButton1.setIconXY(15, 15);
-    flexButton1.setPosition(0, 0, 60, 60);
+    flexButton1.setPosition(10, 10, 60, 60);
     flexButton1.setAction(flexButtonCallback);
+
+    tcpButton.setBitmaps(Bitmap(BITMAP_SMALL_BTN_ID), Bitmap(BITMAP_SMALL_BTN_PRESSED_ID));
+    tcpButton.setBitmapXY(0, 0);
+    tcpButton.setText(TypedText(T_SINGLEUSEID19));
+    tcpButton.setTextPosition(0, 19, 100, 56);
+    tcpButton.setTextColors(touchgfx::Color::getColorFrom24BitRGB(70, 70, 70), touchgfx::Color::getColorFrom24BitRGB(231, 154, 9));
+    tcpButton.setPosition(355, 200, 100, 56);
+
+    image1.setXY(155, 108);
+    image1.setBitmap(Bitmap(BITMAP_BTN_LONG_ID));
+
+    textArea1.setXY(80, 127);
+    textArea1.setColor(touchgfx::Color::getColorFrom24BitRGB(255, 255, 255));
+    textArea1.setLinespacing(0);
+    textArea1.setTypedText(TypedText(T_SINGLEUSEID20));
+
+    textArea1_1.setXY(169, 127);
+    textArea1_1.setColor(touchgfx::Color::getColorFrom24BitRGB(69, 69, 69));
+    textArea1_1.setLinespacing(0);
+    textArea1_1.setTypedText(TypedText(T_SINGLEUSEID21));
 
     add(backgroundImage);
     add(flexButton1);
+    add(tcpButton);
+    add(image1);
+    add(textArea1);
+    add(textArea1_1);
 }
 
 void NetworkViewBase::setupScreen()
@@ -34,5 +60,9 @@ void NetworkViewBase::flexButtonCallbackHandler(const touchgfx::AbstractButtonCo
         //When flexButton1 clicked change screen to Main
         //Go to Main with no screen transition
         application().gotoMainScreenNoTransition();
+    }
+    else if (&src == &tcpButton)
+    {
+
     }
 }

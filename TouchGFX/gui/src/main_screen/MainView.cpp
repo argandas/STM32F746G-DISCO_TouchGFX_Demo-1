@@ -143,17 +143,3 @@ void MainView::tcpButtonPressed()
   touchgfx_printf("MainView::%s = %d\r\n", __FUNCTION__, tmpVal);
   presenter->v2p_SendTCPData(tmpVal);
 }
-
-void MainView::logButtonPressed()
-{
-  int tmpVal = Unicode::atoi(countTxt.getWildcard());
-  touchgfx_printf("MainView::%s = %d\r\n", __FUNCTION__, tmpVal);
-  presenter->v2p_LogData(tmpVal);
-}
-
-void MainView::dumpButtonPressed()
-{
-  int tmpVal = 0;
-  touchgfx_printf("MainView::%s = %d\r\n", __FUNCTION__, tmpVal);
-  presenter->v2p_DumpData();
-}

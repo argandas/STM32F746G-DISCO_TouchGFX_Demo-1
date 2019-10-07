@@ -11,6 +11,10 @@ public:
     virtual ~LoggerView() {}
     virtual void setupScreen();
     virtual void tearDownScreen();
+
+    virtual void logButtonPressed();
+    virtual void dumpButtonPressed();
+
 protected:
 };
 
