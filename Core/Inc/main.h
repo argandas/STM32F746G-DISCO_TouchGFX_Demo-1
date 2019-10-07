@@ -98,6 +98,7 @@ extern "C" {
 #define DHCP_ADDRESS_ASSIGNED      (uint8_t) 3
 #define DHCP_TIMEOUT               (uint8_t) 4
 #define DHCP_LINK_DOWN             (uint8_t) 5
+#define DHCP_RESTART               (uint8_t) 6
   
 /* USER CODE END EC */
 

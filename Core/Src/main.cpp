@@ -281,11 +281,11 @@ int main(void)
   sdTaskHandle = osThreadCreate(osThread(sdTask), NULL);
 
   /* definition and creation of lwipTask */
-  osThreadDef(lwipTask, StartLWIPTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
+  osThreadDef(lwipTask, StartLWIPTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 6);
   lwipTaskHandle = osThreadCreate(osThread(lwipTask), (void*)&gnetif);
 
   /* definition and creation of dhcpTask */
-  osThreadDef(dhcpTask, StartDHCPTask, osPriorityHigh, 0, configMINIMAL_STACK_SIZE * 2);
+  osThreadDef(dhcpTask, StartDHCPTask, osPriorityBelowNormal, 0, configMINIMAL_STACK_SIZE * 5);
   dhcpTaskHandle = osThreadCreate(osThread(dhcpTask), (void*)&gnetif);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -2033,18 +2033,18 @@ void StartSDTask(void const * argument)
 * @param argument: Not used
 * @retval None
 */
-portCHAR PAGE_BODY[256];
 
-/* USER CODE END Header_StartLWIPTask */
+void setDHCP_State(uint8_t state)
+{
+  cli_printf("[DHCP] State change %d --> %d\r\n", DHCP_state, state);
+  DHCP_state = state;
+}
+
 void StartLWIPTask(void const * argument)
 {
   /* USER CODE BEGIN StartLWIPTask */
-  
-  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
-
-  /* LwIP PV */
   struct netif* netif = (struct netif*)argument;
-  
+
   /* init code for LWIP */
   MX_LWIP_Init();
   
@@ -2056,35 +2056,28 @@ void StartLWIPTask(void const * argument)
   else
   {  
     DHCP_state = DHCP_LINK_DOWN;
-    cli_printf("[LWIP] %s --> DHCP Link down (state = %d)\r\n", __FUNCTION__, DHCP_state);
+    cli_printf("The network cable is not connected \r\n");
   }
 
   /* Infinite loop */
   for(;;)
-  {
+  {    
     osDelay(10);
   }
   /* USER CODE END StartLWIPTask */
 }
 
-/* USER CODE BEGIN Header_StartDHCPTask */
-/**
-* @brief Function implementing the dhcpTask thread.
-* @param argument: Not used
-* @retval None
-*/
 /* USER CODE END Header_StartDHCPTask */
 void StartDHCPTask(void const * argument)
 {
   /* USER CODE BEGIN StartDHCPTask */
-  
-  cli_printf("[RTOS] Start Task --> %s\r\n", __FUNCTION__);
 
   struct netif* netif = (struct netif*)argument;
   ip_addr_t ipaddr;
   ip_addr_t netmask;
   ip_addr_t gw;
   struct dhcp *dhcp;
+  uint8_t iptxt[20];
   
   /* Get DHCP instance */
   dhcp = (struct dhcp *)netif_get_client_data(netif, LWIP_NETIF_CLIENT_DATA_INDEX_DHCP);
@@ -2108,8 +2101,9 @@ void StartDHCPTask(void const * argument)
       {                
         if (dhcp_supplied_address(netif)) 
         {
-          DHCP_state = DHCP_ADDRESS_ASSIGNED;	
-          cli_printf("[DHCP] Supplied address: %s\r\n", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
+          DHCP_state = DHCP_ADDRESS_ASSIGNED; 
+          sprintf((char *)iptxt, "%s", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));   
+          cli_printf("[DHCP] Supplied address: %s\r\n", iptxt);
         }
         else
         {
@@ -2129,8 +2123,9 @@ void StartDHCPTask(void const * argument)
             IP_ADDR4(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
             netif_set_addr(netif, ip_2_ip4(&ipaddr), ip_2_ip4(&netmask), ip_2_ip4(&gw));
             
+            sprintf((char *)iptxt, "%s", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
             cli_printf("[DHCP] Timeout\r\n");
-            cli_printf("[DHCP] Static IP address: %s\r\n", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
+            cli_printf("[DHCP] Static IP address: %s\r\n", iptxt);
           }
         }
       }
