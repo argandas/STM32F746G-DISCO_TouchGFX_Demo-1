@@ -16,7 +16,6 @@ public:
     virtual void zeroButtonPressed();
     virtual void touchButtonPressed();
     virtual void toggleButtonPressed();
-    virtual void tcpButtonPressed();
     virtual void hw_ButtonPressed();
     
 private:

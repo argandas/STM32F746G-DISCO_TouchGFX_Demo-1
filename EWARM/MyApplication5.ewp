@@ -1229,6 +1229,9 @@
         <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\ApplicationFontProvider.cpp</name>
       </file>
       <file>
+        <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Font_arial_15_4bpp.cpp</name>
+      </file>
+      <file>
         <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Font_Asap_Regular_15_4bpp.cpp</name>
       </file>
       <file>
@@ -1241,6 +1244,9 @@
         <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\FontGetters.cpp</name>
       </file>
       <file>
+        <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Kerning_arial_15_4bpp.cpp</name>
+      </file>
+      <file>
         <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Kerning_Asap_Regular_15_4bpp.cpp</name>
       </file>
       <file>
@@ -1248,6 +1254,9 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Kerning_Asap_Regular_80_4bpp.cpp</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Table_arial_15_4bpp.cpp</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\TouchGFX\generated\fonts\src\Table_Asap_Regular_15_4bpp.cpp</name>
@@ -1307,6 +1316,9 @@
         </file>
         <file>
           <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\__designer\blue_icons_home_32.cpp</name>
+        </file>
+        <file>
+          <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\__designer\blue_icons_refresh_32.cpp</name>
         </file>
         <file>
           <name>$PROJ_DIR$\..\TouchGFX\generated\images\src\__designer\blue_icons_settings_32.cpp</name>

@@ -58,7 +58,7 @@ MainViewBase::MainViewBase() :
     countTxt.setPosition(164, 74, 152, 90);
     countTxt.setColor(touchgfx::Color::getColorFrom24BitRGB(222, 222, 222));
     countTxt.setLinespacing(0);
-    Unicode::snprintf(countTxtBuffer, COUNTTXT_SIZE, "%s", TypedText(T_SINGLEUSEID1).getText());
+    Unicode::snprintf(countTxtBuffer, COUNTTXT_SIZE, "%s", TypedText(T_SINGLEUSEID24).getText());
     countTxt.setWildcard(countTxtBuffer);
     countTxt.setTypedText(TypedText(T_NUMBERTEXT));
 

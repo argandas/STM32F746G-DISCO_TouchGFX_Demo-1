@@ -146,6 +146,8 @@ osMessageQId ledQueueHandle;
 osMessageQId tcpQueueHandle;
 osMessageQId logQueueHandle;
 osMessageQId dumpQueueHandle;
+osMessageQId getIPQueueHandle;
+osMessageQId setIPQueueHandle;
 osSemaphoreId dhcpBinarySemHandle;
 /* USER CODE BEGIN PV */
 
@@ -214,6 +216,9 @@ FRESULT sd_dump(void);
 /* USER CODE BEGIN 0 */
 extern struct netif gnetif;
 extern ip4_addr_t ipaddr;
+
+char ip4_addr_str[IP4ADDR_STRLEN_MAX];
+char* ip4_addr_ptr = &ip4_addr_str[0];
 /* USER CODE END 0 */
 
 /**
@@ -345,6 +350,14 @@ int main(void)
   /* definition and creation of dumpQueue */
   osMessageQDef(dumpQueue, 1, uint16_t);
   dumpQueueHandle = osMessageCreate(osMessageQ(dumpQueue), NULL);
+
+  /* definition and creation of getIPQueue */
+  osMessageQDef(getIPQueue, 1, uint16_t);
+  getIPQueueHandle = osMessageCreate(osMessageQ(getIPQueue), NULL);
+
+  /* definition and creation of setIPQueue */
+  osMessageQDef(setIPQueue, 1, char*);
+  setIPQueueHandle = osMessageCreate(osMessageQ(setIPQueue), NULL);
 
   /* USER CODE BEGIN RTOS_QUEUES */
     /* add queues, ... */
@@ -2129,7 +2142,8 @@ void StartLWIPTask(void const * argument)
   /* USER CODE BEGIN StartLWIPTask */
   /* LwIP PV */
   struct netif* netif = (struct netif*)argument;
-  
+  uint8_t queueData = 0;
+
   /* init code for LWIP */
   MX_LWIP_Init();
 
@@ -2151,6 +2165,18 @@ void StartLWIPTask(void const * argument)
     if (netif_is_up(netif) && (DHCP_state == DHCP_OFF))
     {
       setDHCP_State(DHCP_START);
+    }
+    else if(xQueueReceive(getIPQueueHandle, &queueData, 0) == pdTRUE)
+    {
+        DBG_QUEUE("getIPQueueHandle", &queueData, NULL);
+        #if 1
+        strcpy(ip4_addr_ptr, ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
+
+        if(xQueueSend(setIPQueueHandle, &ip4_addr_ptr, 0) == pdTRUE)
+        {
+            DBG_QUEUE("setIPQueueHandle", NULL, ip4_addr_ptr);
+        }
+        #endif
     }
     else
     {

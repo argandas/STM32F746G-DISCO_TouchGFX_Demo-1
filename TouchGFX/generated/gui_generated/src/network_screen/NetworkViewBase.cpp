@@ -24,7 +24,8 @@ NetworkViewBase::NetworkViewBase() :
     tcpButton.setText(TypedText(T_SINGLEUSEID19));
     tcpButton.setTextPosition(0, 19, 100, 56);
     tcpButton.setTextColors(touchgfx::Color::getColorFrom24BitRGB(70, 70, 70), touchgfx::Color::getColorFrom24BitRGB(231, 154, 9));
-    tcpButton.setPosition(355, 200, 100, 56);
+    tcpButton.setPosition(154, 184, 100, 56);
+    tcpButton.setAction(flexButtonCallback);
 
     image1.setXY(155, 108);
     image1.setBitmap(Bitmap(BITMAP_BTN_LONG_ID));
@@ -34,17 +35,36 @@ NetworkViewBase::NetworkViewBase() :
     textArea1.setLinespacing(0);
     textArea1.setTypedText(TypedText(T_SINGLEUSEID20));
 
-    textArea1_1.setXY(169, 127);
-    textArea1_1.setColor(touchgfx::Color::getColorFrom24BitRGB(69, 69, 69));
-    textArea1_1.setLinespacing(0);
-    textArea1_1.setTypedText(TypedText(T_SINGLEUSEID21));
+    ipAddrText.setPosition(169, 127, 170, 18);
+    ipAddrText.setColor(touchgfx::Color::getColorFrom24BitRGB(69, 69, 69));
+    ipAddrText.setLinespacing(0);
+    Unicode::snprintf(ipAddrTextBuffer, IPADDRTEXT_SIZE, "%s", TypedText(T_SINGLEUSEID25).getText());
+    ipAddrText.setWildcard(ipAddrTextBuffer);
+    ipAddrText.setTypedText(TypedText(T_IPADDRTEXT));
+
+    countTxt.setXY(179, 175);
+    countTxt.setColor(touchgfx::Color::getColorFrom24BitRGB(222, 222, 222));
+    countTxt.setLinespacing(0);
+    countTxtBuffer[0] = 0;
+    countTxt.setWildcard(countTxtBuffer);
+    countTxt.resizeToCurrentText();
+    countTxt.setTypedText(TypedText(T_IPADDRTEXT));
+
+    refreshButton.setBitmaps(Bitmap(BITMAP_BLUE_BUTTONS_ROUND_EDGE_ICON_BUTTON_ID), Bitmap(BITMAP_BLUE_BUTTONS_ROUND_EDGE_ICON_BUTTON_PRESSED_ID));
+    refreshButton.setBitmapXY(0, 0);
+    refreshButton.setIconBitmaps(Bitmap(BITMAP_BLUE_ICONS_REFRESH_32_ID), Bitmap(BITMAP_BLUE_ICONS_REFRESH_32_ID));
+    refreshButton.setIconXY(15, 15);
+    refreshButton.setPosition(404, 10, 60, 60);
+    refreshButton.setAction(flexButtonCallback);
 
     add(backgroundImage);
     add(flexButton1);
     add(tcpButton);
     add(image1);
     add(textArea1);
-    add(textArea1_1);
+    add(ipAddrText);
+    add(countTxt);
+    add(refreshButton);
 }
 
 void NetworkViewBase::setupScreen()
@@ -56,13 +76,23 @@ void NetworkViewBase::flexButtonCallbackHandler(const touchgfx::AbstractButtonCo
 {
     if (&src == &flexButton1)
     {
-        //Interaction1
+        //goHome
         //When flexButton1 clicked change screen to Main
         //Go to Main with no screen transition
         application().gotoMainScreenNoTransition();
     }
     else if (&src == &tcpButton)
     {
-
+        //tcpButtonInteraction
+        //When tcpButton clicked call virtual function
+        //Call tcpButtonPressed
+        tcpButtonPressed();
+    }
+    else if (&src == &refreshButton)
+    {
+        //refresh
+        //When refreshButton clicked change screen to Network
+        //Go to Network with no screen transition
+        application().gotoNetworkScreenNoTransition();
     }
 }

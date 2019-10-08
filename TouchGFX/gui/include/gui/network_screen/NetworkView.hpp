@@ -11,6 +11,14 @@ public:
     virtual ~NetworkView() {}
     virtual void setupScreen();
     virtual void tearDownScreen();
+    
+    virtual void tcpButtonPressed();
+    virtual void getIPAddress();
+    virtual void p2v_SetIPAddress(char* ip_addr_ptr);
+
+#if 0
+    virtual void setIPAddress(char* ip_addr_ptr);
+#endif
 protected:
 };
 

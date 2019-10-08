@@ -25,11 +25,8 @@ public:
      */
     virtual void deactivate();
     
-    /* redefine call on MainListener, to be calle from Model*/
+    /* redefine call on MainListener, to be called from Model*/
     void m2p_ButtonPressed();
-    
-    /* to be called from view */
-    void v2p_SendTCPData(int data);
 
     virtual ~MainPresenter() {};
 

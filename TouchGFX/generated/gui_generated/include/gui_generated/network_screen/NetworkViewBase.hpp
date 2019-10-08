@@ -10,6 +10,7 @@
 #include <touchgfx/widgets/Image.hpp>
 #include <touchgfx/containers/buttons/Buttons.hpp>
 #include <touchgfx/widgets/TextArea.hpp>
+#include <touchgfx/widgets/TextAreaWithWildcard.hpp>
 
 class NetworkViewBase : public touchgfx::View<NetworkPresenter>
 {
@@ -18,6 +19,14 @@ public:
     virtual ~NetworkViewBase() {}
 
     virtual void setupScreen();
+
+    /*
+     * Custom Action Handlers
+     */
+    virtual void tcpButtonPressed()
+    {
+        // Override and implement this function in NetworkView
+    }
 
 protected:
     FrontendApplication& application() {
@@ -32,7 +41,17 @@ protected:
     touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > tcpButton;
     touchgfx::Image image1;
     touchgfx::TextArea textArea1;
-    touchgfx::TextArea textArea1_1;
+    touchgfx::TextAreaWithOneWildcard ipAddrText;
+    touchgfx::TextAreaWithOneWildcard countTxt;
+    touchgfx::IconButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > refreshButton;
+
+    /*
+     * Wildcard Buffers
+     */
+    static const uint16_t IPADDRTEXT_SIZE = 16;
+    touchgfx::Unicode::UnicodeChar ipAddrTextBuffer[IPADDRTEXT_SIZE];
+    static const uint16_t COUNTTXT_SIZE = 3;
+    touchgfx::Unicode::UnicodeChar countTxtBuffer[COUNTTXT_SIZE];
 
 private:
 

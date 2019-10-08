@@ -136,10 +136,3 @@ void MainView::toggleButtonPressed()
     countTxt.invalidate();
     toggleButton.invalidate();
 }
-
-void MainView::tcpButtonPressed()
-{
-  int tmpVal = Unicode::atoi(countTxt.getWildcard());
-  touchgfx_printf("MainView::%s = %d\r\n", __FUNCTION__, tmpVal);
-  presenter->v2p_SendTCPData(tmpVal);
-}

@@ -25,6 +25,12 @@ public:
      */
     virtual void deactivate();
 
+    /* to be called from view */
+    void v2p_SendTCPData(int data);
+    void v2p_getIPAddress(void);
+#if 1
+    void m2p_SetIPAddress(char* ip_addr_ptr);
+#endif
     virtual ~NetworkPresenter() {};
 
 private:

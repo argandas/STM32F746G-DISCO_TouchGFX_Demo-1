@@ -24,7 +24,6 @@ void LoggerView::logButtonPressed()
 
 void LoggerView::dumpButtonPressed()
 {
-  int tmpVal = 0;
-  touchgfx_printf("MainView::%s = %d\r\n", __FUNCTION__, tmpVal);
+  touchgfx_printf("MainView::%s\r\n", __FUNCTION__);
   presenter->v2p_DumpData();
 }

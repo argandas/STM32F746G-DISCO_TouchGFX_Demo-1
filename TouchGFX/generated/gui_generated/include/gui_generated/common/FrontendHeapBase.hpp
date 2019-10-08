@@ -13,6 +13,7 @@
 
 #include <touchgfx/transitions/SlideTransition.hpp>
 
+
 #include <touchgfx/transitions/CoverTransition.hpp>
 
 #include <gui/common/FrontendApplication.hpp>

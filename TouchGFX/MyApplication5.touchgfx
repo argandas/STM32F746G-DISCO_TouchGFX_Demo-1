@@ -267,7 +267,7 @@
             "AutoSize": false,
             "LineSpacing": 0,
             "Wildcard1": {
-              "TextId": "SingleUseId1",
+              "TextId": "SingleUseId24",
               "UseBuffer": true,
               "BufferSize": 3
             },
@@ -939,8 +939,8 @@
               }
             ],
             "Name": "tcpButton",
-            "X": 355,
-            "Y": 200,
+            "X": 154,
+            "Y": 184,
             "Width": 100,
             "Height": 56,
             "Type": "FlexButton",
@@ -989,7 +989,7 @@
             "Moveable": false
           },
           {
-            "TextId": "SingleUseId21",
+            "TextId": "ipAddrText",
             "TextRotation": "0",
             "Color": {
               "Red": 69,
@@ -997,14 +997,81 @@
               "Blue": 69
             },
             "Alpha": 255,
-            "AutoSize": true,
+            "AutoSize": false,
             "LineSpacing": 0,
-            "Name": "textArea1_1",
+            "Wildcard1": {
+              "TextId": "SingleUseId25",
+              "UseBuffer": true,
+              "BufferSize": 16
+            },
+            "Name": "ipAddrText",
             "X": 169,
             "Y": 127,
-            "Width": 81,
+            "Width": 170,
             "Height": 18,
             "Type": "TextArea",
+            "Visible": true,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          },
+          {
+            "TextId": "ipAddrText",
+            "TextRotation": "0",
+            "Color": {
+              "Red": 222,
+              "Green": 222,
+              "Blue": 222
+            },
+            "Alpha": 255,
+            "AutoSize": true,
+            "LineSpacing": 0,
+            "Wildcard1": {
+              "UseBuffer": true,
+              "BufferSize": 3
+            },
+            "Name": "countTxt",
+            "X": 179,
+            "Y": 175,
+            "Width": 0,
+            "Height": 18,
+            "Type": "TextArea",
+            "Visible": true,
+            "Draggable": false,
+            "Clickable": false,
+            "Fadeable": false,
+            "Moveable": false
+          },
+          {
+            "Alpha": 255,
+            "ButtonTrigger": {
+              "Type": "ClickButtonTrigger"
+            },
+            "ButtonStyles": [
+              {
+                "Type": "IconButtonStyle",
+                "X": 15,
+                "Y": 15,
+                "IconReleased": "__designer\\blue_icons_refresh_32.png",
+                "IconPressed": "__designer\\blue_icons_refresh_32.png"
+              },
+              {
+                "Type": "ImageButtonStyle",
+                "X": 0,
+                "Y": 0,
+                "LockFlexButtonToImageSize": true,
+                "Style": "Style1",
+                "ImageReleased": "__designer\\blue_buttons_round_edge_icon_button.png",
+                "ImagePressed": "__designer\\blue_buttons_round_edge_icon_button_pressed.png"
+              }
+            ],
+            "Name": "refreshButton",
+            "X": 404,
+            "Y": 10,
+            "Width": 60,
+            "Height": 60,
+            "Type": "FlexButton",
             "Visible": true,
             "Draggable": false,
             "Clickable": false,
@@ -1014,7 +1081,7 @@
         ],
         "Interactions": [
           {
-            "InteractionName": "Interaction1",
+            "InteractionName": "goHome",
             "HasCompletedTrigger": false,
             "Trigger": {
               "TriggerComponent": "flexButton1",
@@ -1023,6 +1090,31 @@
             "Action": {
               "ScreenTransitionType": "ScreenTransitionNone",
               "ActionComponent": "Main",
+              "Type": "ActionGotoScreen"
+            }
+          },
+          {
+            "InteractionName": "tcpButtonInteraction",
+            "HasCompletedTrigger": false,
+            "Trigger": {
+              "TriggerComponent": "tcpButton",
+              "Type": "TriggerClicked"
+            },
+            "Action": {
+              "FunctionName": "tcpButtonPressed",
+              "Type": "ActionCustom"
+            }
+          },
+          {
+            "InteractionName": "refresh",
+            "HasCompletedTrigger": false,
+            "Trigger": {
+              "TriggerComponent": "refreshButton",
+              "Type": "TriggerClicked"
+            },
+            "Action": {
+              "ScreenTransitionType": "ScreenTransitionNone",
+              "ActionComponent": "Network",
               "Type": "ActionGotoScreen"
             }
           }
@@ -1369,10 +1461,6 @@
         "IsResource": true
       },
       {
-        "TextEntryId": "SingleUseId1",
-        "IsResource": false
-      },
-      {
         "TextEntryId": "SingleUseId3",
         "IsResource": false
       },
@@ -1421,15 +1509,23 @@
         "IsResource": false
       },
       {
-        "TextEntryId": "SingleUseId21",
-        "IsResource": false
-      },
-      {
         "TextEntryId": "SingleUseId22",
         "IsResource": false
       },
       {
         "TextEntryId": "SingleUseId23",
+        "IsResource": false
+      },
+      {
+        "TextEntryId": "ipAddrText",
+        "IsResource": true
+      },
+      {
+        "TextEntryId": "SingleUseId24",
+        "IsResource": false
+      },
+      {
+        "TextEntryId": "SingleUseId25",
         "IsResource": false
       }
     ],

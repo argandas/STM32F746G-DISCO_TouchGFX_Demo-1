@@ -30,6 +30,10 @@ public:
     
     virtual void m2p_ButtonPressed(){}
 
+#if 1
+    virtual void m2p_SetIPAddress(char* ip_addr_ptr){}
+#endif
+
 protected:
     Model* model;
 };
