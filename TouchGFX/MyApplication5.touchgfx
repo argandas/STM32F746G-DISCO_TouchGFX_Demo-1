@@ -290,50 +290,6 @@
             },
             "ButtonStyles": [
               {
-                "Type": "TextButtonStyle",
-                "X": 0,
-                "Y": 19,
-                "TextId": "SingleUseId10",
-                "TextRotation": "0",
-                "ColorReleased": {
-                  "Red": 70,
-                  "Green": 70,
-                  "Blue": 70
-                },
-                "ColorPressed": {
-                  "Red": 231,
-                  "Green": 154,
-                  "Blue": 9
-                }
-              },
-              {
-                "Type": "ImageButtonStyle",
-                "X": 0,
-                "Y": 0,
-                "LockFlexButtonToImageSize": true,
-                "ImageReleased": "small_btn.png",
-                "ImagePressed": "small_btn_pressed.png"
-              }
-            ],
-            "Name": "tcpButton",
-            "X": 32,
-            "Y": 200,
-            "Width": 100,
-            "Height": 56,
-            "Type": "FlexButton",
-            "Visible": true,
-            "Draggable": false,
-            "Clickable": false,
-            "Fadeable": false,
-            "Moveable": false
-          },
-          {
-            "Alpha": 255,
-            "ButtonTrigger": {
-              "Type": "ClickButtonTrigger"
-            },
-            "ButtonStyles": [
-              {
                 "Type": "IconButtonStyle",
                 "X": 15,
                 "Y": 15,
@@ -479,18 +435,6 @@
             },
             "Action": {
               "FunctionName": "repeatButtonPressed",
-              "Type": "ActionCustom"
-            }
-          },
-          {
-            "InteractionName": "tcpButtonInteraction",
-            "HasCompletedTrigger": false,
-            "Trigger": {
-              "TriggerComponent": "tcpButton",
-              "Type": "TriggerClicked"
-            },
-            "Action": {
-              "FunctionName": "tcpButtonPressed",
               "Type": "ActionCustom"
             }
           },
@@ -1471,10 +1415,6 @@
       {
         "TextEntryId": "toggleButtonOrange",
         "IsResource": true
-      },
-      {
-        "TextEntryId": "SingleUseId10",
-        "IsResource": false
       },
       {
         "TextEntryId": "SingleUseId13",

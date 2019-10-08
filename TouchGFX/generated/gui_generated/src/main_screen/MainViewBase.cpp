@@ -62,14 +62,6 @@ MainViewBase::MainViewBase() :
     countTxt.setWildcard(countTxtBuffer);
     countTxt.setTypedText(TypedText(T_NUMBERTEXT));
 
-    tcpButton.setBitmaps(Bitmap(BITMAP_SMALL_BTN_ID), Bitmap(BITMAP_SMALL_BTN_PRESSED_ID));
-    tcpButton.setBitmapXY(0, 0);
-    tcpButton.setText(TypedText(T_SINGLEUSEID10));
-    tcpButton.setTextPosition(0, 19, 100, 56);
-    tcpButton.setTextColors(touchgfx::Color::getColorFrom24BitRGB(70, 70, 70), touchgfx::Color::getColorFrom24BitRGB(231, 154, 9));
-    tcpButton.setPosition(32, 200, 100, 56);
-    tcpButton.setAction(flexButtonCallback);
-
     screenBtnLogger.setBitmaps(Bitmap(BITMAP_BLUE_BUTTONS_ROUND_EDGE_ICON_BUTTON_ID), Bitmap(BITMAP_BLUE_BUTTONS_ROUND_EDGE_ICON_BUTTON_PRESSED_ID));
     screenBtnLogger.setBitmapXY(0, 0);
     screenBtnLogger.setIconBitmaps(Bitmap(BITMAP_BLUE_ICONS_SETTINGS_32_ID), Bitmap(BITMAP_BLUE_ICONS_SETTINGS_32_ID));
@@ -99,7 +91,6 @@ MainViewBase::MainViewBase() :
     add(repeatButton);
     add(counterBackgroundImage);
     add(countTxt);
-    add(tcpButton);
     add(screenBtnLogger);
     add(screenBtnNetwork);
     add(screenBtnIOCont);
@@ -139,13 +130,6 @@ void MainViewBase::flexButtonCallbackHandler(const touchgfx::AbstractButtonConta
         //When repeatButton clicked call virtual function
         //Call repeatButtonPressed
         repeatButtonPressed();
-    }
-    else if (&src == &tcpButton)
-    {
-        //tcpButtonInteraction
-        //When tcpButton clicked call virtual function
-        //Call tcpButtonPressed
-        tcpButtonPressed();
     }
     else if (&src == &screenBtnLogger)
     {
