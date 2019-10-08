@@ -108,6 +108,9 @@ const uint8_t bg_enabled = 0xFF;
 #define  DBG_JSMN(msg, val, txt) debug_print(DBG_JSMN_ENABLED,  (char*)"JSMN",  __FUNCTION__, (char*)msg, (int8_t*)val, (char*)txt);
 #define  DBG_DHCP(msg, val, txt) debug_print(DBG_DHCP_ENABLED,  (char*)"DHCP",  __FUNCTION__, (char*)msg, (int8_t*)val, (char*)txt);
 
+
+#define JSMN_MAX_TOK (128)
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -148,12 +151,14 @@ osMessageQId logQueueHandle;
 osMessageQId dumpQueueHandle;
 osMessageQId getIPQueueHandle;
 osMessageQId setIPQueueHandle;
-osSemaphoreId dhcpBinarySemHandle;
+osMessageQId cliLoggerQueueHandle;
+osSemaphoreId cliBinarySemHandle;
 /* USER CODE BEGIN PV */
 
 osThreadId httpClientTaskHandle;
 osThreadId httpServerTaskHandle;
 osThreadId SDLoggerTaskHandle;
+osThreadId CLILoggerTaskHandle;
 
 FATFS SDFatFs;  /* File system object for SD card logical drive */
 
@@ -194,15 +199,20 @@ void StartDHCPTask(void const * argument);
 void Start_HTTP_Client_Task(void const * argument);
 void Start_HTTP_Server_Task(void const * argument);
 void Start_SD_Logger_Task(void const * argument);
+void Start_CLI_Logger_Task(void const * argument);
 
 uint16_t cli_printf(const char* fmt, ...);
+uint16_t cli_dump(const char* src, uint16_t len);
 uint16_t cli_write(const char* src, uint16_t len);
+
+void http_print_msg(lwhttp_message_t* msg);
 
 void debug_print(uint8_t dbg_mask, char* label, const char* fnc, char* msg, int8_t* val, char* txt);
 
-static int jsoneq(const char *json, jsmntok_t *tok, const char *s);
+static BaseType_t jsoneq(const char *json, const jsmntok_t * const pxTok, const char *s);
 
-err_t post_thingspeak(void);
+BaseType_t post_thingspeak(void);
+BaseType_t parse_thingspeak_rsp(char* src, uint16_t len);
 
 FRESULT sd_scan_files(char* path);
 FRESULT sd_get_free_clusters(FATFS* fs);
@@ -276,9 +286,9 @@ int main(void)
   /* USER CODE END RTOS_MUTEX */
 
   /* Create the semaphores(s) */
-  /* definition and creation of dhcpBinarySem */
-  osSemaphoreDef(dhcpBinarySem);
-  dhcpBinarySemHandle = osSemaphoreCreate(osSemaphore(dhcpBinarySem), 1);
+  /* definition and creation of cliBinarySem */
+  osSemaphoreDef(cliBinarySem);
+  cliBinarySemHandle = osSemaphoreCreate(osSemaphore(cliBinarySem), 1);
 
   /* USER CODE BEGIN RTOS_SEMAPHORES */
     /* add semaphores, ... */
@@ -324,9 +334,13 @@ int main(void)
   osThreadDef(httpServerTask, Start_HTTP_Server_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 6);
   httpServerTaskHandle = osThreadCreate(osThread(httpServerTask), (void*)&gnetif);
 
-    /* definition and creation of SDLoggerTask */
+  /* definition and creation of SDLoggerTask */
   osThreadDef(SDLoggerTask, Start_SD_Logger_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 8);
   SDLoggerTaskHandle = osThreadCreate(osThread(SDLoggerTask), NULL);
+
+  /* definition and creation of CLILoggerTask */
+  osThreadDef(CLILoggerTask, Start_CLI_Logger_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 5);
+  CLILoggerTaskHandle = osThreadCreate(osThread(CLILoggerTask), NULL);
 
   /* USER CODE END RTOS_THREADS */
 
@@ -361,8 +375,10 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_QUEUES */
     /* add queues, ... */
+  /* definition and creation of cliLoggerQueue */
+  osMessageQDef(cliLoggerQueue, 16, char**);
+  cliLoggerQueueHandle = osMessageCreate(osMessageQ(cliLoggerQueue), NULL);
   /* USER CODE END RTOS_QUEUES */
- 
 
   /* Start scheduler */
   osKernelStart();
@@ -1204,6 +1220,29 @@ void debug_print(uint8_t dbg_mask, char* label, const char* fnc, char* msg, int8
   }
 }
 
+uint16_t cli_dump(const char* src, uint16_t len)
+{
+  if (xSemaphoreTake(cliBinarySemHandle, portMAX_DELAY) == pdTRUE)
+  {
+    cli_write(src, len);
+    xSemaphoreGive(cliBinarySemHandle);
+  }
+}
+
+uint16_t cli_write(const char* src, uint16_t len)
+{
+  const uint32_t ulTimeout = 3000UL;
+
+  if ((src != NULL) && (len > 0))
+  {
+    HAL_UART_Transmit(&huart1, (uint8_t*)src, len, ulTimeout);
+    // HAL_UART_Transmit(&huart6, (uint8_t*)src, len, 100);
+  }
+
+  return len;
+}
+
+#if 0
 uint16_t cli_printf(const char* fmt, ...)
 {
   uint16_t len = 0;
@@ -1216,73 +1255,159 @@ uint16_t cli_printf(const char* fmt, ...)
 
   return len;
 }
-
-void jsmn_parser_example(char* json_string, uint16_t len)
-{
-  int i;
-  int r;
-  jsmn_parser p;
-  jsmntok_t t[128]; /* We expect no more than 128 tokens */
-
-  jsmn_init(&p);
-  r = jsmn_parse(&p, json_string, len, t, sizeof(t)/sizeof(t[0]));
-  if (r < 0) 
-  {
-    DBG_JSMN("Failed to parse JSON", &r, NULL)
-    //return 1;
-  }
-
-  /* Assume the top-level element is an object */
-  if (r < 1 || t[0].type != JSMN_OBJECT) {
-    DBG_JSMN("Object expected", &r, NULL)
-    // return 1;
-  }
-
-  /* Loop over all keys of the root object */
-  for (i = 1; i < r; i++) {
-          if (jsoneq(json_string, &t[i], "channel_id") == 0) {
-                  /* We may use strndup() to fetch string value */
-                  cli_printf("[JSMN] Channel ID: %.*s\r\n", t[i+1].end-t[i+1].start,
-                                  json_string + t[i+1].start);
-                  i++;
-          } else if (jsoneq(json_string, &t[i], "entry_id") == 0) {
-                  /* We may additionally check if the value is either "true" or "false" */
-                  cli_printf("[JSMN] Entry ID: %.*s\r\n", t[i+1].end-t[i+1].start,
-                                  json_string + t[i+1].start);
-                  i++;
-          } else if (jsoneq(json_string, &t[i], "field1") == 0) {
-                  /* We may want to do strtol() here to get numeric value */
-                  cli_printf("[JSMN] Field1: %.*s\r\n", t[i+1].end-t[i+1].start,
-                                  json_string + t[i+1].start);
-                  i++;
-#if 0
-          } else if (jsoneq(json_string, &t[i], "groups") == 0) {
-                  int j;
-                  cli_printf("- Groups:\r\n");
-                  if (t[i+1].type != JSMN_ARRAY) {
-                          continue; /* We expect groups to be an array of strings */
-                  }
-                  for (j = 0; j < t[i+1].size; j++) {
-                          jsmntok_t *g = &t[i+j+2];
-                          cli_printf("  * %.*s\r\n", g->end - g->start, json_string + g->start);
-                  }
-                  i += t[i+1].size + 1;
 #endif
-          } else {
-                  // cli_printf("Unexpected key: %.*s\r\n", t[i].end-t[i].start, json_string + t[i].start);
-          }
+
+#define CLI_LOGGER_MAX_MESSAGE_LENGTH (128)
+
+uint16_t cli_printf(const char * fmt, ...)
+{
+  size_t xLength = 0;
+  va_list args;
+  char * pcPrintString = NULL;
+
+  /* The queue is created by xLoggingTaskInitialize().  Check
+   * xLoggingTaskInitialize() has been called. */
+  configASSERT(cliLoggerQueueHandle);
+
+  /* Allocate a buffer to hold the log message. */
+  pcPrintString = (char*)pvPortMalloc(CLI_LOGGER_MAX_MESSAGE_LENGTH);
+
+  if(pcPrintString != NULL)
+  {
+    /* There are a variable number of parameters. */
+    va_start( args, fmt );
+
+    xLength = vsnprintf(pcPrintString, CLI_LOGGER_MAX_MESSAGE_LENGTH, fmt, args);
+
+    va_end( args );
+
+#if 0
+    if(xLength < 0)
+    {
+      xLength = 0;
+    }
+
+    /* Add NULL terminator at the end */
+    if(xLength < CLI_LOGGER_MAX_MESSAGE_LENGTH)
+    {
+      pcPrintString[xLength] = '\0';
+    }
+#endif
+
+    /* Only send the buffer to the logging task if it is not empty. */
+    if(xLength > 0)
+    {
+        /* Send the string to the logging task for IO. */
+        if(xQueueSend(cliLoggerQueueHandle, &pcPrintString, 0) != pdPASS)
+        {
+            /* The buffer was not sent so must be freed again. */
+            vPortFree( ( void * ) pcPrintString );
+        }
+    }
+    else
+    {
+      /* The buffer was not sent, so it must be freed. */
+      vPortFree((void*)pcPrintString);
+    }
   }
+
+  return xLength;
 }
 
+#define THINGSPEAK_TOK_CHANNEL_ID   "channel_id"
+#define THINGSPEAK_TOK_ENTRY_ID     "entry_id"
+#define THINGSPEAK_TOK_FIELD1       "field1"
+#define THINGSPEAK_TOK_CREATED_AT   "created_at"
 
-uint16_t cli_write(const char* src, uint16_t len)
+BaseType_t parse_thingspeak_rsp(char* src, uint16_t len)
 {
-  if ((src != NULL) && (len > 0))
+  BaseType_t xStatus;
+
+  uint32_t ulTokenIndex;
+  uint32_t ulNumTokens;
+  int32_t lNumTokens;
+
+  char* TokenStart;
+  uint32_t TokenLen;
+
+  jsmn_parser xJSMNParser;
+  jsmntok_t pxTok[JSMN_MAX_TOK]; /* We expect no more than 128 tokens */
+
+  jsmn_init(&xJSMNParser);
+
+  lNumTokens = jsmn_parse(&xJSMNParser, src, len, pxTok, JSMN_MAX_TOK);
+
+  if (lNumTokens < 0) 
   {
-    HAL_UART_Transmit(&huart1, (uint8_t*)src, len, 100);
-    // HAL_UART_Transmit(&huart6, (uint8_t*)src, len, 100);
+    DBG_JSMN("Failed to parse JSON", NULL, NULL)
+    xStatus = pdFAIL;
   }
-  return len;
+
+  if(xStatus == pdPASS)
+  {
+    ulNumTokens = (uint32_t)lNumTokens;
+
+    /* Assume the top-level element is an object */
+    if (pxTok[0].type != JSMN_OBJECT) 
+    {
+      DBG_JSMN("Object expected", NULL, NULL)
+      xStatus = pdFAIL;
+    }
+
+    if(xStatus == pdPASS)
+    {
+      /* Loop over all keys of the root object */
+      for (ulTokenIndex = 1; ulTokenIndex < lNumTokens; ulTokenIndex++)
+      {
+
+        TokenStart = &src[ pxTok[ ulTokenIndex + (uint32_t)1].start ];
+        TokenLen = pxTok[ulTokenIndex+1].end - pxTok[ulTokenIndex+1].start;
+
+        if (jsoneq(src, &pxTok[ulTokenIndex], THINGSPEAK_TOK_CHANNEL_ID) == pdTRUE) 
+        {
+          /* We may use strndup() to fetch string value */
+          cli_printf("[JSMN] %s: %.*s\r\n", 
+            THINGSPEAK_TOK_CHANNEL_ID,
+            pxTok[ulTokenIndex+1].end - pxTok[ulTokenIndex+1].start, 
+            &src[ pxTok[ ulTokenIndex + (uint32_t)1].start ]
+          );
+        } 
+        else if (jsoneq(src, &pxTok[ulTokenIndex], THINGSPEAK_TOK_ENTRY_ID) == pdTRUE) 
+        {
+          /* We may use strndup() to fetch string value */
+          cli_printf("[JSMN] %s: %.*s\r\n", 
+            THINGSPEAK_TOK_ENTRY_ID,
+            pxTok[ulTokenIndex+1].end - pxTok[ulTokenIndex+1].start, 
+            &src[ pxTok[ ulTokenIndex + (uint32_t)1].start ]
+          );
+        } 
+        else if (jsoneq(src, &pxTok[ulTokenIndex], THINGSPEAK_TOK_FIELD1) == pdTRUE) 
+        {
+          /* We may use strndup() to fetch string value */
+          cli_printf("[JSMN] %s: %.*s\r\n", 
+            THINGSPEAK_TOK_FIELD1,
+            pxTok[ulTokenIndex+1].end - pxTok[ulTokenIndex+1].start, 
+            &src[ pxTok[ ulTokenIndex + (uint32_t)1].start ]
+          );
+        } 
+        else if (jsoneq(src, &pxTok[ulTokenIndex], THINGSPEAK_TOK_CREATED_AT) == pdTRUE) 
+        {
+          /* We may use strndup() to fetch string value */
+          cli_printf("[JSMN] %s: %.*s\r\n", 
+            THINGSPEAK_TOK_CREATED_AT,
+            pxTok[ulTokenIndex+1].end - pxTok[ulTokenIndex+1].start, 
+            &src[ pxTok[ ulTokenIndex + (uint32_t)1].start ]
+          );
+        }
+        else 
+        {
+                // cli_printf("Unexpected key: %.*s\r\n", t[i].end-t[i].start, src + t[i].start);
+        }
+      }
+    }
+  }
+
+  return xStatus;
 }
 
 FRESULT sd_get_free_clusters(FATFS* fs)
@@ -1380,21 +1505,35 @@ FRESULT sd_scan_files(char* path)
     return fr;
 }
 
-static int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
-	if (tok->type == JSMN_STRING && (int) strlen(s) == tok->end - tok->start &&
-			strncmp(json + tok->start, s, tok->end - tok->start) == 0) {
-		return 0;
-	}
-	return -1;
+static BaseType_t jsoneq(const char *json, const jsmntok_t * const pxTok, const char *s) 
+{
+  BaseType_t xStatus = pdFALSE;
+
+  uint32_t ulStringSize = (uint32_t)pxTok->end - (uint32_t)pxTok->start;
+
+	if (pxTok->type == JSMN_STRING)
+  {
+    if (strlen(s) == ulStringSize)
+    {
+      if (0 == strncmp(&json[pxTok->start], s, ulStringSize)) 
+      {
+  		  xStatus = pdTRUE;
+      }
+  	}
+  }
+
+	return xStatus;
 }
 
-err_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uint8_t data)
+BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uint8_t data)
 {
   /* LwIP PV */
   // struct netif* netif = (struct netif*)argument;
+  uint16_t len = 0;
   struct netconn *conn;
   struct netbuf *netbuf = NULL;
   ip4_addr_t remote_ip; 
+  BaseType_t xStatus = pdFALSE;
   err_t err;
   
   /* Temp Buffer PV */
@@ -1417,7 +1556,8 @@ err_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uin
   {
     /* Parse HTTP Body in JSON format */
     sprintf((char *)json_data, json_data_fmt, key, 5, data);  
-    sprintf((char *)json_data_len, "%d", strlen((char *)json_data));  
+    len = strlen((char *)json_data);
+    sprintf((char *)json_data_len, "%d", len);  
           
     /* Build HTTP Request */
     lwhttp_request_put_request_line(req_ptr, LwHHTP_POST, url);
@@ -1425,11 +1565,16 @@ err_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uin
     lwhttp_request_put_message_header(req_ptr, "Content-Length", (char *)json_data_len);
     lwhttp_request_put_message_body(req_ptr, (char*)json_data, strlen((char *)json_data));  
           
+    DBG_LWIP("JSON Data Sent", &len, json_data);
+
     /* Run LwHTTP Request Parser */
     lwhttp_request_parse(req_ptr);
-          
+
+    /* Print the request */
+    http_print_msg(req_ptr);
+
     /* LwIP Connect TCP */
-    conn = netconn_new(NETCONN_TCP);        
+    conn = netconn_new(NETCONN_TCP);       
     if (NULL != conn)
     {
 #if 0
@@ -1455,12 +1600,6 @@ err_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uin
 
             /* Get LwHTTP Request Data */
             lwhttp_request_get(req_ptr, &temp_buf_data, &temp_buf_data_len);
-
-#if 0
-            cli_printf("[LwIP] %s --> Request:\r\n", __FUNCTION__); 
-            cli_write(req_ptr->buffer.data, req_ptr->buffer.len);
-            cli_printf("\r\n");
-#endif     
 
             /* Write data to server */
             err = netconn_write(conn, temp_buf_data, temp_buf_data_len, NETCONN_NOFLAG);
@@ -1492,22 +1631,11 @@ err_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uin
 
                 DBG_LWIP("netconn_recv",  &rsp_ptr->buffer.len, NULL);
 
-                if (rsp_ptr->start_line.status_line.status_code.data != NULL)
-                {
-                  /* Print HTTP Request */
-                  lwhttp_request_get_request_line(req_ptr, &temp_buf_data, &temp_buf_data_len);
-                  cli_printf("[LwHTTP] Request-Line: %.*s\r\n", temp_buf_data_len, temp_buf_data);
-
-                  /* Parse & Print LwHTTP Response */
-                  lwhttp_response_parse(rsp_ptr);
-                  lwhttp_response_get_status_line(rsp_ptr, &temp_buf_data, &temp_buf_data_len);
-                  cli_printf("[LwHTTP] Status-Line: %.*s\r\n\r\n", temp_buf_data_len, temp_buf_data);
-                  
-                  err = ERR_OK;               
-                }
-                else
-                {
-                  err = ERR_MEM;
+                /* If parsed response contains the status line and the body we are OK*/
+                if ((rsp_ptr->start_line.status_line.buffer.data != NULL) 
+                  && (rsp_ptr->message_body.data != NULL))
+                {                  
+                  xStatus = pdTRUE;               
                 }
               }
               else
@@ -1549,7 +1677,7 @@ err_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uin
 
 void Start_SD_Logger_Task(void const * argument)
 {
-  /* USER CODE BEGIN Start_HTTP_Client_Task */
+  /* USER CODE BEGIN Start_SD_Logger_Task */
   
   /* Queue PV */
   uint8_t queueData = 0;
@@ -1576,9 +1704,41 @@ void Start_SD_Logger_Task(void const * argument)
       osDelay(10);  
     }
   }    
-  /* USER CODE END Start_HTTP_Client_Task */
+  /* USER CODE END Start_SD_Logger_Task */
 }
 
+void Start_CLI_Logger_Task(void const * argument)
+{
+  /* USER CODE BEGIN Start_CLI_Logger_Task */
+  char * pcReceivedString = NULL;
+
+  /* Infinite loop */
+  for(;;)
+  {
+    if(xQueueReceive(cliLoggerQueueHandle, &pcReceivedString, portMAX_DELAY) == pdPASS)
+    {
+      if (xSemaphoreTake(cliBinarySemHandle, portMAX_DELAY) == pdTRUE)
+      {
+        cli_write(pcReceivedString, strlen(pcReceivedString));
+        xSemaphoreGive(cliBinarySemHandle);
+      }
+      vPortFree((void*)pcReceivedString);
+    }
+  }
+  /* USER CODE END Start_CLI_Logger_Task */
+}
+
+void http_print_msg(lwhttp_message_t* msg)
+{
+  /* Temp Buffer PV */
+  char* temp_buf_data = NULL;
+  uint16_t temp_buf_data_len = 0;
+  const char* line = "--------------------------------------------------------------";
+
+  cli_printf("%s", line);
+  cli_dump(msg->buffer.data, msg->buffer.len);
+  cli_printf("%s", line);
+}
 
 void Start_HTTP_Client_Task(void const * argument)
 {
@@ -1586,7 +1746,6 @@ void Start_HTTP_Client_Task(void const * argument)
   
   /* Queue PV */
   uint8_t queueData = 0;
-  err_t err = ERR_OK;
   lwhttp_message_header_t* content_type_header_ptr;
 
   static lwhttp_request_t client_request;
@@ -1613,50 +1772,29 @@ void Start_HTTP_Client_Task(void const * argument)
       lwhttp_response_init(&client_response);  
 
       /* Sen POST request */
-      err = post_thingspeak(&client_request, &client_response, queueData);
-      if (ERR_OK == err)
+      if (pdTRUE == post_thingspeak(&client_request, &client_response, queueData))
       {
-        /* Content-Type */
-        lwhttp_response_get_message_header(&client_response, "Content-Type", &content_type_header_ptr);
-#if 0
-        cli_printf("[LwIP] %s --> Response:\r\n", __FUNCTION__); 
-      
-        cli_write(client_response.buffer.data, client_response.buffer.len);
-
-        cli_printf("[LwIP] %s --> status_code:\r\n%.*s\r\n", 
-          __FUNCTION__, 
-          client_response.start_line.status_line.status_code.len, 
-          client_response.start_line.status_line.status_code.data
-        );
-
-        cli_printf("[LwIP] %s --> message_body:\r\n%d\r\n", 
-          __FUNCTION__, 
-          client_response.message_body.len
-        );
-#endif
-
-        cli_printf("[LwIP] %s --> Content-Type:\r\n%.*s\r\n", 
-          __FUNCTION__, 
-          content_type_header_ptr->field_value.len, 
-          content_type_header_ptr->field_value.data
-        );
+        http_print_msg(&client_response);
 
         /* If HTTP Status Code is OK (200) and Content-Type is JSON */
         if ((0 == strncmp(client_response.start_line.status_line.status_code.data, "200", strlen("200"))) 
             && (0 == strncmp(content_type_header_ptr->field_value.data, "application/json", strlen("application/json")))
             && (1 < client_response.message_body.len))
         {
-          /* Parse LwHTTP Response message body as JSON */        
-          jsmn_parser_example(client_response.message_body.data, client_response.message_body.len);  
+          /* Parse LwHTTP Response message body as JSON */   
+          if (parse_thingspeak_rsp(client_response.message_body.data, client_response.message_body.len) == pdTRUE)
+          {
+            DBG_LWIP("Request FINISHED", NULL, NULL);
+          }
         }   
         else
         {
-          DBG_LWIP("JSON parse",  &err, NULL);
+          DBG_LWIP("Invalid response", NULL, NULL);
         }
       }
       else
       {
-        DBG_LWIP("post_thingspeak", &err, NULL);
+        DBG_LWIP("Failed to POST", NULL, NULL);
       }
 
       /* Free LwHTTP Request & Response */
@@ -2039,7 +2177,7 @@ FRESULT sd_dump(void)
       {
         if(bytesread > 0)
         {
-          cli_write((char*)&rtext[0], bytesread);
+          cli_dump((char*)&rtext[0], bytesread);
         }
       }
       else 
@@ -2262,23 +2400,6 @@ void StartDHCPTask(void const * argument)
     /* wait 250 ms */
     osDelay(250);
   }
-  
-#if 0  
-  /* Infinite loop */
-  for(;;)
-  {
-    memset(PAGE_BODY, 0,256);
-    /* The list of tasks and their status */
-    osThreadList((unsigned char *)PAGE_BODY);
-
-    cli_printf("\r\nName          State  Priority  Stack   Num\r\n" );
-    cli_printf("---------------------------------------------\r\n");
-    cli_write((char*)PAGE_BODY, strlen((char*)PAGE_BODY));
-    cli_printf("---------------------------------------------\r\n");
-    cli_printf("B : Blocked, R : Ready, D : Deleted, S : Suspended\r\n");
-    osDelay(1000);
-  }
-#endif
 
   /* USER CODE END StartDHCPTask */
 }
