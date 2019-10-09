@@ -4,10 +4,32 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdint.h>
+#include <portmacro.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define DBG_LWHTTP_ENABLED   1
+
+
+#define errOK          ( pdPASS )            /** No error, everything OK. */
+#define errNOK         ( pdFAIL )            /** Unknown error.           */
+#define errMEM         ( ( BaseType_t ) -1  ) /** Out of memory error.     */
+#define errBUF         ( ( BaseType_t ) -2  ) /** Buffer error.            */
+#define errTimeout     ( ( BaseType_t ) -3  ) /** Timeout.                 */
+#define errNotFound    ( ( BaseType_t ) -4  ) /** Routing problem.         */
+#define errARG         ( ( BaseType_t ) -5  ) /** Illegal argument.        */
+#define errParser      ( ( BaseType_t ) -6  ) /** Failed to parse.         */
+#define errParseReady  ( ( BaseType_t ) -7  ) /** Failed to parse.         */
+#define errParseStart  ( ( BaseType_t ) -8  ) /** Failed to parse.         */
+#define errParseHeader ( ( BaseType_t ) -9  ) /** Failed to parse.         */
+#define errParseBody   ( ( BaseType_t ) -10 ) /** Failed to parse.         */
+#define errBuild       ( ( BaseType_t ) -11 ) /** Failed to build.         */
+#define errBuildReady  ( ( BaseType_t ) -12 ) /** Failed to build.         */
+#define errBuildStart  ( ( BaseType_t ) -13 ) /** Failed to build.         */
+#define errBuildHeader ( ( BaseType_t ) -14 ) /** Failed to build.         */
+#define errBuildBody   ( ( BaseType_t ) -15 ) /** Failed to build.         */
 
 typedef enum {
     LwHHTP_MESSAGE_TYPE_INVALID = 0,
@@ -24,7 +46,7 @@ typedef enum {
 
 typedef enum {
     LwHHTP_BUILDER_INIT = 0,
-    LwHHTP_BUILDER_READY = 1,
+    LwHHTP_BUILDER_IN_PROGRESS = 1,
     LwHHTP_BUILDER_ADDED_START_LINE = 2,
     LwHHTP_BUILDER_ADDED_MESSAGE_HEADER = 3,
     LwHHTP_BUILDER_ADDED_MESSAGE_BODY = 4,
@@ -91,34 +113,33 @@ typedef lwhttp_message_t lwhttp_response_t;
 typedef lwhttp_message_t lwhttp_request_t;
 
 /* LwHTTP Response Specific functions */
-uint16_t lwhttp_response_init(lwhttp_response_t* response);
-uint16_t lwhttp_response_free(lwhttp_response_t* response);
-uint16_t lwhttp_response_parse(lwhttp_response_t* response);
-uint16_t lwhttp_response_get(lwhttp_response_t* response, char** dest, uint16_t* len);
-uint16_t lwhttp_response_put(lwhttp_response_t* response, const char* src, uint16_t len);
-uint16_t lwhttp_response_put_eol(lwhttp_response_t* response);
-uint16_t lwhttp_response_get_status_line(lwhttp_response_t* response, char** dest, uint16_t* len);
-uint16_t lwhttp_response_put_status_line(lwhttp_response_t* response, const char* status_code, const char* reason_phrase);
-uint16_t lwhttp_response_get_message_header(lwhttp_response_t* response, const char* field_name, lwhttp_message_header_t** dest);
-uint16_t lwhttp_response_put_message_header(lwhttp_response_t* response, const char* header, const char* value);
-uint16_t lwhttp_response_get_message_body(lwhttp_response_t* response, char** dest, uint16_t* len);
-uint16_t lwhttp_response_put_message_body(lwhttp_response_t* response, const char* body, uint16_t len);
-
-uint16_t lwhttp_response_get_status_code(lwhttp_response_t* response, char** dest, uint16_t* len);
+BaseType_t lwhttp_response_init(lwhttp_response_t* response);
+BaseType_t lwhttp_response_free(lwhttp_response_t* response);
+BaseType_t lwhttp_response_parse(lwhttp_response_t* response);
+BaseType_t lwhttp_response_get(lwhttp_response_t* response, char** dest, uint16_t* len);
+BaseType_t lwhttp_response_put(lwhttp_response_t* response, const char* src, uint16_t len);
+BaseType_t lwhttp_response_put_eol(lwhttp_response_t* response);
+BaseType_t lwhttp_response_get_status_line(lwhttp_response_t* response, char** dest, uint16_t* len);
+BaseType_t lwhttp_response_put_status_line(lwhttp_response_t* response, const char* status_code, const char* reason_phrase);
+BaseType_t lwhttp_response_get_message_header(lwhttp_response_t* response, const char* field_name, lwhttp_message_header_t** dest);
+BaseType_t lwhttp_response_put_message_header(lwhttp_response_t* response, const char* header, const char* value);
+BaseType_t lwhttp_response_get_message_body(lwhttp_response_t* response, char** dest, uint16_t* len);
+BaseType_t lwhttp_response_put_message_body(lwhttp_response_t* response, const char* body, uint16_t len);
+BaseType_t lwhttp_response_get_status_code(lwhttp_response_t* response, char** dest, uint16_t* len);
 
 /* LwHTTP Request Specific functions */
-uint16_t lwhttp_request_init(lwhttp_request_t* request);
-uint16_t lwhttp_request_free(lwhttp_request_t* request);
-uint16_t lwhttp_request_parse(lwhttp_request_t* request);
-uint16_t lwhttp_request_get(lwhttp_request_t* request, char** dest, uint16_t* len);
-uint16_t lwhttp_request_put(lwhttp_request_t* request, const char* src, uint16_t len);
-uint16_t lwhttp_request_put_eol(lwhttp_request_t* request);
-uint16_t lwhttp_request_get_request_line(lwhttp_request_t* request, char** dest, uint16_t* len);
-uint16_t lwhttp_request_put_request_line(lwhttp_request_t* request, lwhttp_method_t method, const char* request_uri);
-uint16_t lwhttp_request_get_message_header(lwhttp_request_t* request, const char* field_name, lwhttp_message_header_t** dest);
-uint16_t lwhttp_request_put_message_header(lwhttp_request_t* request, const char* header, const char* value);
-uint16_t lwhttp_request_get_message_body(lwhttp_request_t* request, char** dest, uint16_t* len);
-uint16_t lwhttp_request_put_message_body(lwhttp_request_t* request, const char* body, uint16_t len);
+BaseType_t lwhttp_request_init(lwhttp_request_t* request);
+BaseType_t lwhttp_request_free(lwhttp_request_t* request);
+BaseType_t lwhttp_request_parse(lwhttp_request_t* request);
+BaseType_t lwhttp_request_get(lwhttp_request_t* request, char** dest, uint16_t* len);
+BaseType_t lwhttp_request_put(lwhttp_request_t* request, const char* src, uint16_t len);
+BaseType_t lwhttp_request_put_eol(lwhttp_request_t* request);
+BaseType_t lwhttp_request_get_request_line(lwhttp_request_t* request, char** dest, uint16_t* len);
+BaseType_t lwhttp_request_put_request_line(lwhttp_request_t* request, lwhttp_method_t method, const char* request_uri);
+BaseType_t lwhttp_request_get_message_header(lwhttp_request_t* request, const char* field_name, lwhttp_message_header_t** dest);
+BaseType_t lwhttp_request_put_message_header(lwhttp_request_t* request, const char* header, const char* value);
+BaseType_t lwhttp_request_get_message_body(lwhttp_request_t* request, char** dest, uint16_t* len);
+BaseType_t lwhttp_request_put_message_body(lwhttp_request_t* request, const char* body, uint16_t len);
 
 #ifdef __cplusplus
 }

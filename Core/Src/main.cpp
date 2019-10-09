@@ -109,7 +109,7 @@
 #endif
 
 #if (DBG_LWIP_ENABLED == 1 )
-  #define DBG_LWIP(...) cli_dbg((char*)"LWIP",  __FUNCTION__, __VA_ARGS__)
+  #define DBG_LWIP(...) cli_dbg((char*)"LwIP",  __FUNCTION__, __VA_ARGS__)
 #else
   #define DBG_LWIP(...) (void)0
 #endif
