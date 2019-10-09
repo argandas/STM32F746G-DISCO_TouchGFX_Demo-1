@@ -85,12 +85,18 @@
 #define MAX_DHCP_TRIES  4
 #define JSMN_MAX_TOK (128)
 
+#define CLI_USE_FREERTOS_QUEUE 1
+
 #define DBG_LWIP_ENABLED   1
 #define DBG_RTOS_ENABLED   1
 #define DBG_FATFS_ENABLED  1
 #define DBG_QUEUE_ENABLED  1
 #define DBG_JSMN_ENABLED   1
 #define DBG_DHCP_ENABLED   1
+
+#if (CLI_USE_FREERTOS_QUEUE == 0)
+#define cli_dbg(a,b,...) cli_printf(__VA_ARGS__)
+#endif
 
 #if (DBG_RTOS_ENABLED == 1 )
   #define DBG_RTOS(...)     cli_dbg((char*)"RTOS",  __FUNCTION__, __VA_ARGS__)
@@ -163,7 +169,6 @@ osThreadId defaultTaskHandle;
 osThreadId buttonTaskHandle;
 osThreadId ledTaskHandle;
 osThreadId sdTaskHandle;
-osThreadId lwipTaskHandle;
 osThreadId dhcpTaskHandle;
 osMessageQId buttonQueueHandle;
 osMessageQId ledQueueHandle;
@@ -213,12 +218,14 @@ void StartDefaultTask(void const * argument);
 void StartButtonTask(void const * argument);
 void StartLEDTask(void const * argument);
 void StartSDTask(void const * argument);
-void StartLWIPTask(void const * argument);
 
 /* USER CODE BEGIN PFP */
 void Start_HTTP_Client_Task(void const * argument);
 void Start_HTTP_Server_Task(void const * argument);
+
+#if (CLI_USE_FREERTOS_QUEUE == 1)
 void Start_CLI_Logger_Task(void const * argument);
+#endif
 
 uint16_t cli_printf(const char* fmt, ...);
 uint16_t cli_dump(const char* src, uint16_t len);
@@ -226,7 +233,9 @@ uint16_t cli_write(const char* src, uint16_t len);
 
 void http_print_msg(lwhttp_message_t* msg);
 
+#if (CLI_USE_FREERTOS_QUEUE == 1)
 void cli_dbg(const char* label, const char* fn, const char* fmt, ...);
+#endif
 
 static BaseType_t jsoneq(const char *json, const jsmntok_t * const pxTok, const char *s);
 
@@ -322,45 +331,60 @@ int main(void)
   osThreadDef(defaultTask, StartDefaultTask, osPriorityHigh, 0, configMINIMAL_STACK_SIZE * 4);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
+#if (CLI_USE_FREERTOS_QUEUE == 1)
   /* definition and creation of CLILoggerTask */
   osThreadDef(CLILoggerTask, Start_CLI_Logger_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
   CLILoggerTaskHandle = osThreadCreate(osThread(CLILoggerTask), NULL);
-  
+#endif
+
   /* definition and creation of buttonTask */
   osThreadDef(buttonTask, StartButtonTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
   buttonTaskHandle = osThreadCreate(osThread(buttonTask), NULL);
-  
+
   /* definition and creation of ledTask */
   osThreadDef(ledTask, StartLEDTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
   ledTaskHandle = osThreadCreate(osThread(ledTask), NULL);
 
   /* definition and creation of sdTask */
-  osThreadDef(sdTask, StartSDTask, osPriorityAboveNormal, 0, configMINIMAL_STACK_SIZE * 4);
+  osThreadDef(sdTask, StartSDTask, osPriorityAboveNormal, 0, configMINIMAL_STACK_SIZE * 8);
   sdTaskHandle = osThreadCreate(osThread(sdTask), NULL);
 
+#if 0
   /* definition and creation of lwipTask */
-  osThreadDef(lwipTask, StartLWIPTask, osPriorityHigh, 0, configMINIMAL_STACK_SIZE * 4);
+  osThreadDef(lwipTask, StartLWIPTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
   lwipTaskHandle = osThreadCreate(osThread(lwipTask), (void*)&gnetif);
 
+  /* definition and creation of dhcpTask */
+  osThreadDef(dhcpTask, StartDHCPTask, osPriorityHigh, 0, configMINIMAL_STACK_SIZE * 2);
+  dhcpTaskHandle = osThreadCreate(osThread(dhcpTask), (void*)&gnetif);
+#endif
+
+  /* USER CODE BEGIN RTOS_THREADS */
+    /* add threads, ... */
+
   /* definition and creation of httpClientTask */
-  osThreadDef(httpClientTask, Start_HTTP_Client_Task, osPriorityRealtime, 0, configMINIMAL_STACK_SIZE * 12);
+  osThreadDef(httpClientTask, Start_HTTP_Client_Task, osPriorityHigh, 0, configMINIMAL_STACK_SIZE * 8);
   httpClientTaskHandle = osThreadCreate(osThread(httpClientTask), (void*)&gnetif);
   
 #if 0
   /* definition and creation of httpServerTask */
-  osThreadDef(httpServerTask, Start_HTTP_Server_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 6);
+  osThreadDef(httpServerTask, Start_HTTP_Server_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 8);
   httpServerTaskHandle = osThreadCreate(osThread(httpServerTask), (void*)&gnetif);
-#endif
 
+    /* definition and creation of SDLoggerTask */
+  osThreadDef(SDLoggerTask, Start_SD_Logger_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 8);
+  SDLoggerTaskHandle = osThreadCreate(osThread(SDLoggerTask), NULL);
+#endif
+  
   /* USER CODE END RTOS_THREADS */
 
   /* Create the queue(s) */
   /* definition and creation of buttonQueue */
-  osMessageQDef(buttonQueue, 4, uint8_t);
+  osMessageQDef(buttonQueue, 16, uint8_t);
   buttonQueueHandle = osMessageCreate(osMessageQ(buttonQueue), NULL);
 
   /* definition and creation of ledQueue */
-  osMessageQDef(ledQueue, 4, uint8_t);
+  osMessageQDef(ledQueue, 16, uint8_t);
   ledQueueHandle = osMessageCreate(osMessageQ(ledQueue), NULL);
 
   /* definition and creation of tcpQueue */
@@ -372,7 +396,7 @@ int main(void)
   logQueueHandle = osMessageCreate(osMessageQ(logQueue), NULL);
 
   /* definition and creation of dumpQueue */
-  osMessageQDef(dumpQueue, 1, uint16_t);
+  osMessageQDef(dumpQueue, 8, uint16_t);
   dumpQueueHandle = osMessageCreate(osMessageQ(dumpQueue), NULL);
 
   /* definition and creation of getIPQueue */
@@ -386,9 +410,10 @@ int main(void)
   /* USER CODE BEGIN RTOS_QUEUES */
     /* add queues, ... */
   /* definition and creation of cliLoggerQueue */
-  osMessageQDef(cliLoggerQueue, 16, char**);
+  osMessageQDef(cliLoggerQueue, 32, char**);
   cliLoggerQueueHandle = osMessageCreate(osMessageQ(cliLoggerQueue), NULL);
   /* USER CODE END RTOS_QUEUES */
+ 
 
   /* Start scheduler */
   osKernelStart();
@@ -1214,6 +1239,7 @@ static void MX_GPIO_Init(void)
 
 #define CLI_LOGGER_MAX_MESSAGE_LENGTH (128)
 
+#if (CLI_USE_FREERTOS_QUEUE == 1)
 void cli_dbg(const char* label, const char* fn, const char* fmt, ...)
 {
   size_t xLength = 0;
@@ -1278,14 +1304,17 @@ void cli_dbg(const char* label, const char* fn, const char* fmt, ...)
     }
   }
 }
+#endif
 
 uint16_t cli_dump(const char* src, uint16_t len)
 {
+  #if 0
   if (xSemaphoreTake(cliBinarySemHandle, 0) == pdTRUE)
   {
     cli_write(src, len);
     xSemaphoreGive(cliBinarySemHandle);
   }
+  #endif
 }
 
 void vApplicationStackOverflowHook(xTaskHandle *pxTask, signed portCHAR *pcTaskName )
@@ -1293,20 +1322,7 @@ void vApplicationStackOverflowHook(xTaskHandle *pxTask, signed portCHAR *pcTaskN
     DBG_RTOS(" ERROR: Stack overflow --> %s\r\n", pcTaskName);
 }
 
-uint16_t cli_write(const char* src, uint16_t len)
-{
-  const uint32_t ulTimeout = 3000UL;
-
-  if ((src != NULL) && (len > 0))
-  {
-    HAL_UART_Transmit(&huart1, (uint8_t*)src, len, ulTimeout);
-    // HAL_UART_Transmit(&huart6, (uint8_t*)src, len, 100);
-  }
-
-  return len;
-}
-
-#if 0
+#if (CLI_USE_FREERTOS_QUEUE == 0)
 uint16_t cli_printf(const char* fmt, ...)
 {
   uint16_t len = 0;
@@ -1319,8 +1335,7 @@ uint16_t cli_printf(const char* fmt, ...)
 
   return len;
 }
-#endif
-
+#else
 uint16_t cli_printf(const char * fmt, ...)
 {
   size_t xLength = 0;
@@ -1360,6 +1375,7 @@ uint16_t cli_printf(const char * fmt, ...)
 
   return xLength;
 }
+#endif
 
 #define THINGSPEAK_TOK_CHANNEL_ID   "channel_id"
 #define THINGSPEAK_TOK_ENTRY_ID     "entry_id"
@@ -1460,6 +1476,17 @@ BaseType_t parse_thingspeak_rsp(char* src, uint16_t len)
   }
 
   return xStatus;
+}
+
+
+uint16_t cli_write(const char* src, uint16_t len)
+{
+  if ((src != NULL) && (len > 0))
+  {
+    HAL_UART_Transmit(&huart1, (uint8_t*)src, len, 100);
+    // HAL_UART_Transmit(&huart6, (uint8_t*)src, len, 100);
+  }
+  return len;
 }
 
 FRESULT sd_get_free_clusters(FATFS* fs)
@@ -1583,9 +1610,7 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
   // struct netif* netif = (struct netif*)argument;
   uint16_t len = 0;
   struct netconn *conn;
-  struct netbuf *buf;
-  buf = netbuf_new();     /* create a new netbuf */
-
+  struct netbuf *netbuf = NULL;
   ip4_addr_t remote_ip; 
   BaseType_t xStatus = pdFALSE;
   err_t err;
@@ -1625,7 +1650,7 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
     lwhttp_request_parse(req_ptr);
 
     /* Print the request */
-    // http_print_msg(req_ptr);
+    http_print_msg(req_ptr);
 
     /* LwIP Connect TCP */
     conn = netconn_new(NETCONN_TCP);       
@@ -1673,20 +1698,18 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
                 {
                   case 0:
                     {
-                      err = netconn_recv(conn, &buf);
-                      DBG_LWIP("switch --> netconn_recv (err = %d)\r\n", err);
-                      // DBG_RTOS("xPortGetFreeHeapSize = %d\r\n", xPortGetFreeHeapSize());
+                      err = netconn_recv(conn, &netbuf);
                       if (err == ERR_OK)
                       {
+                        DBG_LWIP("switch --> netconn_recv (err = %d)\r\n", err);
                         state++;
                       }
                     }
                     break;
                   case 1:
                     {
-                      nxt_rsp = netbuf_next(buf);
+                      nxt_rsp = netbuf_next(netbuf);
                       DBG_LWIP("switch --> netbuf_next (nxt_rsp = %d)\r\n", nxt_rsp);
-                      // DBG_RTOS("xPortGetFreeHeapSize = %d\r\n", xPortGetFreeHeapSize());
 
                       /* Moved to the next part */
                       if(nxt_rsp >= 0)
@@ -1696,38 +1719,41 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
                       /* There is no next part */
                       else
                       {
-                        finished = pdTRUE;
+                        state++;
                       }
                     }
                     break;
+                  case 2:
+                    {                      
+                        finished = pdTRUE;
+                        netbuf_delete(netbuf);   
+                    }
                   default:
                   break;
                 }
 
+                DBG_LWIP("state (%d), err (%d), finished(%d)\r\n", state, err, finished);
+
                 if ((err == ERR_OK) && (finished == pdFALSE))
                 {
                     /* Get pointer to data and length*/
-                    netbuf_data(buf, (void**)&temp_buf_data, &temp_buf_data_len);
+                    netbuf_data(netbuf, (void**)&temp_buf_data, &temp_buf_data_len);
                     
                     /* LwHTTP write response to parser */
                     lwhttp_response_put(rsp_ptr, (char*)temp_buf_data, temp_buf_data_len);
                 }
               }
-
-              if(state > 0)
-              {
-                /* Free data buffer */
-                netbuf_delete(buf);
-              }
-              else
-              {
-                DBG_LWIP("netbuf not allocated (err = %d)\r\n", err);
-              }
               
+              DBG_LWIP("state (%d), err (%d), finished(%d)\r\n", state, err, finished);
+
               if ((ERR_OK == err) || (err == ERR_CLSD))
               {
                 /* Run LwHTTP Request Parser */
-                lwhttp_response_parse(rsp_ptr);
+                xStatus = lwhttp_response_parse(rsp_ptr);
+                if(xStatus != 1)
+                {
+                  DBG_LWIP("lwhttp_response_parse (status = %d)\r\n", xStatus);
+                }
 
                 DBG_LWIP("netconn_recv (%d bytes)\r\n",  rsp_ptr->buffer.len);
 
@@ -1736,6 +1762,7 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
                   && (rsp_ptr->message_body.data != NULL))
                 {                  
                   xStatus = pdTRUE;               
+                  DBG_LWIP("xStatus =  %d\r\n", xStatus);
                 }
               }
               else
@@ -1759,7 +1786,11 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
         }
       }
       
-      netconn_delete(conn);
+      err = netconn_delete(conn);
+      if (err != ERR_OK)
+      {
+        DBG_LWIP("netconn_delete (err = %d)\r\n", err);
+      }
     }
     else
     {
@@ -1775,6 +1806,7 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
   return xStatus;
 }
 
+#if (CLI_USE_FREERTOS_QUEUE == 1)
 void Start_CLI_Logger_Task(void const * argument)
 {
   /* USER CODE BEGIN Start_CLI_Logger_Task */
@@ -1783,25 +1815,32 @@ void Start_CLI_Logger_Task(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    if(xQueueReceive(cliLoggerQueueHandle, &pcReceivedString, portMAX_DELAY) == pdPASS)
+    if(xQueueReceive(cliLoggerQueueHandle, &pcReceivedString, 0) == pdPASS)
     {
-      if (xSemaphoreTake(cliBinarySemHandle, portMAX_DELAY) == pdTRUE)
-      {
+//      if (xSemaphoreTake(cliBinarySemHandle, 0) == pdTRUE)
+//      {
         cli_write(pcReceivedString, strlen(pcReceivedString));
-        xSemaphoreGive(cliBinarySemHandle);
-      }
+//        xSemaphoreGive(cliBinarySemHandle);
+//      }
       vPortFree((void*)pcReceivedString);
     }
   }
   /* USER CODE END Start_CLI_Logger_Task */
 }
+#endif
+
+void setDHCP_State(uint8_t state)
+{
+  DBG_DHCP("DHCP State change (%d >> %d)\r\n", DHCP_state, state);
+  DHCP_state = state;
+}
 
 void http_print_msg(lwhttp_message_t* msg)
 {
   /* Temp Buffer PV */
-  const char* line = "----------------------------";
+  const char* line = "----------------------------\r\n";
   cli_printf("%s", line);
-  cli_write(msg->buffer.data, msg->buffer.len);
+  // cli_printf("%*.s", 64, msg->buffer.data);
   cli_printf("%s", line);
 }
 
@@ -1817,62 +1856,160 @@ void Start_HTTP_Client_Task(void const * argument)
   static lwhttp_request_t client_request;
   static lwhttp_response_t client_response;
 
-  /* Wait for DHCP */
-  while (DHCP_state != DHCP_ADDRESS_ASSIGNED)
-  {
-    // DBG_LWIP("Waiting for DHCP (state = %d)\r\n",  DHCP_state);
-    osDelay(10);
-  }
+  /* LwIP PV */
+  struct netif* netif = (struct netif*)argument;
+  ip_addr_t ipaddr;
+  ip_addr_t netmask;
+  ip_addr_t gw;
+  struct dhcp *dhcp;
+
+  /* init code for LWIP */
+  MX_LWIP_Init();
 
   RTOS_TASK_READY();
-
-  DBG_RTOS("xPortGetFreeHeapSize = %d\r\n", xPortGetFreeHeapSize());
+  //DBG_RTOS("xPortGetFreeHeapSize = %d\r\n", xPortGetFreeHeapSize());
   
   /* Infinite loop */
   for(;;)
   {
-    if(xQueueReceive(tcpQueueHandle, &queueData, 0) == pdTRUE)
+    switch (DHCP_state)
     {
-      DBG_QUEUE("tcpQueueHandle: %d\r\n", queueData);
-
-      /* LwHTTP Inits */
-      lwhttp_request_init(&client_request);
-      lwhttp_response_init(&client_response);  
-
-      /* Sen POST request */
-      if (pdTRUE == post_thingspeak(&client_request, &client_response, queueData))
+    case DHCP_OFF:
       {
-        // http_print_msg(&client_response);
-
-        /* If HTTP Status Code is OK (200) and Content-Type is JSON */
-        if ((0 == strncmp(client_response.start_line.status_line.status_code.data, "200", strlen("200"))) 
-            && (0 == strncmp(content_type_header_ptr->field_value.data, "application/json", strlen("application/json")))
-            && (1 < client_response.message_body.len))
+        /* Check interface status */
+        if (netif_is_up(netif))
         {
-          DBG_LWIP("Valid response\r\n");
-          /* Parse LwHTTP Response message body as JSON */   
-          if (parse_thingspeak_rsp(client_response.message_body.data, client_response.message_body.len) == pdTRUE)
-          {
-            DBG_LWIP("Request FINISHED\r\n");
-          }
-        }   
-        else
-        {
-          DBG_LWIP("Invalid response\r\n");
+          setDHCP_State(DHCP_START);
         }
       }
-      else
+      break;
+    case DHCP_START:
       {
-        DBG_LWIP("Failed to POST\r\n");
+        ip_addr_set_zero_ip4(&netif->ip_addr);
+        ip_addr_set_zero_ip4(&netif->netmask);
+        ip_addr_set_zero_ip4(&netif->gw);       
+        dhcp_start(netif);
+        setDHCP_State(DHCP_WAIT_ADDRESS);
+        DBG_DHCP("Looking for server\r\n");
       }
+      break;
+    case DHCP_WAIT_ADDRESS:
+      {                
+        if (dhcp_supplied_address(netif)) 
+        {
+          setDHCP_State(DHCP_ADDRESS_ASSIGNED); 
+          DBG_DHCP("Dynamic IP address (%s)\r\n", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
+        }
+        else
+        {
+          dhcp = (struct dhcp *)netif_get_client_data(netif, LWIP_NETIF_CLIENT_DATA_INDEX_DHCP);
+    
+          /* DHCP timeout */
+            if (dhcp->tries > MAX_DHCP_TRIES)
+            {
+              setDHCP_State(DHCP_TIMEOUT);
+              
+              /* Stop DHCP */
+              dhcp_stop(netif);
+              
+              /* Static address used */
+              IP_ADDR4(&ipaddr, IP_ADDR0 ,IP_ADDR1 , IP_ADDR2 , IP_ADDR3 );
+              IP_ADDR4(&netmask, NETMASK_ADDR0, NETMASK_ADDR1, NETMASK_ADDR2, NETMASK_ADDR3);
+              IP_ADDR4(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
+              netif_set_addr(netif, ip_2_ip4(&ipaddr), ip_2_ip4(&netmask), ip_2_ip4(&gw));
+              
+              DBG_DHCP("Timeout\r\n");
+              DBG_DHCP("Static IP address (%s)\r\n", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
+            }
+          }
+        }
+        break;
+      case DHCP_LINK_DOWN:
+        {
+          /* Stop DHCP */
+          dhcp_stop(netif);
+          setDHCP_State(DHCP_OFF); 
+        }
+        break;
+      case DHCP_ADDRESS_ASSIGNED:
+        {
+          if(xQueueReceive(tcpQueueHandle, &queueData, 0) == pdTRUE)
+          {
+            DBG_QUEUE("tcpQueueHandle: %d\r\n", queueData);
 
-      /* Free LwHTTP Request & Response */
-      lwhttp_request_free(&client_request);
-      lwhttp_response_free(&client_response);    
-    }
-    else
-    {
-      osDelay(10);  
+            /* LwHTTP Inits */
+            lwhttp_request_init(&client_request);
+            lwhttp_response_init(&client_response);  
+
+            /* Sen POST request */
+            if (pdTRUE == post_thingspeak(&client_request, &client_response, queueData))
+            {
+              DBG_LWIP("post_thingspeak finished\r\n");
+
+              http_print_msg(&client_response);
+
+              DBG_LWIP("client_response status len: %d\r\n", 
+                client_response.start_line.status_line.status_code.len);
+
+              DBG_LWIP("client_response status data: %*.s\r\n", 
+                client_response.start_line.status_line.status_code.len,
+                (char*)client_response.start_line.status_line.status_code.data
+              );
+
+#if 0
+              DBG_LWIP("client_response body: %*.s\r\n", 
+                client_response.message_body.len,
+                (char*)client_response.message_body.data
+              );
+              /* If HTTP Status Code is OK (200) and Content-Type is JSON */
+              if ((0 == strncmp(client_response.start_line.status_line.status_code.data, "200", strlen("200"))) 
+                  && (0 == strncmp(content_type_header_ptr->field_value.data, "application/json", strlen("application/json")))
+                  && (1 < client_response.message_body.len))
+              {
+                DBG_LWIP("Valid response\r\n");
+                /* Parse LwHTTP Response message body as JSON */   
+                if (parse_thingspeak_rsp(client_response.message_body.data, client_response.message_body.len) == pdTRUE)
+                {
+                  DBG_LWIP("Request FINISHED\r\n");
+                }
+              }   
+              else
+              {
+                DBG_LWIP("Invalid response\r\n");
+              }
+#endif
+            }
+            else
+            {
+              DBG_LWIP("Failed to POST\r\n");
+            }
+
+            /* Free LwHTTP Request & Response */
+            lwhttp_request_free(&client_request);
+            lwhttp_response_free(&client_response);    
+          }
+          else if(xQueueReceive(getIPQueueHandle, &queueData, 0) == pdTRUE)
+          {
+            DBG_QUEUE("getIPQueueHandle\r\n");
+
+            strcpy(ip4_addr_ptr, ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
+
+            if(xQueueSend(setIPQueueHandle, &ip4_addr_ptr, 0) == pdTRUE)
+            {
+              DBG_QUEUE("setIPQueueHandle = %s\r\n", ip4_addr_ptr);
+            }
+          }
+          else
+          {
+            osDelay(10);  
+          }
+        }
+      break;
+    default: 
+      {
+        osDelay(10);  
+      }
+      break;
     }
   }    
   /* USER CODE END Start_HTTP_Client_Task */
@@ -2128,12 +2265,11 @@ void StartButtonTask(void const * argument)
     {
       if(xQueueSend(buttonQueueHandle, (uint8_t*)&buttonState, 0) == pdTRUE)
       {
-        buttonCount++;
-        DBG_QUEUE("buttonQueueHandle: %d\r\n", buttonState);
+        DBG_QUEUE("buttonQueueHandle: %d\r\n", buttonCount++);
       }
     }
     
-    osDelay(100);
+    osDelay(10);
   }
   /* USER CODE END StartButtonTask */
 }
@@ -2171,10 +2307,8 @@ void StartLEDTask(void const * argument)
         BSP_LED_Off(LED_GREEN);
       }
     }
-    else
-    {
-      osDelay(10);
-    }
+
+    osDelay(10);
   }
   /* USER CODE END StartLEDTask */
 }
@@ -2387,125 +2521,6 @@ void StartSDTask(void const * argument)
   }
 
   /* USER CODE END StartSDTask */
-}
-
-/* USER CODE BEGIN Header_StartLWIPTask */
-/**
-* @brief Function implementing the lwipTask thread.
-* @param argument: Not used
-* @retval None
-*/
-
-void setDHCP_State(uint8_t state)
-{
-  DBG_DHCP("DHCP State change (%d >> %d)\r\n", DHCP_state, state);
-  DHCP_state = state;
-}
-
-void StartLWIPTask(void const * argument)
-{
-  RTOS_TASK_START();  
-
-  /* USER CODE BEGIN StartLWIPTask */
-  /* LwIP PV */
-  struct netif* netif = (struct netif*)argument;
-  ip_addr_t ipaddr;
-  ip_addr_t netmask;
-  ip_addr_t gw;
-  struct dhcp *dhcp;
-
-  uint8_t queueData = 0;
-
-  /* init code for LWIP */
-  MX_LWIP_Init();
-
-  RTOS_TASK_READY();
-
-  /* Infinite loop */
-  for(;;)
-  {
-    switch (DHCP_state)
-    {
-    case DHCP_OFF:
-      {
-        /* Check interface status */
-        if (netif_is_up(netif))
-        {
-          setDHCP_State(DHCP_START);
-        }
-      }
-      break;
-    case DHCP_START:
-      {
-        ip_addr_set_zero_ip4(&netif->ip_addr);
-        ip_addr_set_zero_ip4(&netif->netmask);
-        ip_addr_set_zero_ip4(&netif->gw);       
-        dhcp_start(netif);
-        setDHCP_State(DHCP_WAIT_ADDRESS);
-        DBG_DHCP("Looking for server\r\n");
-      }
-      break;
-    case DHCP_WAIT_ADDRESS:
-      {                
-        if (dhcp_supplied_address(netif)) 
-        {
-          setDHCP_State(DHCP_ADDRESS_ASSIGNED); 
-          DBG_DHCP("Dynamic IP address (%s)\r\n", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
-        }
-        else
-        {
-          dhcp = (struct dhcp *)netif_get_client_data(netif, LWIP_NETIF_CLIENT_DATA_INDEX_DHCP);
-    
-          /* DHCP timeout */
-          if (dhcp->tries > MAX_DHCP_TRIES)
-          {
-            setDHCP_State(DHCP_TIMEOUT);
-            
-            /* Stop DHCP */
-            dhcp_stop(netif);
-            
-            /* Static address used */
-            IP_ADDR4(&ipaddr, IP_ADDR0 ,IP_ADDR1 , IP_ADDR2 , IP_ADDR3 );
-            IP_ADDR4(&netmask, NETMASK_ADDR0, NETMASK_ADDR1, NETMASK_ADDR2, NETMASK_ADDR3);
-            IP_ADDR4(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
-            netif_set_addr(netif, ip_2_ip4(&ipaddr), ip_2_ip4(&netmask), ip_2_ip4(&gw));
-            
-            DBG_DHCP("Timeout\r\n");
-            DBG_DHCP("Static IP address (%s)\r\n", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
-          }
-        }
-      }
-      break;
-    case DHCP_LINK_DOWN:
-      {
-        /* Stop DHCP */
-        dhcp_stop(netif);
-        setDHCP_State(DHCP_OFF); 
-      }
-      break;
-    case DHCP_ADDRESS_ASSIGNED:
-      {
-        if(xQueueReceive(getIPQueueHandle, &queueData, 0) == pdTRUE)
-        {
-          DBG_QUEUE("getIPQueueHandle\r\n");
-
-          strcpy(ip4_addr_ptr, ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
-
-          if(xQueueSend(setIPQueueHandle, &ip4_addr_ptr, 0) == pdTRUE)
-          {
-              DBG_QUEUE("setIPQueueHandle = %s\r\n", ip4_addr_ptr);
-          }
-        }
-      }
-      break;
-    default: 
-      break;
-    }
-      
-      /* wait 100 ms */
-      osDelay(10);
-  }
-  /* USER CODE END StartLWIPTask */
 }
 
 /**
