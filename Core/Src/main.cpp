@@ -862,7 +862,7 @@ static void MX_USART1_UART_Init(void)
 
   /* USER CODE END USART1_Init 1 */
   huart1.Instance = USART1;
-  huart1.Init.BaudRate = 921600;
+  huart1.Init.BaudRate = 115200;
   huart1.Init.WordLength = UART_WORDLENGTH_8B;
   huart1.Init.StopBits = UART_STOPBITS_1;
   huart1.Init.Parity = UART_PARITY_NONE;
@@ -1604,6 +1604,12 @@ static BaseType_t jsoneq(const char *json, const jsmntok_t * const pxTok, const 
 	return xStatus;
 }
 
+#define NETCONN_FSM_START      0
+#define NETCONN_FSM_GET_DATA   1
+#define NETCONN_FSM_GET_NEXT   2
+#define NETCONN_FSM_DELETE     3
+#define NETCONN_FSM_FINISHED   4
+
 BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uint8_t data)
 {
   /* LwIP PV */
@@ -1629,14 +1635,13 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
   const char* server = "api.thingspeak.com";
   const char* url = "/update.json?headers=false";
 
-  DBG_LWIP("POST data: %d\r\n",  data);
+  DBG_LWIP("   data: %d\r\n",  data);
 
   if (DHCP_state == DHCP_ADDRESS_ASSIGNED)
   {
     /* Parse HTTP Body in JSON format */
     sprintf((char *)json_data, json_data_fmt, key, 5, data);  
-    len = strlen((char *)json_data);
-    sprintf((char *)json_data_len, "%d", len);  
+    sprintf((char *)json_data_len, "%d", strlen((char *)json_data));  
           
     /* Build HTTP Request */
     lwhttp_request_put_request_line(req_ptr, LwHHTP_POST, url);
@@ -1644,7 +1649,7 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
     lwhttp_request_put_message_header(req_ptr, "Content-Length", (char *)json_data_len);
     lwhttp_request_put_message_body(req_ptr, (char*)json_data, strlen((char *)json_data));  
           
-    DBG_LWIP("JSON Data Sent: %d bytes\r\n%s\r\n", len, json_data);
+    DBG_LWIP("JSON Data Sent: %s\r\n", json_data);
 
     /* Run LwHTTP Request Parser */
     lwhttp_request_parse(req_ptr);
@@ -1688,66 +1693,70 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
               // DBG_RTOS("xPortGetFreeHeapSize = %d\r\n", xPortGetFreeHeapSize());
 
               /* Get pointer to buffer where response data is stored */
-              uint8_t state = 0;
+              uint8_t state = NETCONN_FSM_START;
               int8_t nxt_rsp = 0;
               BaseType_t finished = pdFALSE;
 
-              for(err = ERR_OK; (err == ERR_OK) && (finished == pdFALSE);)
+              for(state = NETCONN_FSM_START; state < NETCONN_FSM_FINISHED;)
               {
                 switch (state)
                 {
-                  case 0:
+                  case NETCONN_FSM_START:
                     {
                       err = netconn_recv(conn, &netbuf);
-                      if (err == ERR_OK)
+                      if (err != ERR_OK)
+                      {
+                        state = NETCONN_FSM_FINISHED;
+                      }
+                      else
                       {
                         DBG_LWIP("switch --> netconn_recv (err = %d)\r\n", err);
-                        state++;
+                        state = NETCONN_FSM_GET_DATA;
                       }
                     }
                     break;
-                  case 1:
+                  case NETCONN_FSM_GET_DATA:
+                    {
+                      /* Get pointer to data and length*/
+                      netbuf_data(netbuf, (void**)&temp_buf_data, &temp_buf_data_len);
+                      
+                      /* LwHTTP write response to parser */
+                      lwhttp_response_put(rsp_ptr, (char*)temp_buf_data, temp_buf_data_len);
+
+                      DBG_LWIP("netbuf_data: %d bytes\r\n", temp_buf_data_len);
+
+                      /* Try to get next part */
+                      state = NETCONN_FSM_GET_NEXT;
+                    }
+                    break;
+                  case NETCONN_FSM_GET_NEXT:
                     {
                       nxt_rsp = netbuf_next(netbuf);
                       DBG_LWIP("switch --> netbuf_next (nxt_rsp = %d)\r\n", nxt_rsp);
-
-                      /* Moved to the next part */
-                      if(nxt_rsp >= 0)
-                      {
-                        err = ERR_OK;
+                      if(nxt_rsp >= 0) {
+                        state = NETCONN_FSM_GET_DATA; /* Continue */
                       }
-                      /* There is no next part */
-                      else
-                      {
-                        state++;
+                      else {
+                        state = NETCONN_FSM_DELETE; /* No more parts */
                       }
                     }
                     break;
-                  case 2:
+                  case NETCONN_FSM_DELETE:
                     {                      
-                        finished = pdTRUE;
-                        netbuf_delete(netbuf);   
+                      netbuf_delete(netbuf);  
+                      state = NETCONN_FSM_START; 
                     }
                   default:
                   break;
                 }
 
-                DBG_LWIP("state (%d), err (%d), finished(%d)\r\n", state, err, finished);
-
-                if ((err == ERR_OK) && (finished == pdFALSE))
-                {
-                    /* Get pointer to data and length*/
-                    netbuf_data(netbuf, (void**)&temp_buf_data, &temp_buf_data_len);
-                    
-                    /* LwHTTP write response to parser */
-                    lwhttp_response_put(rsp_ptr, (char*)temp_buf_data, temp_buf_data_len);
-                }
+                DBG_LWIP("NETCONN FSM: state (%d), err (%d)\r\n", state, err, finished);
               }
               
-              DBG_LWIP("state (%d), err (%d), finished(%d)\r\n", state, err, finished);
-
               if ((ERR_OK == err) || (err == ERR_CLSD))
               {
+                DBG_LWIP("netconn_recv: Got %d bytes\r\n",  rsp_ptr->buffer.len);
+
                 /* Run LwHTTP Request Parser */
                 xStatus = lwhttp_response_parse(rsp_ptr);
                 if(xStatus != 1)
@@ -1755,14 +1764,22 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
                   DBG_LWIP("lwhttp_response_parse (status = %d)\r\n", xStatus);
                 }
 
-                DBG_LWIP("netconn_recv (%d bytes)\r\n",  rsp_ptr->buffer.len);
+                if (rsp_ptr->start_line.status_line.status_code.data != NULL)
+                {
+                  /* Print HTTP Request */
+                  lwhttp_request_get_request_line(req_ptr, &temp_buf_data, &temp_buf_data_len);
+                  cli_printf("[LwHTTP] Request-Line: %.*s\r\n", temp_buf_data_len, temp_buf_data);
 
-                /* If parsed response contains the status line and the body we are OK*/
-                if ((rsp_ptr->start_line.status_line.buffer.data != NULL) 
-                  && (rsp_ptr->message_body.data != NULL))
-                {                  
+                  /* Parse & Print LwHTTP Response */
+                  lwhttp_response_get_status_line(rsp_ptr, &temp_buf_data, &temp_buf_data_len);
+                  cli_printf("[LwHTTP] Status-Line: %.*s\r\n\r\n", temp_buf_data_len, temp_buf_data);
+                  
                   xStatus = pdTRUE;               
                   DBG_LWIP("xStatus =  %d\r\n", xStatus);
+                }
+                else
+                {
+                  xStatus = pdFALSE;               
                 }
               }
               else
