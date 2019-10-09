@@ -82,34 +82,55 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-/* Enable/Disable usage for FatFs mkfs function */
-// #define USE_FATFS_MKFS 0
-
 #define MAX_DHCP_TRIES  4
-
-#define DBG_LWIP_ENABLED  1
-#define DBG_RTOS_ENABLED  2
-#define DBG_FATFS_ENABLED 4
-#define DBG_QUEUE_ENABLED 8
-#define DBG_JSMN_ENABLED  16
-#define DBG_DHCP_ENABLED  32
-
-const uint8_t bg_enabled = 0xFF;
-
-#define DBG_PRINT_MSG(label, fnc, msg, err, txt) 
-#define DBG_PRINT_ERR(label, fnc, msg, err, txt) //cli_printf("$$$ [%s] %s --> %s (ERR = %d)\r\n", label, fnc, msg, *err)
-#define DBG_PRINT_TXT(label, fnc, msg, err, txt) //cli_printf("$$$ [%s] %s --> %s: %s\r\n", label, fnc, msg, txt)
-#define DBG_PRINT_ALL(label, fnc, msg, err, txt) //cli_printf("$$$ [%s] %s --> %s: %s (ERR = %d)\r\n", label, fnc, msg, txt, *err)
-
-#define  DBG_LWIP(msg, val, txt) debug_print(DBG_LWIP_ENABLED,  (char*)"LWIP",  __FUNCTION__, (char*)msg, (int8_t*)val, (char*)txt);
-#define DBG_FATFS(msg, val, txt) debug_print(DBG_FATFS_ENABLED, (char*)"FatFs", __FUNCTION__, (char*)msg, (int8_t*)val, (char*)txt);
-#define  DBG_RTOS(msg, val, txt) debug_print(DBG_RTOS_ENABLED,  (char*)"RTOS",  __FUNCTION__, (char*)msg, (int8_t*)val, (char*)txt);
-#define DBG_QUEUE(msg, val, txt) debug_print(DBG_QUEUE_ENABLED, (char*)"QUEUE", __FUNCTION__, (char*)msg, (int8_t*)val, (char*)txt);
-#define  DBG_JSMN(msg, val, txt) debug_print(DBG_JSMN_ENABLED,  (char*)"JSMN",  __FUNCTION__, (char*)msg, (int8_t*)val, (char*)txt);
-#define  DBG_DHCP(msg, val, txt) debug_print(DBG_DHCP_ENABLED,  (char*)"DHCP",  __FUNCTION__, (char*)msg, (int8_t*)val, (char*)txt);
-
-
 #define JSMN_MAX_TOK (128)
+
+#define DBG_LWIP_ENABLED   1
+#define DBG_RTOS_ENABLED   1
+#define DBG_FATFS_ENABLED  1
+#define DBG_QUEUE_ENABLED  1
+#define DBG_JSMN_ENABLED   1
+#define DBG_DHCP_ENABLED   1
+
+#if (DBG_RTOS_ENABLED == 1 )
+  #define DBG_RTOS(...)     cli_dbg((char*)"RTOS",  __FUNCTION__, __VA_ARGS__)
+  #define RTOS_TASK_START() DBG_RTOS("%s\r\n", "Task START")
+  #define RTOS_TASK_READY() DBG_RTOS("%s\r\n", "Task READY")
+#else
+  #define DBG_RTOS(...)     (void)0
+  #define RTOS_TASK_START() (void)0
+  #define RTOS_TASK_START() (void)0
+#endif
+
+#if (DBG_LWIP_ENABLED == 1 )
+  #define DBG_LWIP(...) cli_dbg((char*)"LWIP",  __FUNCTION__, __VA_ARGS__)
+#else
+  #define DBG_LWIP(...) (void)0
+#endif
+
+#if (DBG_FATFS_ENABLED == 1 )
+  #define DBG_FATFS(...) cli_dbg((char*)"FatFs",  __FUNCTION__, __VA_ARGS__)
+#else
+  #define DBG_FATFS(...) (void)0
+#endif
+
+#if (DBG_QUEUE_ENABLED == 1 )
+  #define DBG_QUEUE(...) cli_dbg((char*)"Queue",  __FUNCTION__, __VA_ARGS__)
+#else
+  #define DBG_QUEUE(...) (void)0
+#endif
+
+#if (DBG_JSMN_ENABLED == 1 )
+  #define DBG_JSMN(...) cli_dbg((char*)"jsmn",  __FUNCTION__, __VA_ARGS__)
+#else
+  #define DBG_JSMN(...) (void)0
+#endif
+
+#if (DBG_DHCP_ENABLED == 1 )
+  #define DBG_DHCP(...) cli_dbg((char*)"DHCP",  __FUNCTION__, __VA_ARGS__)
+#else
+  #define DBG_DHCP(...) (void)0
+#endif
 
 /* USER CODE END PD */
 
@@ -193,12 +214,10 @@ void StartButtonTask(void const * argument);
 void StartLEDTask(void const * argument);
 void StartSDTask(void const * argument);
 void StartLWIPTask(void const * argument);
-void StartDHCPTask(void const * argument);
 
 /* USER CODE BEGIN PFP */
 void Start_HTTP_Client_Task(void const * argument);
 void Start_HTTP_Server_Task(void const * argument);
-void Start_SD_Logger_Task(void const * argument);
 void Start_CLI_Logger_Task(void const * argument);
 
 uint16_t cli_printf(const char* fmt, ...);
@@ -207,7 +226,7 @@ uint16_t cli_write(const char* src, uint16_t len);
 
 void http_print_msg(lwhttp_message_t* msg);
 
-void debug_print(uint8_t dbg_mask, char* label, const char* fnc, char* msg, int8_t* val, char* txt);
+void cli_dbg(const char* label, const char* fn, const char* fmt, ...);
 
 static BaseType_t jsoneq(const char *json, const jsmntok_t * const pxTok, const char *s);
 
@@ -303,10 +322,14 @@ int main(void)
   osThreadDef(defaultTask, StartDefaultTask, osPriorityHigh, 0, configMINIMAL_STACK_SIZE * 4);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
+  /* definition and creation of CLILoggerTask */
+  osThreadDef(CLILoggerTask, Start_CLI_Logger_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
+  CLILoggerTaskHandle = osThreadCreate(osThread(CLILoggerTask), NULL);
+  
   /* definition and creation of buttonTask */
   osThreadDef(buttonTask, StartButtonTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
   buttonTaskHandle = osThreadCreate(osThread(buttonTask), NULL);
-
+  
   /* definition and creation of ledTask */
   osThreadDef(ledTask, StartLEDTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
   ledTaskHandle = osThreadCreate(osThread(ledTask), NULL);
@@ -316,31 +339,18 @@ int main(void)
   sdTaskHandle = osThreadCreate(osThread(sdTask), NULL);
 
   /* definition and creation of lwipTask */
-  osThreadDef(lwipTask, StartLWIPTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
+  osThreadDef(lwipTask, StartLWIPTask, osPriorityHigh, 0, configMINIMAL_STACK_SIZE * 4);
   lwipTaskHandle = osThreadCreate(osThread(lwipTask), (void*)&gnetif);
 
-  /* definition and creation of dhcpTask */
-  osThreadDef(dhcpTask, StartDHCPTask, osPriorityAboveNormal, 0, configMINIMAL_STACK_SIZE * 4);
-  dhcpTaskHandle = osThreadCreate(osThread(dhcpTask), (void*)&gnetif);
-
-  /* USER CODE BEGIN RTOS_THREADS */
-    /* add threads, ... */
-
   /* definition and creation of httpClientTask */
-  osThreadDef(httpClientTask, Start_HTTP_Client_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
+  osThreadDef(httpClientTask, Start_HTTP_Client_Task, osPriorityRealtime, 0, configMINIMAL_STACK_SIZE * 12);
   httpClientTaskHandle = osThreadCreate(osThread(httpClientTask), (void*)&gnetif);
   
+#if 0
   /* definition and creation of httpServerTask */
   osThreadDef(httpServerTask, Start_HTTP_Server_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 6);
   httpServerTaskHandle = osThreadCreate(osThread(httpServerTask), (void*)&gnetif);
-
-  /* definition and creation of SDLoggerTask */
-  osThreadDef(SDLoggerTask, Start_SD_Logger_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 8);
-  SDLoggerTaskHandle = osThreadCreate(osThread(SDLoggerTask), NULL);
-
-  /* definition and creation of CLILoggerTask */
-  osThreadDef(CLILoggerTask, Start_CLI_Logger_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 5);
-  CLILoggerTaskHandle = osThreadCreate(osThread(CLILoggerTask), NULL);
+#endif
 
   /* USER CODE END RTOS_THREADS */
 
@@ -1202,31 +1212,85 @@ static void MX_GPIO_Init(void)
 
 }
 
-/* USER CODE BEGIN 4 */
-void debug_print(uint8_t dbg_mask, char* label, const char* fnc, char* msg, int8_t* val, char* txt)
+#define CLI_LOGGER_MAX_MESSAGE_LENGTH (128)
+
+void cli_dbg(const char* label, const char* fn, const char* fmt, ...)
 {
-  if (0 < (dbg_mask & bg_enabled)) {
-    if (NULL != msg) {
-      if ((NULL != val) && (NULL != txt)) {
-        cli_printf("[%s] %s --> %s: %s (val = %d)\r\n", label, fnc, msg, txt, *val);
-      } else if (NULL != val) {
-        cli_printf("[%s] %s --> %s (val = %d)\r\n", label, fnc, msg, *val);
-      } else if (NULL != txt) {
-        cli_printf("[%s] %s --> %s: %s\r\n", label, fnc, msg, txt);
-      } else {
-        cli_printf("[%s] %s --> %s\r\n", label, fnc, msg);
+  size_t xLength = 0;
+  int32_t xLength2 = 0;
+  va_list args;
+  char * pcPrintString = NULL;
+
+  /* The queue is created by xLoggingTaskInitialize().  Check
+   * xLoggingTaskInitialize() has been called. */
+  configASSERT(cliLoggerQueueHandle);
+
+  /* Allocate a buffer to hold the log message. */
+  pcPrintString = (char*)pvPortMalloc( CLI_LOGGER_MAX_MESSAGE_LENGTH );
+
+  if( pcPrintString != NULL )
+  {
+    /* There are a variable number of parameters. */
+    va_start( args, fmt );
+
+    if( strcmp( fmt, "\n" ) != 0 )
+    {
+      const char * pcTaskName;
+      const char * pcNoTask = "None";
+
+      if( xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED )
+      {
+          pcTaskName = pcTaskGetName( NULL );
       }
+      else
+      {
+          pcTaskName = pcNoTask;
+      }
+
+      xLength = snprintf( pcPrintString, CLI_LOGGER_MAX_MESSAGE_LENGTH, "[%s] %s --> ", label, pcTaskName);
+    }
+
+    xLength2 = vsnprintf( pcPrintString + xLength, CLI_LOGGER_MAX_MESSAGE_LENGTH - xLength, fmt, args );
+
+    if( xLength2 < 0 )
+    {
+        xLength2 = 0;
+        pcPrintString[ xLength ] = '\0';
+    }
+
+    xLength += ( size_t ) xLength2;
+    va_end( args );
+
+    /* Only send the buffer to the logging task if it is not empty. */
+    if( xLength > 0 )
+    {
+        /* Send the string to the logging task for IO. */
+        if( xQueueSend( cliLoggerQueueHandle, &pcPrintString, 0 ) != pdPASS )
+        {
+            /* The buffer was not sent so must be freed again. */
+            vPortFree( ( void * ) pcPrintString );
+        }
+    }
+    else
+    {
+        /* The buffer was not sent, so it must be freed. */
+        vPortFree( ( void * ) pcPrintString );
     }
   }
 }
 
 uint16_t cli_dump(const char* src, uint16_t len)
 {
-  if (xSemaphoreTake(cliBinarySemHandle, portMAX_DELAY) == pdTRUE)
+  if (xSemaphoreTake(cliBinarySemHandle, 0) == pdTRUE)
   {
     cli_write(src, len);
     xSemaphoreGive(cliBinarySemHandle);
   }
+}
+
+void vApplicationStackOverflowHook(xTaskHandle *pxTask, signed portCHAR *pcTaskName )
+{
+    DBG_RTOS(" ERROR: Stack overflow --> %s\r\n", pcTaskName);
 }
 
 uint16_t cli_write(const char* src, uint16_t len)
@@ -1257,8 +1321,6 @@ uint16_t cli_printf(const char* fmt, ...)
 }
 #endif
 
-#define CLI_LOGGER_MAX_MESSAGE_LENGTH (128)
-
 uint16_t cli_printf(const char * fmt, ...)
 {
   size_t xLength = 0;
@@ -1276,23 +1338,8 @@ uint16_t cli_printf(const char * fmt, ...)
   {
     /* There are a variable number of parameters. */
     va_start( args, fmt );
-
     xLength = vsnprintf(pcPrintString, CLI_LOGGER_MAX_MESSAGE_LENGTH, fmt, args);
-
     va_end( args );
-
-#if 0
-    if(xLength < 0)
-    {
-      xLength = 0;
-    }
-
-    /* Add NULL terminator at the end */
-    if(xLength < CLI_LOGGER_MAX_MESSAGE_LENGTH)
-    {
-      pcPrintString[xLength] = '\0';
-    }
-#endif
 
     /* Only send the buffer to the logging task if it is not empty. */
     if(xLength > 0)
@@ -1339,7 +1386,7 @@ BaseType_t parse_thingspeak_rsp(char* src, uint16_t len)
 
   if (lNumTokens < 0) 
   {
-    DBG_JSMN("Failed to parse JSON", NULL, NULL)
+    DBG_JSMN("Failed to parse JSON (num = %d)", lNumTokens);
     xStatus = pdFAIL;
   }
 
@@ -1350,7 +1397,7 @@ BaseType_t parse_thingspeak_rsp(char* src, uint16_t len)
     /* Assume the top-level element is an object */
     if (pxTok[0].type != JSMN_OBJECT) 
     {
-      DBG_JSMN("Object expected", NULL, NULL)
+      DBG_JSMN("Object expected (type = %d)", pxTok[0].type);
       xStatus = pdFAIL;
     }
 
@@ -1366,7 +1413,7 @@ BaseType_t parse_thingspeak_rsp(char* src, uint16_t len)
         if (jsoneq(src, &pxTok[ulTokenIndex], THINGSPEAK_TOK_CHANNEL_ID) == pdTRUE) 
         {
           /* We may use strndup() to fetch string value */
-          cli_printf("[JSMN] %s: %.*s\r\n", 
+          DBG_JSMN("%s: %.*s\r\n", 
             THINGSPEAK_TOK_CHANNEL_ID,
             pxTok[ulTokenIndex+1].end - pxTok[ulTokenIndex+1].start, 
             &src[ pxTok[ ulTokenIndex + (uint32_t)1].start ]
@@ -1375,7 +1422,7 @@ BaseType_t parse_thingspeak_rsp(char* src, uint16_t len)
         else if (jsoneq(src, &pxTok[ulTokenIndex], THINGSPEAK_TOK_ENTRY_ID) == pdTRUE) 
         {
           /* We may use strndup() to fetch string value */
-          cli_printf("[JSMN] %s: %.*s\r\n", 
+          DBG_JSMN("%s: %.*s\r\n", 
             THINGSPEAK_TOK_ENTRY_ID,
             pxTok[ulTokenIndex+1].end - pxTok[ulTokenIndex+1].start, 
             &src[ pxTok[ ulTokenIndex + (uint32_t)1].start ]
@@ -1384,7 +1431,7 @@ BaseType_t parse_thingspeak_rsp(char* src, uint16_t len)
         else if (jsoneq(src, &pxTok[ulTokenIndex], THINGSPEAK_TOK_FIELD1) == pdTRUE) 
         {
           /* We may use strndup() to fetch string value */
-          cli_printf("[JSMN] %s: %.*s\r\n", 
+          DBG_JSMN("%s: %.*s\r\n", 
             THINGSPEAK_TOK_FIELD1,
             pxTok[ulTokenIndex+1].end - pxTok[ulTokenIndex+1].start, 
             &src[ pxTok[ ulTokenIndex + (uint32_t)1].start ]
@@ -1393,16 +1440,21 @@ BaseType_t parse_thingspeak_rsp(char* src, uint16_t len)
         else if (jsoneq(src, &pxTok[ulTokenIndex], THINGSPEAK_TOK_CREATED_AT) == pdTRUE) 
         {
           /* We may use strndup() to fetch string value */
-          cli_printf("[JSMN] %s: %.*s\r\n", 
+          DBG_JSMN("%s: %.*s\r\n", 
             THINGSPEAK_TOK_CREATED_AT,
             pxTok[ulTokenIndex+1].end - pxTok[ulTokenIndex+1].start, 
             &src[ pxTok[ ulTokenIndex + (uint32_t)1].start ]
           );
         }
+#if 0
         else 
         {
-                // cli_printf("Unexpected key: %.*s\r\n", t[i].end-t[i].start, src + t[i].start);
+          DBG_JSMN("Unexpected Token: %.*s\r\n",
+            pxTok[ulTokenIndex+1].end - pxTok[ulTokenIndex+1].start, 
+            &src[ pxTok[ ulTokenIndex + (uint32_t)1].start ]
+          );
         }
+#endif
       }
     }
   }
@@ -1431,7 +1483,7 @@ FRESULT sd_get_free_clusters(FATFS* fs)
     }
     else
     {
-      DBG_FATFS("f_getfree",  &fr, NULL);
+      DBG_FATFS("f_getfree (fr = %d)\r\n",  fr);
     }
     
     return fr;
@@ -1444,28 +1496,28 @@ FRESULT read_file_sector(FIL* file, void* dest, FSIZE_t len, UINT* bytesread, UI
   fr = f_open(file, "index.htm", FA_READ);
   if(fr != FR_OK)
   {
-    DBG_FATFS("f_open",  &fr, NULL);
+    DBG_FATFS("f_open (fr = %d)\r\n",  fr);
   }
   else
   {
     fr = f_lseek(file, (index * len));
     if(fr != FR_OK)
     {
-      DBG_FATFS("f_lseek",  &fr, NULL);
+      DBG_FATFS("f_lseek (fr = %d)\r\n",  fr);
     }
     else
     {
       fr = f_read(file, dest, len, bytesread);
       if(fr != FR_OK)
       {
-        DBG_FATFS("f_read",  &fr, NULL);
+        DBG_FATFS("f_read (fr = %d)\r\n",  fr);
       }
     }
     
     fr = f_close(file);
     if(fr != FR_OK)
     {
-      DBG_FATFS("f_close",  &fr, NULL);
+      DBG_FATFS("f_close (fr = %d)\r\n",  fr);
     }
   }
   
@@ -1531,7 +1583,9 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
   // struct netif* netif = (struct netif*)argument;
   uint16_t len = 0;
   struct netconn *conn;
-  struct netbuf *netbuf = NULL;
+  struct netbuf *buf;
+  buf = netbuf_new();     /* create a new netbuf */
+
   ip4_addr_t remote_ip; 
   BaseType_t xStatus = pdFALSE;
   err_t err;
@@ -1550,7 +1604,7 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
   const char* server = "api.thingspeak.com";
   const char* url = "/update.json?headers=false";
 
-  DBG_LWIP("Send TCP",  &data, NULL);
+  DBG_LWIP("POST data: %d\r\n",  data);
 
   if (DHCP_state == DHCP_ADDRESS_ASSIGNED)
   {
@@ -1565,13 +1619,13 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
     lwhttp_request_put_message_header(req_ptr, "Content-Length", (char *)json_data_len);
     lwhttp_request_put_message_body(req_ptr, (char*)json_data, strlen((char *)json_data));  
           
-    DBG_LWIP("JSON Data Sent", &len, json_data);
+    DBG_LWIP("JSON Data Sent: %d bytes\r\n%s\r\n", len, json_data);
 
     /* Run LwHTTP Request Parser */
     lwhttp_request_parse(req_ptr);
 
     /* Print the request */
-    http_print_msg(req_ptr);
+    // http_print_msg(req_ptr);
 
     /* LwIP Connect TCP */
     conn = netconn_new(NETCONN_TCP);       
@@ -1590,13 +1644,13 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
         err  = netconn_gethostbyname(server, &remote_ip);
         if (ERR_OK == err)
         {
-          DBG_LWIP(server,  NULL, ip4addr_ntoa((const ip4_addr_t *)&remote_ip));
+          DBG_LWIP("HOST: %s (%s)\r\n", server, ip4addr_ntoa((const ip4_addr_t *)&remote_ip));
           
           /* Connect to server */
           err = netconn_connect(conn, &remote_ip, 80); 
           if (ERR_OK == err)
           {
-            DBG_LWIP("Connection",  NULL, "OK!");
+            DBG_LWIP("netconn_connect: OK\r\n");
 
             /* Get LwHTTP Request Data */
             lwhttp_request_get(req_ptr, &temp_buf_data, &temp_buf_data_len);
@@ -1605,23 +1659,69 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
             err = netconn_write(conn, temp_buf_data, temp_buf_data_len, NETCONN_NOFLAG);
             if (ERR_OK == err)
             {
-              DBG_LWIP("netconn_write",  &temp_buf_data_len, NULL);
+              // DBG_LWIP("netconn_write (%d bytes)\r\n",  temp_buf_data_len);
+              // DBG_RTOS("xPortGetFreeHeapSize = %d\r\n", xPortGetFreeHeapSize());
 
               /* Get pointer to buffer where response data is stored */
-              while (( err = netconn_recv(conn, &netbuf)) == ERR_OK)
+              uint8_t state = 0;
+              int8_t nxt_rsp = 0;
+              BaseType_t finished = pdFALSE;
+
+              for(err = ERR_OK; (err == ERR_OK) && (finished == pdFALSE);)
               {
-                  do
-                  {
+                switch (state)
+                {
+                  case 0:
+                    {
+                      err = netconn_recv(conn, &buf);
+                      DBG_LWIP("switch --> netconn_recv (err = %d)\r\n", err);
+                      // DBG_RTOS("xPortGetFreeHeapSize = %d\r\n", xPortGetFreeHeapSize());
+                      if (err == ERR_OK)
+                      {
+                        state++;
+                      }
+                    }
+                    break;
+                  case 1:
+                    {
+                      nxt_rsp = netbuf_next(buf);
+                      DBG_LWIP("switch --> netbuf_next (nxt_rsp = %d)\r\n", nxt_rsp);
+                      // DBG_RTOS("xPortGetFreeHeapSize = %d\r\n", xPortGetFreeHeapSize());
+
+                      /* Moved to the next part */
+                      if(nxt_rsp >= 0)
+                      {
+                        err = ERR_OK;
+                      }
+                      /* There is no next part */
+                      else
+                      {
+                        finished = pdTRUE;
+                      }
+                    }
+                    break;
+                  default:
+                  break;
+                }
+
+                if ((err == ERR_OK) && (finished == pdFALSE))
+                {
                     /* Get pointer to data and length*/
-                    netbuf_data(netbuf, (void**)&temp_buf_data, &temp_buf_data_len);
+                    netbuf_data(buf, (void**)&temp_buf_data, &temp_buf_data_len);
                     
                     /* LwHTTP write response to parser */
                     lwhttp_response_put(rsp_ptr, (char*)temp_buf_data, temp_buf_data_len);
-                  }
-                  while (netbuf_next(netbuf) >= 0);
+                }
+              }
 
-                  /* Free data buffer */
-                  netbuf_delete(netbuf);
+              if(state > 0)
+              {
+                /* Free data buffer */
+                netbuf_delete(buf);
+              }
+              else
+              {
+                DBG_LWIP("netbuf not allocated (err = %d)\r\n", err);
               }
               
               if ((ERR_OK == err) || (err == ERR_CLSD))
@@ -1629,7 +1729,7 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
                 /* Run LwHTTP Request Parser */
                 lwhttp_response_parse(rsp_ptr);
 
-                DBG_LWIP("netconn_recv",  &rsp_ptr->buffer.len, NULL);
+                DBG_LWIP("netconn_recv (%d bytes)\r\n",  rsp_ptr->buffer.len);
 
                 /* If parsed response contains the status line and the body we are OK*/
                 if ((rsp_ptr->start_line.status_line.buffer.data != NULL) 
@@ -1640,22 +1740,22 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
               }
               else
               {
-                DBG_LWIP("netconn_recv", &err, NULL);
+                DBG_LWIP("netconn_recv (err = %d)\r\n", err);
               }
             }
             else
             {
-              DBG_LWIP("netconn_write", &err, NULL);
+              DBG_LWIP("netconn_write (err = %d)\r\n", err);
             }
           }
           else
           {
-            DBG_LWIP("netconn_connect", &err, NULL);
+            DBG_LWIP("netconn_connect (err = %d)\r\n", err);
           }
         }
         else
         {
-          DBG_LWIP("netconn_gethostbyname", &err, NULL);
+          DBG_LWIP("netconn_gethostbyname (err = %d)\r\n", err);
         }
       }
       
@@ -1664,47 +1764,15 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
     else
     {
       err = ERR_CONN;
-      DBG_LWIP("netconn_new",  &err, NULL);
+      DBG_LWIP("netconn_new (err = %d)\r\n", err);
     }    
   }
   else
   {
-    DBG_DHCP("Unable to send TCP", &DHCP_state, "DHCP State");
+    DBG_DHCP("Unable to send TCP (DHCP State = %d)\r\n", DHCP_state);
   }
 
-  return err;
-}
-
-void Start_SD_Logger_Task(void const * argument)
-{
-  /* USER CODE BEGIN Start_SD_Logger_Task */
-  
-  /* Queue PV */
-  uint8_t queueData = 0;
-
-  osDelay(100);  
-
-  DBG_RTOS("Start Task",  NULL, NULL);
-
-  /* Infinite loop */
-  for(;;)
-  {
-    if(xQueueReceive(logQueueHandle, &queueData, 0) == pdTRUE)
-    {
-      DBG_QUEUE("logQueueHandle",  &queueData, NULL);
-      sd_log(queueData);
-    }
-    else if(xQueueReceive(dumpQueueHandle, &queueData, 0) == pdTRUE)
-    {
-      DBG_QUEUE("dumpQueueHandle",  NULL, NULL);
-      sd_dump();
-    }
-    else
-    {
-      osDelay(10);  
-    }
-  }    
-  /* USER CODE END Start_SD_Logger_Task */
+  return xStatus;
 }
 
 void Start_CLI_Logger_Task(void const * argument)
@@ -1731,18 +1799,16 @@ void Start_CLI_Logger_Task(void const * argument)
 void http_print_msg(lwhttp_message_t* msg)
 {
   /* Temp Buffer PV */
-  char* temp_buf_data = NULL;
-  uint16_t temp_buf_data_len = 0;
-  const char* line = "--------------------------------------------------------------";
-
+  const char* line = "----------------------------";
   cli_printf("%s", line);
-  cli_dump(msg->buffer.data, msg->buffer.len);
+  cli_write(msg->buffer.data, msg->buffer.len);
   cli_printf("%s", line);
 }
 
 void Start_HTTP_Client_Task(void const * argument)
 {
   /* USER CODE BEGIN Start_HTTP_Client_Task */
+  RTOS_TASK_START();  
   
   /* Queue PV */
   uint8_t queueData = 0;
@@ -1754,18 +1820,20 @@ void Start_HTTP_Client_Task(void const * argument)
   /* Wait for DHCP */
   while (DHCP_state != DHCP_ADDRESS_ASSIGNED)
   {
-    DBG_LWIP("Waiting for DHCP",  &DHCP_state, NULL);
-    osDelay(500);
+    // DBG_LWIP("Waiting for DHCP (state = %d)\r\n",  DHCP_state);
+    osDelay(10);
   }
 
-  DBG_RTOS("Start Task",  NULL, NULL);
+  RTOS_TASK_READY();
 
+  DBG_RTOS("xPortGetFreeHeapSize = %d\r\n", xPortGetFreeHeapSize());
+  
   /* Infinite loop */
   for(;;)
   {
     if(xQueueReceive(tcpQueueHandle, &queueData, 0) == pdTRUE)
     {
-      DBG_QUEUE("tcpQueueHandle", &queueData, NULL);
+      DBG_QUEUE("tcpQueueHandle: %d\r\n", queueData);
 
       /* LwHTTP Inits */
       lwhttp_request_init(&client_request);
@@ -1774,27 +1842,28 @@ void Start_HTTP_Client_Task(void const * argument)
       /* Sen POST request */
       if (pdTRUE == post_thingspeak(&client_request, &client_response, queueData))
       {
-        http_print_msg(&client_response);
+        // http_print_msg(&client_response);
 
         /* If HTTP Status Code is OK (200) and Content-Type is JSON */
         if ((0 == strncmp(client_response.start_line.status_line.status_code.data, "200", strlen("200"))) 
             && (0 == strncmp(content_type_header_ptr->field_value.data, "application/json", strlen("application/json")))
             && (1 < client_response.message_body.len))
         {
+          DBG_LWIP("Valid response\r\n");
           /* Parse LwHTTP Response message body as JSON */   
           if (parse_thingspeak_rsp(client_response.message_body.data, client_response.message_body.len) == pdTRUE)
           {
-            DBG_LWIP("Request FINISHED", NULL, NULL);
+            DBG_LWIP("Request FINISHED\r\n");
           }
         }   
         else
         {
-          DBG_LWIP("Invalid response", NULL, NULL);
+          DBG_LWIP("Invalid response\r\n");
         }
       }
       else
       {
-        DBG_LWIP("Failed to POST", NULL, NULL);
+        DBG_LWIP("Failed to POST\r\n");
       }
 
       /* Free LwHTTP Request & Response */
@@ -1811,6 +1880,8 @@ void Start_HTTP_Client_Task(void const * argument)
 
 void Start_HTTP_Server_Task(void const * argument)
 {
+  RTOS_TASK_START();  
+
   /* USER CODE BEGIN Start_HTTP_Server_Task */
   static lwhttp_request_t server_request;
   static lwhttp_response_t server_response;
@@ -1837,11 +1908,12 @@ void Start_HTTP_Server_Task(void const * argument)
   /* Wait for DHCP */
   while (DHCP_state != DHCP_ADDRESS_ASSIGNED)
   {
-    DBG_LWIP("Waiting for DHCP",  &DHCP_state, NULL);
-    osDelay(500);
+    // DBG_LWIP("Waiting for DHCP (state = %d)\r\n", DHCP_state);
+    osDelay(10);
   }
-  DBG_RTOS("Start Task",  NULL, NULL);
   
+  RTOS_TASK_READY();
+
   /* Create a new TCP connection handle */
   conn = netconn_new(NETCONN_TCP);
   if (conn!= NULL)
@@ -1874,14 +1946,14 @@ void Start_HTTP_Server_Task(void const * argument)
             err = netconn_recv(newconn, &netbuf);
             if (err != ERR_OK)
             {
-              DBG_LWIP("netconn_recv",  &err, NULL);
+              DBG_LWIP("netconn_recv (err = %d)\r\n", err);
             }
             else
             {
               err = netconn_err(newconn);
               if (err != ERR_OK) 
               {
-                DBG_LWIP("netconn_err",  &err, NULL);
+                DBG_LWIP("netconn_err (err = %d)\r\n", err);
               }
               else
               {
@@ -1891,7 +1963,7 @@ void Start_HTTP_Server_Task(void const * argument)
                   err = netbuf_data(netbuf, (void**)&temp_buf_data, &temp_buf_data_len);
                   if (err != ERR_OK) 
                   {
-                    DBG_LWIP("netbuf_data",  &err, NULL);
+                    DBG_LWIP("netbuf_data (err = %d)\r\n", err);
                   }
                   else
                   {
@@ -1953,7 +2025,7 @@ void Start_HTTP_Server_Task(void const * argument)
               fr = read_file_sector(&HTTP_File, (void*)server_response_buffer, sizeof(server_response_buffer), &bytes_read, idx);
               if (FR_OK != fr)
               {
-                DBG_FATFS("read_file_sector",  &fr, NULL);
+                DBG_FATFS("read_file_sector (fr = %d)\r\n",  fr);
                 bytes_read = 0;
               }
               else
@@ -2012,17 +2084,19 @@ void Start_HTTP_Server_Task(void const * argument)
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void const * argument)
 {
+  RTOS_TASK_START();  
 
   /* Graphic application */  
   GRAPHICS_MainTask();
       
   /* USER CODE BEGIN 5 */
-  DBG_RTOS("Start Task",  NULL, NULL);
+
+  RTOS_TASK_READY();
 
   /* Infinite loop */
   for (;;)
   {
-      osDelay(1);
+      osDelay(10);
   }
   /* USER CODE END 5 */ 
 }
@@ -2036,14 +2110,16 @@ void StartDefaultTask(void const * argument)
 /* USER CODE END Header_StartButtonTask */
 void StartButtonTask(void const * argument)
 {
+  RTOS_TASK_START();  
+
   /* USER CODE BEGIN StartButtonTask */
   uint32_t buttonState = 0;
   uint8_t buttonCount = 0;
   
   BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
   
-  DBG_RTOS("Start Task",  NULL, NULL);
 
+  RTOS_TASK_READY();
   /* Infinite loop */
   for(;;)
   {
@@ -2053,7 +2129,7 @@ void StartButtonTask(void const * argument)
       if(xQueueSend(buttonQueueHandle, (uint8_t*)&buttonState, 0) == pdTRUE)
       {
         buttonCount++;
-        DBG_QUEUE("buttonQueueHandle",  &buttonCount, NULL);
+        DBG_QUEUE("buttonQueueHandle: %d\r\n", buttonState);
       }
     }
     
@@ -2071,20 +2147,21 @@ void StartButtonTask(void const * argument)
 /* USER CODE END Header_StartLEDTask */
 void StartLEDTask(void const * argument)
 {
+  RTOS_TASK_START();  
+
   /* USER CODE BEGIN StartLEDTask */
   uint8_t led_state = 0;
 
   BSP_LED_Init(LED_GREEN);
-  BSP_LED_Off(LED_GREEN);
-  
-  DBG_RTOS("Start Task",  NULL, NULL);
+  BSP_LED_Off(LED_GREEN);  
       
+  RTOS_TASK_READY();
   /* Infinite loop */
   for(;;)
   {
     if(xQueueReceive(ledQueueHandle, &led_state, 0) == pdTRUE)
     {
-      DBG_QUEUE("ledQueueHandle", &led_state, NULL);
+      DBG_QUEUE("ledQueueHandle: %d\r\n", led_state);
       if (led_state == 1)
       {
         BSP_LED_On(LED_GREEN);
@@ -2094,8 +2171,10 @@ void StartLEDTask(void const * argument)
         BSP_LED_Off(LED_GREEN);
       }
     }
-    
-    osDelay(20);
+    else
+    {
+      osDelay(10);
+    }
   }
   /* USER CODE END StartLEDTask */
 }
@@ -2107,8 +2186,8 @@ FRESULT sd_append(char* fn, char* wtext)
 
   uint32_t byteswritten = 0;                     /* File write/read counts */
 
-  DBG_FATFS("File name",  NULL, fn);
-  DBG_FATFS("Text",  NULL, wtext);
+  DBG_FATFS("File name = %s\r\n",   fn);
+  DBG_FATFS("Text = %s\r\n",  wtext);
 
   /*##-3- Create and Open a new text file object with write access #####*/
   fr = f_open(&fil, (char*)fn, FA_OPEN_ALWAYS | FA_WRITE);
@@ -2122,28 +2201,28 @@ FRESULT sd_append(char* fn, char* wtext)
       fr = f_write(&fil, wtext, strlen(wtext), (UINT *)&byteswritten);
       if(fr == FR_OK)
       {
-        DBG_FATFS("byteswritten",  &byteswritten, NULL);
+        DBG_FATFS("byteswritten = %d\r\n",  byteswritten);
       }
       else
       {
-        DBG_FATFS("f_write", &fr, NULL);
+        DBG_FATFS("f_write (fr = %d)\r\n",  fr);
       }
     }
     else
     {
-      DBG_FATFS("f_lseek", &fr, NULL);
+      DBG_FATFS("f_lseek (fr = %d)\r\n",  fr);
     }
     
     /*##-6- Close the open text file #################################*/
     fr = f_close(&fil);
     if(fr != FR_OK)
     {
-      DBG_FATFS("f_close", &fr, NULL);
+      DBG_FATFS("f_close (fr = %d)\r\n",  fr);
     }
   }
   else
   {
-    DBG_FATFS("f_open", &fr, NULL);
+    DBG_FATFS("f_open (fr = %d)\r\n",  fr);
   }
   
   return fr;
@@ -2163,7 +2242,7 @@ FRESULT sd_dump(void)
   uint32_t bytesread = 0;                     /* File write/read counts */
   uint8_t rtext[256];                         /* File read buffer */
 
-  DBG_FATFS("File name",  NULL, (char*)sd_log_filename);
+  DBG_FATFS("File name = %s\r\n",  (char*)sd_log_filename);
 
   /*##-7- Open the text file object with read access ###############*/
   fr = f_open(&fil, (char*)sd_log_filename, FA_READ);
@@ -2182,7 +2261,7 @@ FRESULT sd_dump(void)
       }
       else 
       {
-        DBG_FATFS("f_read", &fr, NULL);
+        DBG_FATFS("f_read (fr = %d)\r\n",  fr);
       }
     } while((bytesread > 0) && (fr == FR_OK));
 
@@ -2190,12 +2269,12 @@ FRESULT sd_dump(void)
     fr = f_close(&fil);
     if(fr != FR_OK)
     {
-      DBG_FATFS("f_close", &fr, NULL);
+      DBG_FATFS("f_close (fr = %d)\r\n",  fr);
     }
   }
   else
   {
-    DBG_FATFS("f_open", &fr, NULL);
+    DBG_FATFS("f_open (fr = %d)\r\n",  fr);
   }
   
   return fr;
@@ -2210,54 +2289,102 @@ FRESULT sd_dump(void)
 /* USER CODE END Header_StartSDTask */
 void StartSDTask(void const * argument)
 {
+  RTOS_TASK_START();  
+
   /* USER CODE BEGIN StartSDTask */
   FRESULT fr;                                 /* FatFs function common result code */
   FATFS* fs = &SDFatFs;                       /* File system object for SD card logical drive */
   uint8_t ret = 0;
   uint32_t rng_value = 0;
-  uint8_t file_name[16];
+
+  uint8_t state = 0;
+  uint8_t state_new = 0;
+
+  /* Queue PV */
+  uint8_t queueData = 0;
 
   /* init code for FATFS */
   MX_FATFS_Init();
 
-  DBG_RTOS("Start Task",  NULL, NULL);
+  RTOS_TASK_READY();
 
-  /*##-1- Link the micro SD disk I/O driver ##################################*/
-  ret = BSP_SD_Init();
-  if(ret == MSD_OK)
-  {
-    /*##-2- Register the file system object to the FatFs module ##############*/
-    fr = f_mount(fs, (TCHAR const*)SDPath, 0);
-    if(fr == FR_OK)
-    {
-      DBG_FATFS("f_mount", NULL, "OK!");
-    }
-    else
-    {
-      DBG_FATFS("f_mount", &fr, NULL);
-    }
-  }
-  else
-  {
-    DBG_FATFS("BSP_SD_Init", &ret, NULL);
-  }
-
-  /* Get random number */
-  HAL_RNG_GenerateRandomNumber(&hrng, &rng_value);
-
-  /* Parse filename */
-  snprintf((char*)file_name, 16, "file%u.TXT", (uint8_t)(rng_value % 10));
-
-  /* Add to file */
-  sd_append((char*)file_name, (char*)"STM32 FatFs Demo\r\n");
-  
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
-  }
+    if (state != state_new)
+    {
+      DBG_FATFS("State transition (%d >> %d)\r\n", state, state_new);
+      state = state_new;
+    }
 
-  FATFS_UnLinkDriver(SDPath);
+    switch(state){
+      case 0:
+      {
+        /*##-1- Link the micro SD disk I/O driver ##################################*/
+        ret = BSP_SD_Init();
+        if(ret == MSD_OK)
+        {
+          /*##-2- Register the file system object to the FatFs module ##############*/
+          fr = f_mount(fs, (TCHAR const*)SDPath, 0);
+          if(fr != FR_OK)
+          {
+            DBG_FATFS("f_mount (fr = %d)\r\n",  fr);
+          }
+          else
+          {
+            state_new = 1;
+          }
+        }
+        else
+        {
+          DBG_FATFS("BSP_SD_Init (ret = %d)\r\n",  ret);
+        }
+      }
+      break;
+      case 1:
+      {
+        /* Get random number */
+        HAL_RNG_GenerateRandomNumber(&hrng, &rng_value);
+
+        /* Add to file */
+        fr = sd_log((uint8_t)(rng_value % 10));
+        if(fr != FR_OK)
+        {
+          state_new = 0;
+        }
+        else
+        {
+          state_new = 2;
+        }
+      }
+      break;
+      case 2:
+      {
+        if(xQueueReceive(logQueueHandle, &queueData, 0) == pdTRUE)
+        {
+          DBG_QUEUE("logQueueHandle: %d\r\n", queueData);
+          fr = sd_log(queueData);
+          if(fr != FR_OK)
+          {
+            state_new = 0;
+          }
+        }
+        else if(xQueueReceive(dumpQueueHandle, &queueData, 0) == pdTRUE)
+        {
+          DBG_QUEUE("dumpQueueHandle\r\n");
+          fr = sd_dump();
+          if(fr != FR_OK)
+          {
+            state_new = 0;
+          }
+        }
+      }
+      break;
+      default:
+      break;
+    }
+    osDelay(10);
+  }
 
   /* USER CODE END StartSDTask */
 }
@@ -2271,79 +2398,43 @@ void StartSDTask(void const * argument)
 
 void setDHCP_State(uint8_t state)
 {
-  DBG_DHCP("DHCP State change", &state, NULL);
+  DBG_DHCP("DHCP State change (%d >> %d)\r\n", DHCP_state, state);
   DHCP_state = state;
 }
 
 void StartLWIPTask(void const * argument)
 {
+  RTOS_TASK_START();  
+
   /* USER CODE BEGIN StartLWIPTask */
   /* LwIP PV */
-  struct netif* netif = (struct netif*)argument;
-  uint8_t queueData = 0;
-
-  /* init code for LWIP */
-  MX_LWIP_Init();
-
-  DBG_RTOS("Start Task",  NULL, NULL);
-  
-  /* Check interface status */
-  if (netif_is_up(netif))
-  {
-    setDHCP_State(DHCP_START);
-  }
-  else
-  {  
-    setDHCP_State(DHCP_LINK_DOWN);
-  }
-
-  /* Infinite loop */
-  for(;;)
-  {    
-    if (netif_is_up(netif) && (DHCP_state == DHCP_OFF))
-    {
-      setDHCP_State(DHCP_START);
-    }
-    else if(xQueueReceive(getIPQueueHandle, &queueData, 0) == pdTRUE)
-    {
-        DBG_QUEUE("getIPQueueHandle", &queueData, NULL);
-        #if 1
-        strcpy(ip4_addr_ptr, ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
-
-        if(xQueueSend(setIPQueueHandle, &ip4_addr_ptr, 0) == pdTRUE)
-        {
-            DBG_QUEUE("setIPQueueHandle", NULL, ip4_addr_ptr);
-        }
-        #endif
-    }
-    else
-    {
-      osDelay(10);
-    }
-  }
-  /* USER CODE END StartLWIPTask */
-}
-
-/* USER CODE END Header_StartDHCPTask */
-void StartDHCPTask(void const * argument)
-{
-  /* USER CODE BEGIN StartDHCPTask */
   struct netif* netif = (struct netif*)argument;
   ip_addr_t ipaddr;
   ip_addr_t netmask;
   ip_addr_t gw;
   struct dhcp *dhcp;
-  uint8_t iptxt[20];
-  
-  /* Get DHCP instance */
-  dhcp = (struct dhcp *)netif_get_client_data(netif, LWIP_NETIF_CLIENT_DATA_INDEX_DHCP);
 
-  DBG_RTOS("Start Task",  NULL, NULL);
-  
-  for (;;)
+  uint8_t queueData = 0;
+
+  /* init code for LWIP */
+  MX_LWIP_Init();
+
+  RTOS_TASK_READY();
+
+  /* Infinite loop */
+  for(;;)
   {
     switch (DHCP_state)
     {
+    case DHCP_OFF:
+      {
+        /* Check interface status */
+        if (netif_is_up(netif))
+        {
+          setDHCP_State(DHCP_START);
+        }
+      }
+      break;
     case DHCP_START:
       {
         ip_addr_set_zero_ip4(&netif->ip_addr);
@@ -2351,16 +2442,15 @@ void StartDHCPTask(void const * argument)
         ip_addr_set_zero_ip4(&netif->gw);       
         dhcp_start(netif);
         setDHCP_State(DHCP_WAIT_ADDRESS);
-        DBG_DHCP("Looking for server", NULL, NULL);
+        DBG_DHCP("Looking for server\r\n");
       }
       break;
-      
     case DHCP_WAIT_ADDRESS:
       {                
         if (dhcp_supplied_address(netif)) 
         {
           setDHCP_State(DHCP_ADDRESS_ASSIGNED); 
-          DBG_DHCP("Supplied address", NULL, ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
+          DBG_DHCP("Dynamic IP address (%s)\r\n", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
         }
         else
         {
@@ -2380,8 +2470,8 @@ void StartDHCPTask(void const * argument)
             IP_ADDR4(&gw, GW_ADDR0, GW_ADDR1, GW_ADDR2, GW_ADDR3);
             netif_set_addr(netif, ip_2_ip4(&ipaddr), ip_2_ip4(&netmask), ip_2_ip4(&gw));
             
-            DBG_DHCP("Timeout", NULL, NULL);
-            DBG_DHCP("Static IP address", NULL, ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
+            DBG_DHCP("Timeout\r\n");
+            DBG_DHCP("Static IP address (%s)\r\n", ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
           }
         }
       }
@@ -2393,15 +2483,29 @@ void StartDHCPTask(void const * argument)
         setDHCP_State(DHCP_OFF); 
       }
       break;
+    case DHCP_ADDRESS_ASSIGNED:
+      {
+        if(xQueueReceive(getIPQueueHandle, &queueData, 0) == pdTRUE)
+        {
+          DBG_QUEUE("getIPQueueHandle\r\n");
+
+          strcpy(ip4_addr_ptr, ip4addr_ntoa((const ip4_addr_t *)&netif->ip_addr));
+
+          if(xQueueSend(setIPQueueHandle, &ip4_addr_ptr, 0) == pdTRUE)
+          {
+              DBG_QUEUE("setIPQueueHandle = %s\r\n", ip4_addr_ptr);
+          }
+        }
+      }
+      break;
     default: 
       break;
     }
-    
-    /* wait 250 ms */
-    osDelay(250);
+      
+      /* wait 100 ms */
+      osDelay(10);
   }
-
-  /* USER CODE END StartDHCPTask */
+  /* USER CODE END StartLWIPTask */
 }
 
 /**
