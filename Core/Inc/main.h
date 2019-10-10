@@ -99,6 +99,18 @@ extern "C" {
 #define DHCP_TIMEOUT               (uint8_t) 4
 #define DHCP_LINK_DOWN             (uint8_t) 5
 #define DHCP_RESTART               (uint8_t) 6
+
+#define MAX_DHCP_TRIES  4
+#define JSMN_MAX_TOK (128)
+
+#define CLI_USE_FREERTOS_QUEUE 1
+
+#define DBG_LWIP_ENABLED   1
+#define DBG_RTOS_ENABLED   1
+#define DBG_FATFS_ENABLED  1
+#define DBG_QUEUE_ENABLED  1
+#define DBG_JSMN_ENABLED   1
+#define DBG_DHCP_ENABLED   1
   
 /* USER CODE END EC */
 
@@ -109,6 +121,12 @@ extern "C" {
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
+
+#if (CLI_USE_FREERTOS_QUEUE == 1)
+void cli_dbg(const char* label, const char* fn, const char* fmt, ...);
+#endif
+
+uint16_t cli_printf(const char* fmt, ...);
 
 /* USER CODE BEGIN EFP */
 

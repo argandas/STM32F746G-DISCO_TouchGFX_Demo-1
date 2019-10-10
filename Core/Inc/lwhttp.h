@@ -4,14 +4,13 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdint.h>
-#include <portmacro.h>
+#include "FreeRTOS.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define DBG_LWHTTP_ENABLED   1
-
 
 #define errOK          ( pdPASS )            /** No error, everything OK. */
 #define errNOK         ( pdFAIL )            /** Unknown error.           */
@@ -21,7 +20,7 @@ extern "C" {
 #define errNotFound    ( ( BaseType_t ) -4  ) /** Routing problem.         */
 #define errARG         ( ( BaseType_t ) -5  ) /** Illegal argument.        */
 #define errParser      ( ( BaseType_t ) -6  ) /** Failed to parse.         */
-#define errParseReady  ( ( BaseType_t ) -7  ) /** Failed to parse.         */
+#define errParseReady  ( ( BaseType_t ) -7  ) /** Parser is not ready.     */
 #define errParseStart  ( ( BaseType_t ) -8  ) /** Failed to parse.         */
 #define errParseHeader ( ( BaseType_t ) -9  ) /** Failed to parse.         */
 #define errParseBody   ( ( BaseType_t ) -10 ) /** Failed to parse.         */

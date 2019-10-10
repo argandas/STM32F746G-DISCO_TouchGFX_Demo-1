@@ -82,17 +82,6 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define MAX_DHCP_TRIES  4
-#define JSMN_MAX_TOK (128)
-
-#define CLI_USE_FREERTOS_QUEUE 1
-
-#define DBG_LWIP_ENABLED   1
-#define DBG_RTOS_ENABLED   1
-#define DBG_FATFS_ENABLED  1
-#define DBG_QUEUE_ENABLED  1
-#define DBG_JSMN_ENABLED   1
-#define DBG_DHCP_ENABLED   1
 
 #if (CLI_USE_FREERTOS_QUEUE == 0)
 #define cli_dbg(a,b,...) cli_printf(__VA_ARGS__)
@@ -227,15 +216,10 @@ void Start_HTTP_Server_Task(void const * argument);
 void Start_CLI_Logger_Task(void const * argument);
 #endif
 
-uint16_t cli_printf(const char* fmt, ...);
 uint16_t cli_dump(const char* src, uint16_t len);
 uint16_t cli_write(const char* src, uint16_t len);
 
 void http_print_msg(lwhttp_message_t* msg);
-
-#if (CLI_USE_FREERTOS_QUEUE == 1)
-void cli_dbg(const char* label, const char* fn, const char* fmt, ...);
-#endif
 
 static BaseType_t jsoneq(const char *json, const jsmntok_t * const pxTok, const char *s);
 
@@ -1261,6 +1245,7 @@ void cli_dbg(const char* label, const char* fn, const char* fmt, ...)
 
     if( strcmp( fmt, "\n" ) != 0 )
     {
+#if 0
       const char * pcTaskName;
       const char * pcNoTask = "None";
 
@@ -1274,6 +1259,9 @@ void cli_dbg(const char* label, const char* fn, const char* fmt, ...)
       }
 
       xLength = snprintf( pcPrintString, CLI_LOGGER_MAX_MESSAGE_LENGTH, "[%s] %s --> ", label, pcTaskName);
+#else
+      xLength = snprintf( pcPrintString, CLI_LOGGER_MAX_MESSAGE_LENGTH, "[%s] %s --> ", label, fn);
+#endif
     }
 
     xLength2 = vsnprintf( pcPrintString + xLength, CLI_LOGGER_MAX_MESSAGE_LENGTH - xLength, fmt, args );
@@ -1478,7 +1466,6 @@ BaseType_t parse_thingspeak_rsp(char* src, uint16_t len)
   return xStatus;
 }
 
-
 uint16_t cli_write(const char* src, uint16_t len)
 {
   if ((src != NULL) && (len > 0))
@@ -1619,6 +1606,7 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
   struct netbuf *netbuf = NULL;
   ip4_addr_t remote_ip; 
   BaseType_t xStatus = pdFALSE;
+  BaseType_t xStatusHTTP = pdFALSE;
   err_t err;
   
   /* Temp Buffer PV */
@@ -1633,9 +1621,9 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
   /* Thingspeak server PV */
   const char* key = "WTN6FH385TCUNDMU";
   const char* server = "api.thingspeak.com";
-  const char* url = "/update.json?headers=false";
+  const char* url = "/update.json";
 
-  DBG_LWIP("   data: %d\r\n",  data);
+  DBG_LWIP("Data to send: %d\r\n",  data);
 
   if (DHCP_state == DHCP_ADDRESS_ASSIGNED)
   {
@@ -1647,15 +1635,29 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
     lwhttp_request_put_request_line(req_ptr, LwHHTP_POST, url);
     lwhttp_request_put_message_header(req_ptr, "Content-Type", "application/json");
     lwhttp_request_put_message_header(req_ptr, "Content-Length", (char *)json_data_len);
-    lwhttp_request_put_message_body(req_ptr, (char*)json_data, strlen((char *)json_data));  
-          
-    DBG_LWIP("JSON Data Sent: %s\r\n", json_data);
+    xStatusHTTP = lwhttp_request_put_message_body(req_ptr, (char*)json_data, strlen((char *)json_data));  
 
-    /* Run LwHTTP Request Parser */
-    lwhttp_request_parse(req_ptr);
+    if ((xStatusHTTP == pdTRUE) && (req_ptr->builder_state == LwHHTP_BUILDER_FINISHED))
+    {
+      DBG_LWIP("HTTP Build Success!\r\n");
+    }
+    else
+    {
+      DBG_LWIP("HTTP Build Failed! (status = %d, state = %d)\r\n", xStatusHTTP, req_ptr->builder_state);
+    }
 
-    /* Print the request */
-    http_print_msg(req_ptr);
+    /* Get LwHTTP Request Data */
+    xStatusHTTP = lwhttp_request_get(req_ptr, &temp_buf_data, &temp_buf_data_len);
+    if (pdTRUE != xStatusHTTP)
+    {
+      DBG_LWIP("Failed to get request! (status = %d)\r\n", xStatusHTTP);
+    }
+    else
+    {
+      DBG_LWIP("Bytes to send: %d\r\n", temp_buf_data_len);
+    }
+
+    http_print_msg((lwhttp_message_t*)req_ptr);
 
     /* LwIP Connect TCP */
     conn = netconn_new(NETCONN_TCP);       
@@ -1674,17 +1676,16 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
         err  = netconn_gethostbyname(server, &remote_ip);
         if (ERR_OK == err)
         {
+#if 0
           DBG_LWIP("HOST: %s (%s)\r\n", server, ip4addr_ntoa((const ip4_addr_t *)&remote_ip));
-          
+#endif      
           /* Connect to server */
           err = netconn_connect(conn, &remote_ip, 80); 
           if (ERR_OK == err)
           {
+#if 0
             DBG_LWIP("netconn_connect: OK\r\n");
-
-            /* Get LwHTTP Request Data */
-            lwhttp_request_get(req_ptr, &temp_buf_data, &temp_buf_data_len);
-
+#endif
             /* Write data to server */
             err = netconn_write(conn, temp_buf_data, temp_buf_data_len, NETCONN_NOFLAG);
             if (ERR_OK == err)
@@ -1710,7 +1711,6 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
                       }
                       else
                       {
-                        DBG_LWIP("switch --> netconn_recv (err = %d)\r\n", err);
                         state = NETCONN_FSM_GET_DATA;
                       }
                     }
@@ -1721,9 +1721,10 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
                       netbuf_data(netbuf, (void**)&temp_buf_data, &temp_buf_data_len);
                       
                       /* LwHTTP write response to parser */
-                      lwhttp_response_put(rsp_ptr, (char*)temp_buf_data, temp_buf_data_len);
-
-                      DBG_LWIP("netbuf_data: %d bytes\r\n", temp_buf_data_len);
+                      if(pdPASS != lwhttp_response_put(rsp_ptr, (char*)temp_buf_data, temp_buf_data_len))
+                      {
+                        DBG_LWIP("HTTP Failed to put\r\n", temp_buf_data_len);
+                      }
 
                       /* Try to get next part */
                       state = NETCONN_FSM_GET_NEXT;
@@ -1732,7 +1733,6 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
                   case NETCONN_FSM_GET_NEXT:
                     {
                       nxt_rsp = netbuf_next(netbuf);
-                      DBG_LWIP("switch --> netbuf_next (nxt_rsp = %d)\r\n", nxt_rsp);
                       if(nxt_rsp >= 0) {
                         state = NETCONN_FSM_GET_DATA; /* Continue */
                       }
@@ -1750,35 +1750,24 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
                   break;
                 }
 
-                DBG_LWIP("NETCONN FSM: state (%d), err (%d)\r\n", state, err, finished);
+                /* Debug if there is an error */
+                if ((ERR_OK != err) && (err != ERR_CLSD))
+                {
+                  DBG_LWIP("NETCONN FSM: state (%d), err (%d)\r\n", state, err, finished);
+                }
               }
               
               if ((ERR_OK == err) || (err == ERR_CLSD))
               {
                 DBG_LWIP("netconn_recv: Got %d bytes\r\n",  rsp_ptr->buffer.len);
 
-                /* Run LwHTTP Request Parser */
-                xStatus = lwhttp_response_parse(rsp_ptr);
-                if(xStatus != 1)
+                if ((rsp_ptr->buffer.data != NULL) && (rsp_ptr->buffer.len > 0))
                 {
-                  DBG_LWIP("lwhttp_response_parse (status = %d)\r\n", xStatus);
-                }
-
-                if (rsp_ptr->start_line.status_line.status_code.data != NULL)
-                {
-                  /* Print HTTP Request */
-                  lwhttp_request_get_request_line(req_ptr, &temp_buf_data, &temp_buf_data_len);
-                  cli_printf("[LwHTTP] Request-Line: %.*s\r\n", temp_buf_data_len, temp_buf_data);
-
-                  /* Parse & Print LwHTTP Response */
-                  lwhttp_response_get_status_line(rsp_ptr, &temp_buf_data, &temp_buf_data_len);
-                  cli_printf("[LwHTTP] Status-Line: %.*s\r\n\r\n", temp_buf_data_len, temp_buf_data);
-                  
                   xStatus = pdTRUE;               
-                  DBG_LWIP("xStatus =  %d\r\n", xStatus);
                 }
                 else
                 {
+                  DBG_LWIP("xStatus =  %d\r\n", xStatus);
                   xStatus = pdFALSE;               
                 }
               }
@@ -1855,10 +1844,24 @@ void setDHCP_State(uint8_t state)
 void http_print_msg(lwhttp_message_t* msg)
 {
   /* Temp Buffer PV */
-  const char* line = "----------------------------\r\n";
-  cli_printf("%s", line);
-  // cli_printf("%*.s", 64, msg->buffer.data);
-  cli_printf("%s", line);
+  char * pcPrintString = NULL;
+  const char* line = "\r\n---------------------------------------------------\r\n";
+
+  /* Allocate a buffer to hold the log message. */
+  pcPrintString = (char*)pvPortMalloc(1024);
+
+  if (pcPrintString != NULL)
+  {
+    memcpy(pcPrintString, msg->buffer.data, msg->buffer.len);
+
+    cli_printf("%s", line);
+    if( xQueueSend( cliLoggerQueueHandle, &pcPrintString, 0 ) != pdPASS )
+    {
+      /* The buffer was not sent so must be freed again. */
+      vPortFree( ( void * ) pcPrintString );
+    }
+    cli_printf("%s", line);
+  }
 }
 
 void Start_HTTP_Client_Task(void const * argument)
@@ -1866,12 +1869,16 @@ void Start_HTTP_Client_Task(void const * argument)
   /* USER CODE BEGIN Start_HTTP_Client_Task */
   RTOS_TASK_START();  
   
+  /* wait for other tasks to start */
+  osDelay(100);
+
   /* Queue PV */
   uint8_t queueData = 0;
   lwhttp_message_header_t* content_type_header_ptr;
 
   static lwhttp_request_t client_request;
   static lwhttp_response_t client_response;
+  BaseType_t xResultHTTP = pdFAIL;
 
   /* LwIP PV */
   struct netif* netif = (struct netif*)argument;
@@ -1963,15 +1970,21 @@ void Start_HTTP_Client_Task(void const * argument)
             {
               DBG_LWIP("post_thingspeak finished\r\n");
 
-              http_print_msg(&client_response);
+              /* Run LwHTTP Request Parser */
+              xResultHTTP = lwhttp_request_parse(&client_request);
+              if (pdTRUE != xResultHTTP)
+              {
+                DBG_LWIP("Failed to parse request! (ret = %d)\r\n", xResultHTTP);
+              }
+              http_print_msg((lwhttp_message_t*)&client_request);
 
-              DBG_LWIP("client_response status len: %d\r\n", 
-                client_response.start_line.status_line.status_code.len);
-
-              DBG_LWIP("client_response status data: %*.s\r\n", 
-                client_response.start_line.status_line.status_code.len,
-                (char*)client_response.start_line.status_line.status_code.data
-              );
+              /* Run LwHTTP Response Parser */
+              xResultHTTP = lwhttp_response_parse(&client_response);
+              if (pdTRUE != xResultHTTP)
+              {
+                DBG_LWIP("Failed to parse response! (ret = %d)\r\n", xResultHTTP);
+              }
+              http_print_msg((lwhttp_message_t*)&client_response);
 
 #if 0
               DBG_LWIP("client_response body: %*.s\r\n", 
