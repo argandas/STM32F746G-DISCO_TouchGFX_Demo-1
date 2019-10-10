@@ -10,7 +10,8 @@
 extern "C" {
 #endif
 
-#define DBG_LWHTTP_ENABLED   1
+#define DBG_LWHTTP_ENABLED               1
+#define DBG_LWHTTP_TRANSITIONS_ENABLED   0
 
 #define errOK          ( pdPASS )            /** No error, everything OK. */
 #define errNOK         ( pdFAIL )            /** Unknown error.           */
@@ -48,9 +49,8 @@ typedef enum {
     LwHHTP_BUILDER_IN_PROGRESS = 1,
     LwHHTP_BUILDER_ADDED_START_LINE = 2,
     LwHHTP_BUILDER_ADDED_MESSAGE_HEADER = 3,
-    LwHHTP_BUILDER_ADDED_MESSAGE_BODY = 4,
-    LwHHTP_BUILDER_FINISHED = LwHHTP_BUILDER_ADDED_MESSAGE_BODY,
-    LwHHTP_BUILDER_ERROR = 6,
+    LwHHTP_BUILDER_FINISHED = 4,
+    LwHHTP_BUILDER_ERROR = 5,
 } lwhttp_message_builder_state_t;
 
 typedef enum {

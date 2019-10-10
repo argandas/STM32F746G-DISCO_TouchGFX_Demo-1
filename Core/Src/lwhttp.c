@@ -4,9 +4,7 @@
 
 #if (DBG_LWHTTP_ENABLED == 1 )
   extern void cli_dbg(const char* label, const char* fn, const char* fmt, ...);
-  extern uint16_t cli_printf(const char* fmt, ...);
   #define DBG_LWHTTP(...) cli_dbg((char*)"LwHTTP",  __FUNCTION__, __VA_ARGS__)
-  // #define DBG_LWHTTP(...) cli_printf(__VA_ARGS__)
 #else
   #define DBG_LWHTTP(...) (void)0
 #endif
@@ -39,6 +37,24 @@ static BaseType_t lwhttp_token_get(lwhttp_token_t* token, char** dest, uint16_t*
 static BaseType_t lwhttp_token_reset(lwhttp_token_t* token);
 static BaseType_t lwhttp_parse_message_header(lwhttp_message_header_t* message_header);
 static BaseType_t lwhttp_parse_start_line(lwhttp_start_line_t* start_line, lwhttp_message_type_t type);
+static void lwhttp_builder_set_state(lwhttp_message_t* message, lwhttp_message_builder_state_t state);
+static void lwhttp_parser_set_state(lwhttp_message_t* message, lwhttp_message_parser_state_t state);
+
+static void lwhttp_builder_set_state(lwhttp_message_t* message, lwhttp_message_builder_state_t state)
+{
+#if (DBG_LWHTTP_TRANSITIONS_ENABLED == 1 )
+  DBG_LWHTTP("Transition from (%d) to (%d)\r\n", message->builder_state, state);
+#endif
+  message->builder_state = state;
+}
+
+static void lwhttp_parser_set_state(lwhttp_message_t* message, lwhttp_message_parser_state_t state)
+{
+#if (DBG_LWHTTP_TRANSITIONS_ENABLED == 1 )
+  DBG_LWHTTP("Transition from (%d) to (%d)\r\n", message->parser_state, state);
+#endif
+  message->parser_state = state;
+}
 
 static BaseType_t lwhttp_token_set(lwhttp_token_t* token, const char* src, uint16_t len)
 {
@@ -118,8 +134,8 @@ static BaseType_t lwhttp_message_init(lwhttp_message_t* message, lwhttp_message_
     }
 
     /* Parser/Builder internals */
-    message->builder_state = LwHHTP_BUILDER_INIT;
-    message->parser_state = LwHHTP_PARSER_INIT;
+    lwhttp_builder_set_state(message, LwHHTP_BUILDER_INIT);
+    lwhttp_parser_set_state(message, LwHHTP_PARSER_INIT);
     
     lwhttp_message_free(message);
 
@@ -176,11 +192,11 @@ static BaseType_t lwhttp_message_parse(lwhttp_message_t* message)
   {    
     if (LwHHTP_PARSER_READY == message->parser_state)
     {
-      message->parser_state = LwHHTP_PARSER_START_LINE;
+      lwhttp_parser_set_state(message, LwHHTP_PARSER_START_LINE);
     }
     else
     {
-      message->parser_state = LwHHTP_PARSER_ERROR;
+      lwhttp_parser_set_state(message, LwHHTP_PARSER_ERROR);
       xReturn = errParseReady;
     }
     
@@ -190,7 +206,7 @@ static BaseType_t lwhttp_message_parse(lwhttp_message_t* message)
       end = strstr(start, LwHTTP_eol_string);
       if ((end == NULL) && (message->parser_state != LwHHTP_PARSER_MESSAGE_BODY))
       {
-        message->parser_state = LwHHTP_PARSER_ERROR;
+        lwhttp_parser_set_state(message, LwHHTP_PARSER_ERROR);
         xReturn = errParser;
       }
       
@@ -212,12 +228,12 @@ static BaseType_t lwhttp_message_parse(lwhttp_message_t* message)
           if(xReturn != errOK)
           {
             xReturn = errParseStart;
-            message->parser_state = LwHHTP_PARSER_ERROR;
+            lwhttp_parser_set_state(message, LwHHTP_PARSER_ERROR);
           }
           else
           {
             /* Parse next header */
-            message->parser_state = LwHHTP_PARSER_MESSAGE_HEADER;
+            lwhttp_parser_set_state(message, LwHHTP_PARSER_MESSAGE_HEADER);
           }
         }
         break;
@@ -227,7 +243,7 @@ static BaseType_t lwhttp_message_parse(lwhttp_message_t* message)
           if ((end - start) <= 0)
           {
             /* Empty line found, next line is body */
-            message->parser_state = LwHHTP_PARSER_MESSAGE_BODY;
+            lwhttp_parser_set_state(message, LwHHTP_PARSER_MESSAGE_BODY);
           }
           else
           {
@@ -244,12 +260,12 @@ static BaseType_t lwhttp_message_parse(lwhttp_message_t* message)
             if(xReturn != errOK)
             {
               xReturn = errParseHeader;
-              message->parser_state = LwHHTP_PARSER_ERROR;
+              lwhttp_parser_set_state(message, LwHHTP_PARSER_ERROR);
             }
             else
             {
               /* Parse next header */
-              message->parser_state = LwHHTP_PARSER_MESSAGE_HEADER;
+              lwhttp_parser_set_state(message, LwHHTP_PARSER_MESSAGE_HEADER);
             }
           }
         }
@@ -260,11 +276,11 @@ static BaseType_t lwhttp_message_parse(lwhttp_message_t* message)
         message->message_body.len = (uint16_t)(&message->buffer.data[message->buffer.len] - start);
         if (message->message_body.data != NULL)
         {
-          message->parser_state = LwHHTP_PARSER_END;
+          lwhttp_parser_set_state(message, LwHHTP_PARSER_END);
         }
         else
         {
-          message->parser_state = LwHHTP_PARSER_ERROR;
+          lwhttp_parser_set_state(message, LwHHTP_PARSER_ERROR);
           xReturn = errParseBody;
         }
         break;
@@ -277,7 +293,7 @@ static BaseType_t lwhttp_message_parse(lwhttp_message_t* message)
 #if (DBG_LWHTTP_ENABLED == 1)
       if (errOK != xReturn)
       {
-        DBG_LWHTTP("Parser FSM state = %d, ret = %d\r\n", message->parser_state, xReturn);
+        DBG_LWHTTP("xRet = %d, pState = %d, bState = %d\r\n", xReturn, message->parser_state, message->builder_state);
       }
 #endif
     }
@@ -295,7 +311,7 @@ static BaseType_t lwhttp_message_parse(lwhttp_message_t* message)
 #if (DBG_LWHTTP_ENABLED == 1)
   if (xReturn != errOK)
   {
-    DBG_LWHTTP("xReturn = %d, Parse State = %d\r\n", xReturn, message->parser_state);
+    DBG_LWHTTP("xRet = %d, pState = %d, bState = %d\r\n", xReturn, message->parser_state, message->builder_state);
   }
 #endif 
   
@@ -500,12 +516,13 @@ static BaseType_t lwhttp_message_put_ext(lwhttp_message_t* message, const char* 
     {
       if ((message->builder_state == LwHHTP_BUILDER_IN_PROGRESS) && (src == NULL) && (len == 0))
       {
-        message->builder_state = LwHHTP_BUILDER_FINISHED;
+        lwhttp_parser_set_state(message, LwHHTP_PARSER_READY);
+        lwhttp_builder_set_state(message, LwHHTP_BUILDER_FINISHED);
         xReturn = errOK;
       }
       else if ((src != NULL) && (len > 0))
       {
-        message->builder_state = LwHHTP_BUILDER_IN_PROGRESS;
+        lwhttp_builder_set_state(message, LwHHTP_BUILDER_IN_PROGRESS);
         xReturn = lwhttp_message_put(message, src, len);
       }
       else
@@ -526,7 +543,8 @@ static BaseType_t lwhttp_message_put_ext(lwhttp_message_t* message, const char* 
 #if (DBG_LWHTTP_ENABLED == 1)
   if (xReturn != errOK)
   {
-    DBG_LWHTTP("xReturn = %d, Build State = %d\r\n", xReturn, message->builder_state);
+    DBG_LWHTTP("src = %ld, len = %d\r\n", (uint32_t)src, len);
+    DBG_LWHTTP("xRet = %d, pState = %d, bState = %d\r\n", xReturn, message->parser_state, message->builder_state);
   }
 #endif 
 
@@ -557,7 +575,7 @@ static BaseType_t lwhttp_message_put_int(lwhttp_message_t* message, const char* 
 #if (DBG_LWHTTP_ENABLED == 1)
   if (xReturn != errOK)
   {
-    DBG_LWHTTP("xReturn = %d, Build State = %d\r\n", xReturn, message->builder_state);
+    DBG_LWHTTP("xRet = %d, pState = %d, bState = %d\r\n", xReturn, message->parser_state, message->builder_state);
   }
 #endif 
 
@@ -676,7 +694,7 @@ static BaseType_t lwhttp_message_put_start_line(lwhttp_message_t* message, const
       xReturn = lwhttp_message_put_int(message, &temp_buff[0], usLength);
       if (xReturn == errOK)
       {
-        message->builder_state = LwHHTP_BUILDER_ADDED_START_LINE;
+        lwhttp_builder_set_state(message, LwHHTP_BUILDER_ADDED_START_LINE);
       }
       else
       {
@@ -766,7 +784,7 @@ static BaseType_t lwhttp_message_put_message_header(lwhttp_message_t* message, c
 
       if (xReturn == errOK)
       {
-        message->builder_state = LwHHTP_BUILDER_ADDED_MESSAGE_HEADER;
+        lwhttp_builder_set_state(message, LwHHTP_BUILDER_ADDED_MESSAGE_HEADER);
       }
     }
     else
@@ -833,8 +851,8 @@ static BaseType_t lwhttp_message_put_message_body(lwhttp_message_t* message, con
 
       if (xReturn == errOK)
       {
-        message->builder_state = LwHHTP_BUILDER_FINISHED;
-        message->parser_state = LwHHTP_PARSER_READY;
+        lwhttp_builder_set_state(message, LwHHTP_BUILDER_FINISHED);
+        lwhttp_parser_set_state(message, LwHHTP_PARSER_READY);
       }
     }
     else

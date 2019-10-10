@@ -1637,13 +1637,9 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
     lwhttp_request_put_message_header(req_ptr, "Content-Length", (char *)json_data_len);
     xStatusHTTP = lwhttp_request_put_message_body(req_ptr, (char*)json_data, strlen((char *)json_data));  
 
-    if ((xStatusHTTP == pdTRUE) && (req_ptr->builder_state == LwHHTP_BUILDER_FINISHED))
+    if ((xStatusHTTP != pdTRUE) || (req_ptr->builder_state != LwHHTP_BUILDER_FINISHED))
     {
-      DBG_LWIP("HTTP Build Success!\r\n");
-    }
-    else
-    {
-      DBG_LWIP("HTTP Build Failed! (status = %d, state = %d)\r\n", xStatusHTTP, req_ptr->builder_state);
+      DBG_LWIP("HTTP Request Build Failed! (status = %d, state = %d)\r\n", xStatusHTTP, req_ptr->builder_state);
     }
 
     /* Get LwHTTP Request Data */
@@ -1654,7 +1650,7 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
     }
     else
     {
-      DBG_LWIP("Bytes to send: %d\r\n", temp_buf_data_len);
+      DBG_LWIP("HTTP Request = %d bytes\r\n", temp_buf_data_len);
     }
 
     http_print_msg((lwhttp_message_t*)req_ptr);
@@ -1723,7 +1719,7 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
                       /* LwHTTP write response to parser */
                       if(pdPASS != lwhttp_response_put(rsp_ptr, (char*)temp_buf_data, temp_buf_data_len))
                       {
-                        DBG_LWIP("HTTP Failed to put\r\n", temp_buf_data_len);
+                        DBG_LWIP("HTTP Failed to put (len = %d)\r\n", temp_buf_data_len);
                       }
 
                       /* Try to get next part */
@@ -1742,7 +1738,7 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
                     }
                     break;
                   case NETCONN_FSM_DELETE:
-                    {                      
+                    {
                       netbuf_delete(netbuf);  
                       state = NETCONN_FSM_START; 
                     }
@@ -1756,18 +1752,36 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
                   DBG_LWIP("NETCONN FSM: state (%d), err (%d)\r\n", state, err, finished);
                 }
               }
+
+              if (NETCONN_FSM_FINISHED == state)
+              {
+                /* Mark response as finished */
+                lwhttp_response_put(rsp_ptr, NULL, 0);                      
+              }
               
               if ((ERR_OK == err) || (err == ERR_CLSD))
               {
-                DBG_LWIP("netconn_recv: Got %d bytes\r\n",  rsp_ptr->buffer.len);
+                DBG_LWIP("HTTP Response = %d bytes\r\n",  rsp_ptr->buffer.len);
 
-                if ((rsp_ptr->buffer.data != NULL) && (rsp_ptr->buffer.len > 0))
+                if ((rsp_ptr->buffer.data != NULL) 
+                  && (rsp_ptr->buffer.len > 0)
+                  && (rsp_ptr->builder_state == LwHHTP_BUILDER_FINISHED))
                 {
                   xStatus = pdTRUE;               
                 }
                 else
                 {
-                  DBG_LWIP("xStatus =  %d\r\n", xStatus);
+                  DBG_LWIP("xRet = %d, pState = %d, bState = %d\r\n", 
+                    xStatus, 
+                    rsp_ptr->parser_state, 
+                    rsp_ptr->builder_state
+                  );
+
+                  DBG_LWIP("rsp_ptr->buffer .len = %d, .data = %ld\r\n", 
+                    rsp_ptr->buffer.len,
+                    (uint32_t)rsp_ptr->buffer.data
+                  );
+
                   xStatus = pdFALSE;               
                 }
               }
@@ -1968,8 +1982,6 @@ void Start_HTTP_Client_Task(void const * argument)
             /* Sen POST request */
             if (pdTRUE == post_thingspeak(&client_request, &client_response, queueData))
             {
-              DBG_LWIP("post_thingspeak finished\r\n");
-
               /* Run LwHTTP Request Parser */
               xResultHTTP = lwhttp_request_parse(&client_request);
               if (pdTRUE != xResultHTTP)
@@ -1987,20 +1999,15 @@ void Start_HTTP_Client_Task(void const * argument)
               http_print_msg((lwhttp_message_t*)&client_response);
 
 #if 0
-              DBG_LWIP("client_response body: %*.s\r\n", 
-                client_response.message_body.len,
-                (char*)client_response.message_body.data
-              );
               /* If HTTP Status Code is OK (200) and Content-Type is JSON */
               if ((0 == strncmp(client_response.start_line.status_line.status_code.data, "200", strlen("200"))) 
                   && (0 == strncmp(content_type_header_ptr->field_value.data, "application/json", strlen("application/json")))
                   && (1 < client_response.message_body.len))
               {
-                DBG_LWIP("Valid response\r\n");
                 /* Parse LwHTTP Response message body as JSON */   
-                if (parse_thingspeak_rsp(client_response.message_body.data, client_response.message_body.len) == pdTRUE)
+                if (pdTRUE != parse_thingspeak_rsp(client_response.message_body.data, client_response.message_body.len))
                 {
-                  DBG_LWIP("Request FINISHED\r\n");
+                  DBG_LWIP("Failed to parse JSON\r\n");
                 }
               }   
               else
