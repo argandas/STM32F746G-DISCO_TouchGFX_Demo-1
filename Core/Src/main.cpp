@@ -1930,6 +1930,10 @@ void Start_HTTP_Client_Task(void const * argument)
         {
           setDHCP_State(DHCP_START);
         }
+        else
+        {
+          osDelay(100);
+        }
       }
       break;
     case DHCP_START:
@@ -2386,7 +2390,7 @@ void sd_log_print(sd_log_entry_t* xLogEntry)
 {
   if (xLogEntry != NULL)
   {
-    cli_printf("Log entry = %d (status = %d)", xLogEntry->ucData, xLogEntry->ucStatus);
+    cli_printf("Log entry = %d (status = %d)\r\n", xLogEntry->ucData, xLogEntry->ucStatus);
   }
 }
 
@@ -2458,10 +2462,11 @@ FRESULT sd_log_dump(void)
   if(fr == FR_OK)
   {
     ulFileSize = f_size(&fil);
+    DBG_FATFS("File size = %d\r\n",  ulFileSize);
 
     if ((ulFileSize % ulLogEntrySize) == 0)
     {
-      ulLogEntries = (uint32_t) (ulFileSize % ulLogEntrySize);
+      ulLogEntries = (uint32_t) (ulFileSize / ulLogEntrySize);
       for (ulLogIndex = 0; ulLogIndex < ulLogEntries; ulLogIndex++)
       {
         fr = f_lseek(&fil, ulLogIndex * ulLogEntrySize);
