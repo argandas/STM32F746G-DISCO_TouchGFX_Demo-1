@@ -41,6 +41,7 @@ LoggerViewBase::LoggerViewBase() :
     clearLogButton.setTextPosition(0, 19, 100, 56);
     clearLogButton.setTextColors(touchgfx::Color::getColorFrom24BitRGB(70, 70, 70), touchgfx::Color::getColorFrom24BitRGB(231, 154, 9));
     clearLogButton.setPosition(355, 200, 100, 56);
+    clearLogButton.setAction(flexButtonCallback);
 
     counterBackgroundImage.setXY(164, 23);
     counterBackgroundImage.setBitmap(Bitmap(BITMAP_COUNTER_BOX_ID));
@@ -99,7 +100,10 @@ void LoggerViewBase::flexButtonCallbackHandler(const touchgfx::AbstractButtonCon
     }
     else if (&src == &clearLogButton)
     {
-
+        //clearBtnInteraction
+        //When clearLogButton clicked call virtual function
+        //Call clearButtonPressed
+        clearButtonPressed();
     }
     else if (&src == &rngButton)
     {

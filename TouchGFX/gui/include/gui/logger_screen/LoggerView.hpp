@@ -14,6 +14,7 @@ public:
 
     virtual void logButtonPressed();
     virtual void dumpButtonPressed();
+    virtual void clearButtonPressed();
 
 protected:
 };

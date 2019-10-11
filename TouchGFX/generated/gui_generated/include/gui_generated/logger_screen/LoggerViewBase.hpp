@@ -32,6 +32,11 @@ public:
         // Override and implement this function in LoggerView
     }
 
+    virtual void clearButtonPressed()
+    {
+        // Override and implement this function in LoggerView
+    }
+
 protected:
     FrontendApplication& application() {
         return *static_cast<FrontendApplication*>(Application::getInstance());

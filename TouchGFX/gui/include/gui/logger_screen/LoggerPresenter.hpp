@@ -27,6 +27,7 @@ public:
     
     void v2p_LogData(int data);
     void v2p_DumpData(void);
+    void v2p_ClearData(void);
 
     virtual ~LoggerPresenter() {};
 

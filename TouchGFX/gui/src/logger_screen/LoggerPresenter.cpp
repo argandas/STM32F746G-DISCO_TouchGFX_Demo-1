@@ -18,12 +18,18 @@ void LoggerPresenter::deactivate()
 
 void LoggerPresenter::v2p_LogData(int data)
 {
-  touchgfx_printf("MainPresenter::%s: %d\r\n", __FUNCTION__, data);
+  touchgfx_printf("LoggerPresenter::%s: %d\r\n", __FUNCTION__, data);
   model->p2m_LogData(data);
 }
 
 void LoggerPresenter::v2p_DumpData(void)
 {
-  touchgfx_printf("MainPresenter::%s: %d\r\n", __FUNCTION__, 0);
+  touchgfx_printf("LoggerPresenter::%s: %d\r\n", __FUNCTION__, 0);
   model->p2m_DumpData();
+}
+
+void LoggerPresenter::v2p_ClearData(void)
+{
+  touchgfx_printf("LoggerPresenter::%s: %d\r\n", __FUNCTION__, 0);
+  model->p2m_ClearData();
 }

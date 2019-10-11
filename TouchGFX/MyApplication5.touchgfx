@@ -792,6 +792,18 @@
               "FunctionName": "dumpButtonPressed",
               "Type": "ActionCustom"
             }
+          },
+          {
+            "InteractionName": "clearBtnInteraction",
+            "HasCompletedTrigger": false,
+            "Trigger": {
+              "TriggerComponent": "clearLogButton",
+              "Type": "TriggerClicked"
+            },
+            "Action": {
+              "FunctionName": "clearButtonPressed",
+              "Type": "ActionCustom"
+            }
           }
         ],
         "Name": "Logger",

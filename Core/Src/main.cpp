@@ -77,6 +77,11 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
+typedef struct {
+  uint8_t ucStatus;
+  uint8_t ucData;
+} sd_log_entry_t;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -163,7 +168,8 @@ osMessageQId buttonQueueHandle;
 osMessageQId ledQueueHandle;
 osMessageQId tcpQueueHandle;
 osMessageQId logQueueHandle;
-osMessageQId dumpQueueHandle;
+osMessageQId logDumpQueueHandle;
+osMessageQId logClearQueueHandle;
 osMessageQId getIPQueueHandle;
 osMessageQId setIPQueueHandle;
 osMessageQId cliLoggerQueueHandle;
@@ -228,9 +234,12 @@ BaseType_t parse_thingspeak_rsp(char* src, uint16_t len);
 
 FRESULT sd_scan_files(char* path);
 FRESULT sd_get_free_clusters(FATFS* fs);
-FRESULT sd_append(char* fn, char* wtext);
+
 FRESULT sd_log(uint8_t data);
-FRESULT sd_dump(void);
+FRESULT sd_log_append(sd_log_entry_t* xLogEntry);
+FRESULT sd_log_dump(void);
+FRESULT sd_log_clear(void);
+void sd_log_print(sd_log_entry_t* xLogEntry);
 
 /* USER CODE END PFP */
 
@@ -381,7 +390,11 @@ int main(void)
 
   /* definition and creation of dumpQueue */
   osMessageQDef(dumpQueue, 8, uint16_t);
-  dumpQueueHandle = osMessageCreate(osMessageQ(dumpQueue), NULL);
+  logDumpQueueHandle = osMessageCreate(osMessageQ(dumpQueue), NULL);
+
+  /* definition and creation of clearQueue */
+  osMessageQDef(clearQueue, 8, uint16_t);
+  logClearQueueHandle = osMessageCreate(osMessageQ(clearQueue), NULL);
 
   /* definition and creation of getIPQueue */
   osMessageQDef(getIPQueue, 1, uint16_t);
@@ -2348,33 +2361,56 @@ void StartLEDTask(void const * argument)
   /* USER CODE END StartLEDTask */
 }
 
-FRESULT sd_append(char* fn, char* wtext)
+FRESULT sd_log(uint8_t ucData)
+{
+  FRESULT fr;
+  sd_log_entry_t xLogEntry;
+
+  xLogEntry.ucStatus = (uint8_t)pdFALSE;
+  xLogEntry.ucData = ucData;
+
+  fr = sd_log_append(&xLogEntry);
+  if (fr != FR_OK)
+  {
+    DBG_FATFS("sd_append (fr = %d)\r\n",  fr);
+  }
+  else
+  {
+    sd_log_print(&xLogEntry);
+  }
+
+  return fr;
+}
+
+void sd_log_print(sd_log_entry_t* xLogEntry)
+{
+  if (xLogEntry != NULL)
+  {
+    cli_printf("Log entry = %d (status = %d)", xLogEntry->ucData, xLogEntry->ucStatus);
+  }
+}
+
+FRESULT sd_log_append(sd_log_entry_t* xLogEntry)
 {
   FRESULT fr;                                    /* FatFs function common result code */
   FIL fil;                                       /* File object */
 
-  uint32_t byteswritten = 0;                     /* File write/read counts */
-
-  DBG_FATFS("File name = %s\r\n",   fn);
-  DBG_FATFS("Text = %s\r\n",  wtext);
+  uint32_t ulBytesWritten = 0;                   /* File write/read counts */
 
   /*##-3- Create and Open a new text file object with write access #####*/
-  fr = f_open(&fil, (char*)fn, FA_OPEN_ALWAYS | FA_WRITE);
+  fr = f_open(&fil, (char*)sd_log_filename, FA_OPEN_ALWAYS | FA_WRITE);
   if(fr == FR_OK)
-  {    
+  {
     /*##-4- Prepare to append data to the text file ################################*/
     fr = f_lseek(&fil, f_size(&fil));
     if(fr == FR_OK)
     {
       /*##-5- Write data to the text file ################################*/
-      fr = f_write(&fil, wtext, strlen(wtext), (UINT *)&byteswritten);
-      if(fr == FR_OK)
-      {
-        DBG_FATFS("byteswritten = %d\r\n",  byteswritten);
-      }
-      else
+      fr = f_write(&fil, (void*)xLogEntry, sizeof(sd_log_entry_t), (UINT *)&ulBytesWritten);
+      if ((fr != FR_OK) || (ulBytesWritten != sizeof(sd_log_entry_t)))
       {
         DBG_FATFS("f_write (fr = %d)\r\n",  fr);
+        DBG_FATFS("ulBytesWritten = %d\r\n",  ulBytesWritten);
       }
     }
     else
@@ -2397,19 +2433,23 @@ FRESULT sd_append(char* fn, char* wtext)
   return fr;
 }
 
-FRESULT sd_log(uint8_t data)
+FRESULT sd_log_clear(void)
 {
-  uint8_t buffer[32];
-  snprintf((char*)buffer, sizeof(buffer), "Log entry = %u\r\n", data);
-  return sd_append((char*)sd_log_filename, (char*)buffer);
+  return f_unlink( (char*)sd_log_filename );
 }
 
-FRESULT sd_dump(void)
+FRESULT sd_log_dump(void)
 {
   FRESULT fr;                                 /* FatFs function common result code */
   FIL fil;                                    /* File object */
+  uint32_t ulFileSize = 0;
+  uint32_t ulBytesRead = 0;
+  uint32_t ulLogEntries = 0;
+  uint32_t ulLogIndex = 0;
+  uint32_t ulLogEntrySize = sizeof(sd_log_entry_t);
+  sd_log_entry_t xLogEntry;
+
   uint32_t bytesread = 0;                     /* File write/read counts */
-  uint8_t rtext[256];                         /* File read buffer */
 
   DBG_FATFS("File name = %s\r\n",  (char*)sd_log_filename);
 
@@ -2417,22 +2457,37 @@ FRESULT sd_dump(void)
   fr = f_open(&fil, (char*)sd_log_filename, FA_READ);
   if(fr == FR_OK)
   {
-    do
+    ulFileSize = f_size(&fil);
+
+    if ((ulFileSize % ulLogEntrySize) == 0)
     {
-      /*##-8- Read data from the text file ###########################*/
-      fr = f_read(&fil, rtext, sizeof(rtext), (UINT*)&bytesread);
-      if(fr == FR_OK)
+      ulLogEntries = (uint32_t) (ulFileSize % ulLogEntrySize);
+      for (ulLogIndex = 0; ulLogIndex < ulLogEntries; ulLogIndex++)
       {
-        if(bytesread > 0)
+        fr = f_lseek(&fil, ulLogIndex * ulLogEntrySize);
+        if (fr == FR_OK)
         {
-          cli_dump((char*)&rtext[0], bytesread);
+          /*##-8- Read data from the text file ###########################*/
+          fr = f_read(&fil, (void*)&xLogEntry, ulLogEntrySize, (UINT*)&ulBytesRead);
+          if ((fr == FR_OK) && (ulBytesRead == ulLogEntrySize))
+          {
+            sd_log_print(&xLogEntry);
+          }
+          else 
+          {
+            DBG_FATFS("f_read (fr = %d)\r\n",  fr);
+          }
+        }
+        else 
+        {
+          DBG_FATFS("f_lseek (fr = %d)\r\n",  fr);
         }
       }
-      else 
-      {
-        DBG_FATFS("f_read (fr = %d)\r\n",  fr);
-      }
-    } while((bytesread > 0) && (fr == FR_OK));
+    }
+    else 
+    {
+      DBG_FATFS("f_size mismatch (%d %% %d)\r\n", ulFileSize, ulLogEntrySize);
+    }
 
     /*##-6- Close the open text file #################################*/
     fr = f_close(&fil);
@@ -2535,15 +2590,27 @@ void StartSDTask(void const * argument)
           fr = sd_log(queueData);
           if(fr != FR_OK)
           {
+            DBG_FATFS("sd_log failed = %d\r\n", fr);
             state_new = 0;
           }
         }
-        else if(xQueueReceive(dumpQueueHandle, &queueData, 0) == pdTRUE)
+        else if(xQueueReceive(logDumpQueueHandle, &queueData, 0) == pdTRUE)
         {
-          DBG_QUEUE("dumpQueueHandle\r\n");
-          fr = sd_dump();
+          DBG_QUEUE("logDumpQueueHandle\r\n");
+          fr = sd_log_dump();
           if(fr != FR_OK)
           {
+            DBG_FATFS("sd_log failed = %d\r\n", fr);
+            state_new = 0;
+          }
+        }
+        else if(xQueueReceive(logClearQueueHandle, &queueData, 0) == pdTRUE)
+        {
+          DBG_QUEUE("logClearQueueHandle\r\n");
+          fr = sd_log_clear();
+          if(fr != FR_OK)
+          {
+            DBG_FATFS("sd_log_clear failed = %d\r\n", fr);
             state_new = 0;
           }
         }

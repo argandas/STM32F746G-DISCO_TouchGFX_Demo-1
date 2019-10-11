@@ -18,12 +18,18 @@ void LoggerView::tearDownScreen()
 void LoggerView::logButtonPressed()
 {
   int tmpVal = Unicode::atoi(countTxt.getWildcard());
-  touchgfx_printf("MainView::%s = %d\r\n", __FUNCTION__, tmpVal);
+  touchgfx_printf("LoggerView::%s = %d\r\n", __FUNCTION__, tmpVal);
   presenter->v2p_LogData(tmpVal);
 }
 
 void LoggerView::dumpButtonPressed()
 {
-  touchgfx_printf("MainView::%s\r\n", __FUNCTION__);
+  touchgfx_printf("LoggerView::%s\r\n", __FUNCTION__);
   presenter->v2p_DumpData();
+}
+
+void LoggerView::clearButtonPressed()
+{
+  touchgfx_printf("LoggerView::%s\r\n", __FUNCTION__);
+  presenter->v2p_ClearData();
 }
