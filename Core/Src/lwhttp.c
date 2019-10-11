@@ -30,6 +30,7 @@ static BaseType_t lwhttp_message_put_message_header(lwhttp_message_t* message, c
 static BaseType_t lwhttp_message_get_message_body(lwhttp_message_t* message, char** dest, uint16_t* len);
 static BaseType_t lwhttp_message_put_message_body(lwhttp_message_t* message, const char* body, uint16_t len);
 static BaseType_t lwhttp_message_put_eol(lwhttp_request_t* message);
+static BaseType_t lwhttp_message_put_nul(lwhttp_request_t* message);
 
 /* LwHTTP Auxiliar functions */
 static BaseType_t lwhttp_token_set(lwhttp_token_t* token, const char* src, uint16_t len);
@@ -516,6 +517,7 @@ static BaseType_t lwhttp_message_put_ext(lwhttp_message_t* message, const char* 
     {
       if ((message->builder_state == LwHHTP_BUILDER_IN_PROGRESS) && (src == NULL) && (len == 0))
       {
+        lwhttp_message_put_nul(message);
         lwhttp_parser_set_state(message, LwHHTP_PARSER_READY);
         lwhttp_builder_set_state(message, LwHHTP_BUILDER_FINISHED);
         xReturn = errOK;
@@ -851,6 +853,8 @@ static BaseType_t lwhttp_message_put_message_body(lwhttp_message_t* message, con
 
       if (xReturn == errOK)
       {
+        /* NULL terminate the buff */
+        lwhttp_message_put_nul(message);
         lwhttp_builder_set_state(message, LwHHTP_BUILDER_FINISHED);
         lwhttp_parser_set_state(message, LwHHTP_PARSER_READY);
       }
@@ -881,4 +885,16 @@ BaseType_t lwhttp_request_put_eol(lwhttp_request_t* request)
 static BaseType_t lwhttp_message_put_eol(lwhttp_request_t* message)
 {
   return lwhttp_message_put_int(message, LwHTTP_eol_string, strlen(LwHTTP_eol_string));
+}
+
+static BaseType_t lwhttp_message_put_nul(lwhttp_request_t* message)
+{
+  BaseType_t xReturn = errNOK;
+  xReturn = lwhttp_message_put(message, "\0", 1);
+  if (xReturn == errOK)
+  {
+    /* Decrease Buffer Length */
+   // message->buffer.len--;
+  }
+  return xReturn;
 }

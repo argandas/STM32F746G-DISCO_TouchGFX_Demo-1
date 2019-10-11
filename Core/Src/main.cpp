@@ -223,7 +223,7 @@ void http_print_msg(lwhttp_message_t* msg);
 
 static BaseType_t jsoneq(const char *json, const jsmntok_t * const pxTok, const char *s);
 
-BaseType_t post_thingspeak(void);
+BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr, uint8_t data);
 BaseType_t parse_thingspeak_rsp(char* src, uint16_t len);
 
 FRESULT sd_scan_files(char* path);
@@ -1652,8 +1652,6 @@ BaseType_t post_thingspeak(lwhttp_request_t* req_ptr, lwhttp_response_t* rsp_ptr
     {
       DBG_LWIP("HTTP Request = %d bytes\r\n", temp_buf_data_len);
     }
-
-    http_print_msg((lwhttp_message_t*)req_ptr);
 
     /* LwIP Connect TCP */
     conn = netconn_new(NETCONN_TCP);       
