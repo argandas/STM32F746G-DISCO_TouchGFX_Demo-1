@@ -53,12 +53,13 @@ LoggerViewBase::LoggerViewBase() :
     countTxt.setWildcard(countTxtBuffer);
     countTxt.setTypedText(TypedText(T_NUMBERTEXT));
 
-    rngButton.setBitmaps(Bitmap(BITMAP_SMALL_BTN_ID), Bitmap(BITMAP_SMALL_BTN_PRESSED_ID));
-    rngButton.setBitmapXY(0, 0);
-    rngButton.setText(TypedText(T_SINGLEUSEID18));
-    rngButton.setTextPosition(0, 19, 100, 56);
-    rngButton.setTextColors(touchgfx::Color::getColorFrom24BitRGB(70, 70, 70), touchgfx::Color::getColorFrom24BitRGB(231, 154, 9));
-    rngButton.setPosition(25, 200, 100, 56);
+    sentButton.setBitmaps(Bitmap(BITMAP_SMALL_BTN_ID), Bitmap(BITMAP_SMALL_BTN_PRESSED_ID));
+    sentButton.setBitmapXY(0, 0);
+    sentButton.setText(TypedText(T_SINGLEUSEID18));
+    sentButton.setTextPosition(0, 19, 100, 56);
+    sentButton.setTextColors(touchgfx::Color::getColorFrom24BitRGB(70, 70, 70), touchgfx::Color::getColorFrom24BitRGB(231, 154, 9));
+    sentButton.setPosition(25, 200, 100, 56);
+    sentButton.setAction(flexButtonCallback);
 
     add(backgroundImage);
     add(flexButton1_1);
@@ -67,7 +68,7 @@ LoggerViewBase::LoggerViewBase() :
     add(clearLogButton);
     add(counterBackgroundImage);
     add(countTxt);
-    add(rngButton);
+    add(sentButton);
 }
 
 void LoggerViewBase::setupScreen()
@@ -105,8 +106,11 @@ void LoggerViewBase::flexButtonCallbackHandler(const touchgfx::AbstractButtonCon
         //Call clearButtonPressed
         clearButtonPressed();
     }
-    else if (&src == &rngButton)
+    else if (&src == &sentButton)
     {
-
+        //sentBtnInteraction
+        //When sentButton clicked call virtual function
+        //Call sentButtonPressed
+        sentButtonPressed();
     }
 }

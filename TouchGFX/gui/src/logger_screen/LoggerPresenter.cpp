@@ -28,6 +28,12 @@ void LoggerPresenter::v2p_DumpData(void)
   model->p2m_DumpData();
 }
 
+void LoggerPresenter::v2p_SentData(void)
+{
+  touchgfx_printf("LoggerPresenter::%s: %d\r\n", __FUNCTION__, 0);
+  model->p2m_SentData();
+}
+
 void LoggerPresenter::v2p_ClearData(void)
 {
   touchgfx_printf("LoggerPresenter::%s: %d\r\n", __FUNCTION__, 0);

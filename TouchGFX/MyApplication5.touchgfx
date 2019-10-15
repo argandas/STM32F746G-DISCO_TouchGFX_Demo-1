@@ -741,7 +741,7 @@
                 "ImagePressed": "small_btn_pressed.png"
               }
             ],
-            "Name": "rngButton",
+            "Name": "sentButton",
             "X": 25,
             "Y": 200,
             "Width": 100,
@@ -802,6 +802,18 @@
             },
             "Action": {
               "FunctionName": "clearButtonPressed",
+              "Type": "ActionCustom"
+            }
+          },
+          {
+            "InteractionName": "sentBtnInteraction",
+            "HasCompletedTrigger": false,
+            "Trigger": {
+              "TriggerComponent": "sentButton",
+              "Type": "TriggerClicked"
+            },
+            "Action": {
+              "FunctionName": "sentButtonPressed",
               "Type": "ActionCustom"
             }
           }

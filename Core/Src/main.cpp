@@ -79,11 +79,13 @@
 
 #define SD_LOG_HEADER_SIZE         (sizeof(sd_log_header_t))
 #define SD_LOG_ENTRY_SIZE          (sizeof(sd_log_entry_t))
+#define SD_LOG_PENDING             ((uint8_t) pdFALSE)
+#define SD_LOG_SENT                ((uint8_t) pdTRUE)
 
 typedef struct {
   uint32_t ulCount = 0;
   uint32_t ulPending = 0;
-  uint32_t ulCRC = 0;
+  uint32_t ulIndex = 0;
 } sd_log_header_t;
 
 typedef struct {
@@ -180,6 +182,7 @@ osMessageQId tcpQueueHandle;
 osMessageQId logQueueHandle;
 osMessageQId logDumpQueueHandle;
 osMessageQId logClearQueueHandle;
+osMessageQId logSentQueueHandle;
 osMessageQId getIPQueueHandle;
 osMessageQId setIPQueueHandle;
 osMessageQId cliLoggerQueueHandle;
@@ -249,7 +252,7 @@ FRESULT sd_log(uint32_t data);
 FRESULT sd_log_append(sd_log_entry_t* xLogEntry);
 FRESULT sd_log_dump(void);
 FRESULT sd_log_clear(void);
-void sd_log_print(sd_log_entry_t* xLogEntry);
+void sd_log_entry_print(sd_log_entry_t* xLogEntry);
 
 FRESULT sd_log_mark_sent(uint32_t ulID);
 FRESULT sd_log_header_write(FIL* fp, sd_log_header_t* xHeader);
@@ -257,6 +260,8 @@ FRESULT sd_log_header_read(FIL* fp, sd_log_header_t* xLogHeader);
 FRESULT sd_log_entry_write(FIL* fp, sd_log_entry_t* xLogEntry, uint32_t ulID);
 FRESULT sd_log_entry_read(FIL* fp, sd_log_entry_t* xLogEntry, uint32_t ulID);
 FRESULT sd_log_check(FIL* fp, sd_log_header_t* xHeader);
+FRESULT sd_log_get_pending(sd_log_entry_t* pxEntry);
+
 
 /* USER CODE END PFP */
 
@@ -359,32 +364,12 @@ int main(void)
   osThreadDef(sdTask, StartSDTask, osPriorityAboveNormal, 0, configMINIMAL_STACK_SIZE * 8);
   sdTaskHandle = osThreadCreate(osThread(sdTask), NULL);
 
-#if 0
-  /* definition and creation of lwipTask */
-  osThreadDef(lwipTask, StartLWIPTask, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 4);
-  lwipTaskHandle = osThreadCreate(osThread(lwipTask), (void*)&gnetif);
-
-  /* definition and creation of dhcpTask */
-  osThreadDef(dhcpTask, StartDHCPTask, osPriorityHigh, 0, configMINIMAL_STACK_SIZE * 2);
-  dhcpTaskHandle = osThreadCreate(osThread(dhcpTask), (void*)&gnetif);
-#endif
-
   /* USER CODE BEGIN RTOS_THREADS */
     /* add threads, ... */
 
   /* definition and creation of httpClientTask */
   osThreadDef(httpClientTask, Start_HTTP_Client_Task, osPriorityHigh, 0, configMINIMAL_STACK_SIZE * 8);
   httpClientTaskHandle = osThreadCreate(osThread(httpClientTask), (void*)&gnetif);
-  
-#if 0
-  /* definition and creation of httpServerTask */
-  osThreadDef(httpServerTask, Start_HTTP_Server_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 8);
-  httpServerTaskHandle = osThreadCreate(osThread(httpServerTask), (void*)&gnetif);
-
-    /* definition and creation of SDLoggerTask */
-  osThreadDef(SDLoggerTask, Start_SD_Logger_Task, osPriorityNormal, 0, configMINIMAL_STACK_SIZE * 8);
-  SDLoggerTaskHandle = osThreadCreate(osThread(SDLoggerTask), NULL);
-#endif
   
   /* USER CODE END RTOS_THREADS */
 
@@ -412,6 +397,10 @@ int main(void)
   /* definition and creation of clearQueue */
   osMessageQDef(clearQueue, 8, uint16_t);
   logClearQueueHandle = osMessageCreate(osMessageQ(clearQueue), NULL);
+
+  /* definition and creation of sentQueue */
+  osMessageQDef(sentQueue, 8, uint16_t);
+  logSentQueueHandle = osMessageCreate(osMessageQ(sentQueue), NULL);
 
   /* definition and creation of getIPQueue */
   osMessageQDef(getIPQueue, 1, uint16_t);
@@ -1558,11 +1547,7 @@ FRESULT read_file_sector(FIL* file, void* dest, FSIZE_t len, UINT* bytesread, UI
       }
     }
     
-    fr = f_close(file);
-    if(fr != FR_OK)
-    {
-      DBG_FATFS("f_close (fr = %d)\r\n",  fr);
-    }
+    f_close(file);
   }
   
   return fr;
@@ -2007,6 +1992,17 @@ void Start_HTTP_Client_Task(void const * argument)
           {
             DBG_QUEUE("tcpQueueHandle: %d\r\n", queueData);
 
+            sd_log_entry_t xEntry;
+
+            if (FR_OK == sd_log_get_pending(&xEntry))
+            {
+              queueData = (uint8_t)xEntry.ulData;
+            }
+            else
+            {
+              DBG_LWIP("Failed to get pending!");
+            }
+
             /* LwHTTP Inits */
             lwhttp_request_init(&client_request);
             lwhttp_response_init(&client_response);  
@@ -2029,6 +2025,8 @@ void Start_HTTP_Client_Task(void const * argument)
                 DBG_LWIP("Failed to parse response! (ret = %d)\r\n", xResultHTTP);
               }
               http_print_msg((lwhttp_message_t*)&client_response);
+
+              sd_log_mark_sent(xEntry.ulID);
 
 #if 0
               /* If HTTP Status Code is OK (200) and Content-Type is JSON */
@@ -2324,7 +2322,6 @@ void StartButtonTask(void const * argument)
   
   BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
   
-
   RTOS_TASK_READY();
   /* Infinite loop */
   for(;;)
@@ -2387,7 +2384,7 @@ FRESULT sd_log(uint32_t ulData)
   FRESULT fr;
   sd_log_entry_t xLogEntry;
 
-  xLogEntry.ucStatus = (uint8_t)pdFALSE;
+  xLogEntry.ucStatus = SD_LOG_PENDING;
   xLogEntry.ulData = ulData;
 
   fr = sd_log_append(&xLogEntry);
@@ -2397,22 +2394,89 @@ FRESULT sd_log(uint32_t ulData)
   }
   else
   {
-    sd_log_print(&xLogEntry);
+    sd_log_entry_print(&xLogEntry);
   }
 
   return fr;
 }
 
-void sd_log_print(sd_log_entry_t* xLogEntry)
+void sd_log_entry_print(sd_log_entry_t* xLogEntry)
 {
   if (xLogEntry != NULL)
   {
-    cli_printf("[0x%02X], Status = %d, Data = %d\r\n", 
+    DBG_FATFS("Log entry [0x%04X] Status = %d, Data = %d\r\n", 
       xLogEntry->ulID, 
       xLogEntry->ucStatus, 
       xLogEntry->ulData
     );
   }
+}
+
+void sd_log_header_print(sd_log_header_t* xLogHeader)
+{
+  if (xLogHeader != NULL)
+  {
+    DBG_FATFS("Log header: Count = %d, Pending = %d, Index = %d\r\n", 
+      xLogHeader->ulCount, 
+      xLogHeader->ulPending, 
+      xLogHeader->ulIndex
+    );
+  }
+}
+
+FRESULT sd_log_get_pending(sd_log_entry_t* pxEntry)
+{
+  FRESULT fr;                                 /* FatFs function common result code */
+  FIL fil;                                    /* File object */
+  uint32_t ulLogIndex = 0;
+  sd_log_header_t xLogHeader;
+
+  /*##-7- Open the text file object with read access ###############*/
+  fr = f_open(&fil, (char*)sd_log_filename, FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
+  if(fr == FR_OK)
+  {
+    fr = sd_log_check(&fil, &xLogHeader);
+    if (FR_OK == fr)
+    {
+      if (0 < xLogHeader.ulPending)
+      {
+        for (ulLogIndex = xLogHeader.ulIndex; ulLogIndex < xLogHeader.ulCount; ulLogIndex++)
+        {
+          /*##-8- Read data from the text file ###########################*/
+          fr = sd_log_entry_read(&fil, pxEntry, ulLogIndex);
+          if ((fr == FR_OK) && (pxEntry->ucStatus == SD_LOG_PENDING))
+          {
+            DBG_FATFS("Log Entry Pending: ID = %d\r\n", pxEntry->ulID);
+
+            /* Set index */
+            xLogHeader.ulIndex = pxEntry->ulID;
+            fr = sd_log_header_write(&fil, &xLogHeader);
+            break;
+          }
+          else
+          {
+            fr = FR_DENIED;
+          }
+        }
+      }
+      else
+      {
+        fr = FR_DENIED;
+      }
+    }
+    else
+    {
+      DBG_FATFS("fr = %d\r\n", fr);
+    }
+
+    f_close(&fil);
+  }
+  else
+  {
+    DBG_FATFS("f_open (fr = %d)\r\n",  fr);
+  }
+  
+  return fr;
 }
 
 FRESULT sd_log_mark_sent(uint32_t ulID)
@@ -2423,13 +2487,13 @@ FRESULT sd_log_mark_sent(uint32_t ulID)
   sd_log_entry_t xLogEntry;
 
   /* Open log file */
-  fr = f_open(&fil, (char*)sd_log_filename, FA_OPEN_ALWAYS | FA_WRITE);
+  fr = f_open(&fil, (char*)sd_log_filename, FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
   if(fr == FR_OK)
   {
     /* Check log file integrity */
     fr = sd_log_check(&fil, &xLogHeader);
     if (fr == FR_OK)
-    {
+    {      
       /* Check if ID exists */
       if (ulID <= xLogHeader.ulCount)
       {
@@ -2439,10 +2503,12 @@ FRESULT sd_log_mark_sent(uint32_t ulID)
           /* ID Matches and not already marked as sent */
           if ((xLogEntry.ulID == ulID) && (xLogEntry.ucStatus == 0))
           {
-            xLogEntry.ucStatus = 1;
-            fr = sd_log_entry_write(&fil, &xLogEntry, ulID);
+            xLogEntry.ucStatus = SD_LOG_SENT;
+            fr = sd_log_entry_write(&fil, &xLogEntry, xLogEntry.ulID);
             if(fr == FR_OK)
             {
+              DBG_FATFS("Log Entry Sent: ID = %d\r\n", xLogEntry.ulID);
+
               xLogHeader.ulPending--;
               fr = sd_log_header_write(&fil, &xLogHeader);
             }
@@ -2456,8 +2522,15 @@ FRESULT sd_log_mark_sent(uint32_t ulID)
       else
       {
         /* Invalid ID */
+        fr = FR_DENIED;
       }
     }
+    else
+    {
+      DBG_FATFS("fr = %d\r\n", fr);
+    }
+
+    f_close(&fil);
   }
   return fr;
 }
@@ -2475,6 +2548,7 @@ FRESULT sd_log_header_write(FIL* fp, sd_log_header_t* xHeader)
     {
       DBG_FATFS("fr = %d, bytes = %d\r\n", fr, ulBytesWritten);
     }
+    f_sync(fp);    
   }
   else 
   {
@@ -2486,7 +2560,7 @@ FRESULT sd_log_header_write(FIL* fp, sd_log_header_t* xHeader)
 
 FRESULT sd_log_header_read(FIL* fp, sd_log_header_t* xLogHeader)
 {
-  FRESULT fr;  
+  FRESULT fr = FR_OK;  
   uint32_t ulBytesRead = 0;                   /* File write/read counts */
 
   fr = f_lseek(fp, 0);
@@ -2512,7 +2586,7 @@ FRESULT sd_log_entry_write(FIL* fp, sd_log_entry_t* xLogEntry, uint32_t ulID)
   uint32_t ulBytesWritten = 0;                   /* File write/read counts */
   uint32_t ulOffset = 0;
 
-  if (ulID = 0xFFFFFFFF)
+  if (0xFFFFFFFF == ulID)
   {
     ulOffset = f_size(fp);
   }
@@ -2529,6 +2603,7 @@ FRESULT sd_log_entry_write(FIL* fp, sd_log_entry_t* xLogEntry, uint32_t ulID)
     {
       DBG_FATFS("fr = %d, bytes = %d\r\n", fr, ulBytesWritten);
     }
+    f_sync(fp);
   }
   else 
   {
@@ -2567,7 +2642,7 @@ FRESULT sd_log_append(sd_log_entry_t* xLogEntry)
   sd_log_header_t xLogHeader;
 
   /*##-3- Create and Open a new text file object with write access #####*/
-  fr = f_open(&fil, (char*)sd_log_filename, FA_OPEN_ALWAYS | FA_WRITE);
+  fr = f_open(&fil, (char*)sd_log_filename, FA_OPEN_ALWAYS | FA_WRITE | FA_READ);
   if(fr == FR_OK)
   {
     fr = sd_log_check(&fil, &xLogHeader);
@@ -2586,13 +2661,13 @@ FRESULT sd_log_append(sd_log_entry_t* xLogEntry)
         fr = sd_log_header_write(&fil, &xLogHeader);
       }
     }
+    else
+    {
+      DBG_FATFS("fr = %d\r\n", fr);
+    }
 
     /*##-6- Close the open text file #################################*/
-    fr = f_close(&fil);
-    if(fr != FR_OK)
-    {
-      DBG_FATFS("f_close (fr = %d)\r\n",  fr);
-    }
+    f_close(&fil);
   }
   else
   {
@@ -2612,16 +2687,15 @@ FRESULT sd_log_check(FIL* fp, sd_log_header_t* xHeader)
   FRESULT fr;                                 /* FatFs function common result code */
   uint32_t ulFileSize = 0;
   uint32_t ulLogEntries = 0;
-  sd_log_header_t xLogHeader;
 
   ulFileSize = f_size(fp);
 
   if (0 == ulFileSize)
   {
-    xLogHeader.ulCount = 0;
-    xLogHeader.ulPending = 0;
-    xLogHeader.ulCRC = 0;
-    sd_log_header_write(fp, &xLogHeader);
+    xHeader->ulCount = 0;
+    xHeader->ulPending = 0;
+    xHeader->ulIndex = 0;
+    fr = sd_log_header_write(fp, xHeader);
   }
   else
   {
@@ -2641,6 +2715,10 @@ FRESULT sd_log_check(FIL* fp, sd_log_header_t* xHeader)
           DBG_FATFS("Header count mismatch (%d != %d)\r\n", xHeader->ulCount, ulLogEntries);
         }
       }
+      else
+      {
+        DBG_FATFS("fr = %d\r\n", fr);
+      }
     }
     else
     {
@@ -2652,7 +2730,6 @@ FRESULT sd_log_check(FIL* fp, sd_log_header_t* xHeader)
   return fr;
 }
 
-
 FRESULT sd_log_dump(void)
 {
   FRESULT fr;                                 /* FatFs function common result code */
@@ -2663,24 +2740,27 @@ FRESULT sd_log_dump(void)
   sd_log_header_t xLogHeader;
   sd_log_entry_t xLogEntry;
 
-  uint32_t bytesread = 0;                     /* File write/read counts */
-
   DBG_FATFS("File name = %s\r\n",  (char*)sd_log_filename);
 
   /*##-7- Open the text file object with read access ###############*/
-  fr = f_open(&fil, (char*)sd_log_filename, FA_READ);
+  fr = f_open(&fil, (char*)sd_log_filename, FA_OPEN_ALWAYS | FA_READ | FA_WRITE);
   if(fr == FR_OK)
   {
+    DBG_FATFS("File size = %d bytes\r\n", f_size(&fil));
+
     fr = sd_log_check(&fil, &xLogHeader);
     if (FR_OK == fr)
     {
+      sd_log_header_print(&xLogHeader);
+
       for (ulLogIndex = 0; ulLogIndex < xLogHeader.ulCount; ulLogIndex++)
       {
         /*##-8- Read data from the text file ###########################*/
         fr = sd_log_entry_read(&fil, &xLogEntry, ulLogIndex);
         if (fr == FR_OK)
         {
-          sd_log_print(&xLogEntry);
+          sd_log_entry_print(&xLogEntry);
+          osDelay(10);
         }
         else 
         {
@@ -2688,13 +2768,12 @@ FRESULT sd_log_dump(void)
         }        
       }
     }
-
-    /*##-6- Close the open text file #################################*/
-    fr = f_close(&fil);
-    if(fr != FR_OK)
+    else
     {
-      DBG_FATFS("f_close (fr = %d)\r\n",  fr);
+      DBG_FATFS("fr = %d\r\n", fr);
     }
+
+    f_close(&fil);
   }
   else
   {
@@ -2767,59 +2846,70 @@ void StartSDTask(void const * argument)
       break;
       case 1:
       {
-        /* Get random number */
-        HAL_RNG_GenerateRandomNumber(&hrng, &rng_value);
-
-        /* Add to file */
-        fr = sd_log((uint32_t)(rng_value % 10));
-        if(fr != FR_OK)
-        {
-          state_new = 0;
-        }
-        else
-        {
-          state_new = 2;
-        }
+        /* Idle */
       }
       break;
-      case 2:
-      {
-        if(xQueueReceive(logQueueHandle, &queueData, 0) == pdTRUE)
-        {
-          DBG_QUEUE("logQueueHandle: %d\r\n", queueData);
-          fr = sd_log((uint32_t)queueData);
-          if(fr != FR_OK)
-          {
-            DBG_FATFS("sd_log failed = %d\r\n", fr);
-            state_new = 0;
-          }
-        }
-        else if(xQueueReceive(logDumpQueueHandle, &queueData, 0) == pdTRUE)
-        {
-          DBG_QUEUE("logDumpQueueHandle\r\n");
-          fr = sd_log_dump();
-          if(fr != FR_OK)
-          {
-            DBG_FATFS("sd_log failed = %d\r\n", fr);
-            state_new = 0;
-          }
-        }
-        else if(xQueueReceive(logClearQueueHandle, &queueData, 0) == pdTRUE)
-        {
-          DBG_QUEUE("logClearQueueHandle\r\n");
-          fr = sd_log_clear();
-          if(fr != FR_OK)
-          {
-            DBG_FATFS("sd_log_clear failed = %d\r\n", fr);
-            state_new = 0;
-          }
-        }
-      }
       break;
       default:
       break;
     }
-    osDelay(10);
+
+    if(xQueueReceive(logQueueHandle, &queueData, 0) == pdTRUE)
+    {
+      // DBG_QUEUE("logQueueHandle: %d\r\n", queueData);
+#if 1      
+      /* Get random number */
+      HAL_RNG_GenerateRandomNumber(&hrng, &rng_value);
+
+      /* Add to file */
+      fr = sd_log((uint32_t)(rng_value % 40));
+#else
+      fr = sd_log((uint32_t)queueData);
+#endif
+      if(fr != FR_OK)
+      {
+        DBG_FATFS("sd_log failed = %d\r\n", fr);
+        state_new = 0;
+      }
+    }
+    else if(xQueueReceive(logDumpQueueHandle, &queueData, 0) == pdTRUE)
+    {
+      // DBG_QUEUE("logDumpQueueHandle\r\n");
+      fr = sd_log_dump();
+      if(fr != FR_OK)
+      {
+        DBG_FATFS("sd_log failed = %d\r\n", fr);
+        state_new = 0;
+      }
+    }
+    else if(xQueueReceive(logSentQueueHandle, &queueData, 0) == pdTRUE)
+    {
+      DBG_QUEUE("logSentQueueHandle\r\n");
+      /* Get random number */
+      sd_log_entry_t xEntry;
+
+      if (FR_OK == sd_log_get_pending(&xEntry))
+      {
+        if(FR_OK != sd_log_mark_sent(xEntry.ulID))
+        {
+          DBG_FATFS("sd_log_mark_sent failed = %d\r\n", fr);
+          state_new = 0;
+        }
+      }
+
+    }
+    else if(xQueueReceive(logClearQueueHandle, &queueData, 0) == pdTRUE)
+    {
+      // DBG_QUEUE("logClearQueueHandle\r\n");
+      fr = sd_log_clear();
+      if(fr != FR_OK)
+      {
+        DBG_FATFS("sd_log_clear failed = %d\r\n", fr);
+        state_new = 0;
+      }
+    }
+
+    osDelay(100);
   }
 
   /* USER CODE END StartSDTask */

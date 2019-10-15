@@ -28,6 +28,12 @@ void LoggerView::dumpButtonPressed()
   presenter->v2p_DumpData();
 }
 
+void LoggerView::sentButtonPressed()
+{
+  touchgfx_printf("LoggerView::%s\r\n", __FUNCTION__);
+  presenter->v2p_SentData();
+}
+
 void LoggerView::clearButtonPressed()
 {
   touchgfx_printf("LoggerView::%s\r\n", __FUNCTION__);

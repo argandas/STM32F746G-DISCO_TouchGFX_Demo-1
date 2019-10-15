@@ -37,6 +37,11 @@ public:
         // Override and implement this function in LoggerView
     }
 
+    virtual void sentButtonPressed()
+    {
+        // Override and implement this function in LoggerView
+    }
+
 protected:
     FrontendApplication& application() {
         return *static_cast<FrontendApplication*>(Application::getInstance());
@@ -52,7 +57,7 @@ protected:
     touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > clearLogButton;
     touchgfx::Image counterBackgroundImage;
     touchgfx::TextAreaWithOneWildcard countTxt;
-    touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > rngButton;
+    touchgfx::TextButtonStyle< touchgfx::ImageButtonStyle< touchgfx::ClickButtonTrigger > > sentButton;
 
     /*
      * Wildcard Buffers

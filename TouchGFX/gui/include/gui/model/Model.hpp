@@ -41,6 +41,7 @@ public:
     void p2m_SendTCPData(int data);
     void p2m_LogData(int data);
     void p2m_DumpData(void);
+    void p2m_SentData(void);
     void p2m_ClearData(void);
     void p2m_getIPAddress(void);
         

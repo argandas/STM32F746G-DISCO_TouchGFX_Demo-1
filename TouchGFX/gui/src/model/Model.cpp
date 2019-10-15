@@ -12,6 +12,7 @@ extern osMessageQId tcpQueueHandle;
 extern osMessageQId logQueueHandle;
 extern osMessageQId logDumpQueueHandle;
 extern osMessageQId logClearQueueHandle;
+extern osMessageQId logSentQueueHandle;
 extern osMessageQId getIPQueueHandle;
 extern osMessageQId setIPQueueHandle;
 #endif
@@ -76,6 +77,16 @@ void Model::p2m_DumpData(void)
   touchgfx_printf("Model::%s: %u\r\n\r\n", __FUNCTION__, u8Data);
 #else
   xQueueSend(logDumpQueueHandle, &u8Data, 0);
+#endif
+}
+
+void Model::p2m_SentData(void)
+{
+  uint8_t u8Data = 0;
+#ifdef SIMULATOR
+  touchgfx_printf("Model::%s: %u\r\n\r\n", __FUNCTION__, u8Data);
+#else
+  xQueueSend(logSentQueueHandle, &u8Data, 0);
 #endif
 }
 
