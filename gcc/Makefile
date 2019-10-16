@@ -245,8 +245,9 @@ board_c_files += \
 	$(Middlewares_path)/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.c
 
 board_c_files += \
-	Core/Src/jsmn.c \
+	JSMN/src/jsmn.c \
 	LWHTTP/src/lwhttp.c \
+	SDLOG/src/sdlog.c \
 
 board_c_files += \
     $(Middlewares_path)/Third_Party/FatFs/src/diskio.c \
@@ -368,6 +369,8 @@ board_include_paths := \
 	FATFS/App \
 	FATFS/Target \
 	LWHTTP/inc \
+	SDLOG/inc \
+	JSMN/inc \
 	$(Middlewares_path)/Third_Party/FatFs/src \
 	$(Middlewares_path)/Third_Party/FatFs/src/option \
 	Core/Inc
