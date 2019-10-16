@@ -246,7 +246,7 @@ board_c_files += \
 
 board_c_files += \
 	Core/Src/jsmn.c \
-	Core/Src/lwhttp.c \
+	LWHTTP/src/lwhttp.c \
 
 board_c_files += \
     $(Middlewares_path)/Third_Party/FatFs/src/diskio.c \
@@ -367,6 +367,7 @@ board_include_paths := \
 	LWIP/Target \
 	FATFS/App \
 	FATFS/Target \
+	LWHTTP/inc \
 	$(Middlewares_path)/Third_Party/FatFs/src \
 	$(Middlewares_path)/Third_Party/FatFs/src/option \
 	Core/Inc
