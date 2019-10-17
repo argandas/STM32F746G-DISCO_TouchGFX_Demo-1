@@ -1965,7 +1965,7 @@ void Start_HTTP_Client_Task(void const * argument)
             }
             else
             {
-              DBG_LWIP("Failed to get pending!");
+              DBG_LWIP("Failed to get pending!\r\n");
             }
 
             /* LwHTTP Inits */
@@ -2364,11 +2364,11 @@ void StartSDTask(void const * argument)
   uint8_t state = 0;
   uint8_t state_new = 0;
 
+  uint8_t ucSDState_cur = 0;
+  uint8_t ucSDState_old = 0;
+
   /* Queue PV */
   uint8_t queueData = 0;
-
-  /* init code for FATFS */
-  MX_FATFS_Init();
 
   RTOS_TASK_READY();
 
@@ -2384,7 +2384,7 @@ void StartSDTask(void const * argument)
     switch(state){
       case 0:
       {
-        /*##-1- Link the micro SD disk I/O driver ##################################*/
+        MX_FATFS_Init();
         ret = BSP_SD_Init();
         if(ret == MSD_OK)
         {
@@ -2416,67 +2416,89 @@ void StartSDTask(void const * argument)
       break;
       case 1:
       {
-        /* Idle */
+        /* Check if the SD card is plugged in the slot */
+        ucSDState_cur = BSP_SD_IsDetected();
+        if (ucSDState_cur != SD_PRESENT)
+        {
+          if(ucSDState_old != SD_NOT_PRESENT)
+          {
+            ucSDState_old = SD_NOT_PRESENT; 
+            state_new = 2;
+            DBG_FATFS("SD is Not Detected (state = %d)\r\n",  ucSDState_cur);
+          }
+        }
+        else
+        {
+          if(ucSDState_old != SD_PRESENT)
+          {
+            ucSDState_old = SD_PRESENT;
+            DBG_FATFS("SD has been Detected (state = %d)\r\n",  ucSDState_old);
+          }
+
+          if(xQueueReceive(logQueueHandle, &queueData, 0) == pdTRUE)
+          {
+            DBG_QUEUE("logQueueHandle: %d\r\n", queueData);
+            HAL_RNG_GenerateRandomNumber(&hrng, &rng_value);
+            fr = sd_log((uint32_t)(rng_value % 40));
+            if(fr != FR_OK)
+            {
+              DBG_FATFS("sd_log failed = %d\r\n", fr);
+              state_new = 2;
+            }
+          }
+          else if(xQueueReceive(logDumpQueueHandle, &queueData, 0) == pdTRUE)
+          {
+            DBG_QUEUE("logDumpQueueHandle\r\n");
+            fr = sd_log_dump();
+            if(fr != FR_OK)
+            {
+              DBG_FATFS("sd_log failed = %d\r\n", fr);
+              state_new = 2;
+            }
+          }
+          else if(xQueueReceive(logSentQueueHandle, &queueData, 0) == pdTRUE)
+          {
+            DBG_QUEUE("logSentQueueHandle\r\n");
+            sd_log_entry_t xEntry;
+            if (FR_OK == sd_log_entry_get_pending(&xEntry))
+            {
+              if(FR_OK != sd_log_entry_set_sent(xEntry.ulID))
+              {
+                DBG_FATFS("sd_log_entry_set_sent failed = %d\r\n", fr);
+                state_new = 2;
+              }
+            }
+          }
+          else if(xQueueReceive(logClearQueueHandle, &queueData, 0) == pdTRUE)
+          {
+            DBG_QUEUE("logClearQueueHandle\r\n");
+            fr = sd_log_clear();
+            if(fr != FR_OK)
+            {
+              DBG_FATFS("sd_log_clear failed = %d\r\n", fr);
+              state_new = 2;
+            }
+          }
+        }
       }
       break;
+      case 2:
+      {
+        /* Teardown */
+        #if 0
+        ret = BSP_SD_DeInit();
+        if(ret != MSD_OK)
+        {
+          DBG_FATFS("BSP_SD_DeInit (ret = %d)\r\n",  ret);
+        }
+        #endif
+
+        FATFS_UnLinkDriver(SDPath);
+        state_new = 0;
+      }
       break;
       default:
       break;
-    }
-
-    if(xQueueReceive(logQueueHandle, &queueData, 0) == pdTRUE)
-    {
-      // DBG_QUEUE("logQueueHandle: %d\r\n", queueData);
-#if 1      
-      /* Get random number */
-      HAL_RNG_GenerateRandomNumber(&hrng, &rng_value);
-
-      /* Add to file */
-      fr = sd_log((uint32_t)(rng_value % 40));
-#else
-      fr = sd_log((uint32_t)queueData);
-#endif
-      if(fr != FR_OK)
-      {
-        DBG_FATFS("sd_log failed = %d\r\n", fr);
-        state_new = 0;
-      }
-    }
-    else if(xQueueReceive(logDumpQueueHandle, &queueData, 0) == pdTRUE)
-    {
-      // DBG_QUEUE("logDumpQueueHandle\r\n");
-      fr = sd_log_dump();
-      if(fr != FR_OK)
-      {
-        DBG_FATFS("sd_log failed = %d\r\n", fr);
-        state_new = 0;
-      }
-    }
-    else if(xQueueReceive(logSentQueueHandle, &queueData, 0) == pdTRUE)
-    {
-      DBG_QUEUE("logSentQueueHandle\r\n");
-      /* Get random number */
-      sd_log_entry_t xEntry;
-
-      if (FR_OK == sd_log_entry_get_pending(&xEntry))
-      {
-        if(FR_OK != sd_log_entry_set_sent(xEntry.ulID))
-        {
-          DBG_FATFS("sd_log_entry_set_sent failed = %d\r\n", fr);
-          state_new = 0;
-        }
-      }
-
-    }
-    else if(xQueueReceive(logClearQueueHandle, &queueData, 0) == pdTRUE)
-    {
-      // DBG_QUEUE("logClearQueueHandle\r\n");
-      fr = sd_log_clear();
-      if(fr != FR_OK)
-      {
-        DBG_FATFS("sd_log_clear failed = %d\r\n", fr);
-        state_new = 0;
-      }
     }
 
     osDelay(100);
