@@ -343,7 +343,7 @@ static FRESULT sd_log_entry_read(FIL* fp, sd_log_entry_t* xLogEntry, uint32_t ul
       if (ulBytesRead != SD_LOG_ENTRY_SIZE)
       {
         fr = FR_DENIED;
-        DBG_SDLOG("fr = %d, size mismatch (%ld != %ld)\r\n", fr, ulBytesRead, SD_LOG_HEADER_SIZE);
+        DBG_SDLOG("fr = %d, size mismatch (%ld != %ld)\r\n", fr, ulBytesRead, SD_LOG_ENTRY_SIZE);
       }
     }
     else
@@ -383,7 +383,7 @@ static FRESULT sd_log_entry_write(FIL* fp, sd_log_entry_t* xLogEntry, uint32_t u
       if (ulBytesWritten != SD_LOG_ENTRY_SIZE)
       {
         fr = FR_DENIED;
-        DBG_SDLOG("fr = %d, size mismatch (%ld != %ld)\r\n", fr, ulBytesWritten, SD_LOG_HEADER_SIZE);
+        DBG_SDLOG("fr = %d, size mismatch (%ld != %ld)\r\n", fr, ulBytesWritten, SD_LOG_ENTRY_SIZE);
       }
     }
     else
